@@ -1,0 +1,240 @@
+- generic [ref=e5]:
+  - complementary [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e11]: groups
+        - generic [ref=e12]:
+          - heading "Human Resources" [level=1] [ref=e13]
+          - paragraph [ref=e14]: Manajemen SDM
+      - navigation [ref=e15]:
+        - link "home Halaman Utama" [ref=e17] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e18]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e21]: dashboard
+          - text: Dashboard
+        - generic [ref=e22]:
+          - button "database Master Data" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]:
+              - generic [ref=e25]: database
+              - text: Master Data
+            - img [ref=e26]
+          - generic [ref=e28]:
+            - link "domain Divisi" [ref=e29] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e30]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e31] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e32]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e33] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e34]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e35] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e36]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e37] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e38]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e39] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e40]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e41] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e42]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e43] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e44]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e45] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e46]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e47] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e48]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e49]:
+          - button "groups Manajemen Karyawan" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]:
+              - generic [ref=e52]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e53]
+          - link "person Karyawan" [ref=e56] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e57]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e59] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e60]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e62] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e63]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e64]:
+    - banner [ref=e65]:
+      - generic [ref=e66]:
+        - heading "Human Resources" [level=2] [ref=e67]
+        - navigation [ref=e68]:
+          - link "Direktori" [ref=e69] [cursor=pointer]:
+            - /url: "#"
+          - link "Organisasi" [ref=e70] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e74]
+        - generic [ref=e75]:
+          - button "apps" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: apps
+          - button "notifications" [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: notifications
+          - button "settings" [ref=e81] [cursor=pointer]:
+            - generic [ref=e82]: settings
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: "1234567890123456"
+            - generic [ref=e87]: Super Administrator
+          - button "person" [ref=e89] [cursor=pointer]:
+            - generic [ref=e90]: person
+    - main [ref=e91]:
+      - generic [ref=e94]:
+        - generic [ref=e96]:
+          - heading "Master Data Lokasi Kerja" [level=1] [ref=e97]
+          - paragraph [ref=e98]: Kelola data lokasi kerja karyawan
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - generic:
+                - img
+              - textbox "Cari data..." [ref=e102]
+            - generic [ref=e103]:
+              - generic:
+                - img
+              - combobox [ref=e104]:
+                - option "Semua Status" [selected]
+                - option "Aktif"
+                - option "Tidak Aktif"
+          - button "Tambah Lokasi" [ref=e105] [cursor=pointer]:
+            - img [ref=e106]
+            - text: Tambah Lokasi
+        - generic [ref=e109]:
+          - button "list" [ref=e110] [cursor=pointer]:
+            - generic [ref=e111]: list
+          - button "view_list" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: view_list
+          - button "view_headline" [ref=e114] [cursor=pointer]:
+            - generic [ref=e115]: view_headline
+          - button "grid_view" [ref=e116] [cursor=pointer]:
+            - generic [ref=e117]: grid_view
+          - button "fullscreen" [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: fullscreen
+          - button "table_rows" [ref=e120] [cursor=pointer]:
+            - generic [ref=e121]: table_rows
+          - button "vertical_split" [ref=e122] [cursor=pointer]:
+            - generic [ref=e123]: vertical_split
+        - generic [ref=e124]:
+          - table [ref=e126]:
+            - rowgroup [ref=e127]:
+              - row "No Code Kode Site Nama Lokasi Alamat Status Aksi" [ref=e128]:
+                - columnheader "No" [ref=e129]
+                - columnheader "Code" [ref=e130]
+                - columnheader "Kode Site" [ref=e131]
+                - columnheader "Nama Lokasi" [ref=e132]
+                - columnheader "Alamat" [ref=e133]
+                - columnheader "Status" [ref=e134]
+                - columnheader "Aksi" [ref=e135]
+            - rowgroup [ref=e136]:
+              - row "1 LOK-0001 Kantor Pusat Jakarta Aktif" [ref=e137]:
+                - cell "1" [ref=e138]
+                - cell "LOK-0001" [ref=e139]
+                - cell [ref=e140]
+                - cell "Kantor Pusat" [ref=e141]
+                - cell "Jakarta" [ref=e142]
+                - cell "Aktif" [ref=e143]
+                - cell [ref=e144]:
+                  - generic [ref=e145]:
+                    - button [ref=e146] [cursor=pointer]:
+                      - img [ref=e147]
+                    - button [ref=e149] [cursor=pointer]:
+                      - img [ref=e150]
+              - row "2 LOK-0002 Site Jakarta Bekasi Aktif" [ref=e152]:
+                - cell "2" [ref=e153]
+                - cell "LOK-0002" [ref=e154]
+                - cell [ref=e155]
+                - cell "Site Jakarta" [ref=e156]
+                - cell "Bekasi" [ref=e157]
+                - cell "Aktif" [ref=e158]
+                - cell [ref=e159]:
+                  - generic [ref=e160]:
+                    - button [ref=e161] [cursor=pointer]:
+                      - img [ref=e162]
+                    - button [ref=e164] [cursor=pointer]:
+                      - img [ref=e165]
+              - row "3 LOK-0003 Site Bandung Bandung Aktif" [ref=e167]:
+                - cell "3" [ref=e168]
+                - cell "LOK-0003" [ref=e169]
+                - cell [ref=e170]
+                - cell "Site Bandung" [ref=e171]
+                - cell "Bandung" [ref=e172]
+                - cell "Aktif" [ref=e173]
+                - cell [ref=e174]:
+                  - generic [ref=e175]:
+                    - button [ref=e176] [cursor=pointer]:
+                      - img [ref=e177]
+                    - button [ref=e179] [cursor=pointer]:
+                      - img [ref=e180]
+              - row "4 LOK001 Kantor Pusat Jl. Sudirman No. 1, Jakarta Selatan Aktif" [ref=e182]:
+                - cell "4" [ref=e183]
+                - cell "LOK001" [ref=e184]
+                - cell [ref=e185]
+                - cell "Kantor Pusat" [ref=e186]
+                - cell "Jl. Sudirman No. 1, Jakarta Selatan" [ref=e187]
+                - cell "Aktif" [ref=e188]
+                - cell [ref=e189]:
+                  - generic [ref=e190]:
+                    - button [ref=e191] [cursor=pointer]:
+                      - img [ref=e192]
+                    - button [ref=e194] [cursor=pointer]:
+                      - img [ref=e195]
+              - row "5 LOK002 Site Jakarta Jl. Industri No. 5, Bekasi Aktif" [ref=e197]:
+                - cell "5" [ref=e198]
+                - cell "LOK002" [ref=e199]
+                - cell [ref=e200]
+                - cell "Site Jakarta" [ref=e201]
+                - cell "Jl. Industri No. 5, Bekasi" [ref=e202]
+                - cell "Aktif" [ref=e203]
+                - cell [ref=e204]:
+                  - generic [ref=e205]:
+                    - button [ref=e206] [cursor=pointer]:
+                      - img [ref=e207]
+                    - button [ref=e209] [cursor=pointer]:
+                      - img [ref=e210]
+              - row "6 LOK003 Site Bandung Jl. Soekarno Hatta No. 100, Bandung Aktif" [ref=e212]:
+                - cell "6" [ref=e213]
+                - cell "LOK003" [ref=e214]
+                - cell [ref=e215]
+                - cell "Site Bandung" [ref=e216]
+                - cell "Jl. Soekarno Hatta No. 100, Bandung" [ref=e217]
+                - cell "Aktif" [ref=e218]
+                - cell [ref=e219]:
+                  - generic [ref=e220]:
+                    - button [ref=e221] [cursor=pointer]:
+                      - img [ref=e222]
+                    - button [ref=e224] [cursor=pointer]:
+                      - img [ref=e225]
+          - generic [ref=e227]:
+            - button [disabled]:
+              - img
+            - generic [ref=e228]: Halaman 1
+            - button [disabled]:
+              - img

@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+.env
+!frontend/.env
+*.log
+uploads/*
+!uploads/.gitkeep
+backend/dist/
+frontend/dist/
+*.db
+*.db-wal
+*.db-shm
+.DS_Store
+coverage/
+.vscode/
+.idea/
+
+Photo Karyawan/
+uploads/
+
+template-karyawan .xlsx
+
+.kilocode/skills/
+
+.tmp-antigravity-skills

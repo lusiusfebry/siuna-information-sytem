@@ -1,0 +1,5 @@
+module inventory
+1. pada form tambah produk akan di pilih uom, dan pada transaksi stok ketika memilih produk pada detail item, uom akan otomatis terisi sesuai dengan master data produk
+2. pada form add transaksi stok, ketika memilih produk yang memiliki sn, dan produk tersebut jumlah lebih dari 1 ketika input sn hanya bisa 1 baris harusnya ketika jumlah produk 5 bisa di input 5 sn.
+3. pada menu transaksi stok, ketika add produk pada drop down button buat bisa search produk pada drop down button tersebut
+4. pada menu transaksi stok, ketika buat transaksi produk

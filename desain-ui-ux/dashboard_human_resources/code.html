@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bebang HRIS - PT Prima Sarana Gemilang</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800">
+<div class="size-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-none">Bebang HRIS</h1>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1">PT Prima Sarana Gemilang</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Main Menu -->
+<div>
+<p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Utama</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Manajemen Karyawan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">pending_actions</span>
+<span class="text-sm font-medium">Absensi &amp; Cuti</span>
+</a>
+</div>
+</div>
+<!-- Master Data -->
+<div>
+<p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Master Data</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">account_tree</span>
+<span class="text-sm font-medium">Divisi &amp; Departemen</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+<span class="text-sm font-medium">Posisi &amp; Jabatan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">location_on</span>
+<span class="text-sm font-medium">Lokasi Kerja</span>
+</a>
+</div>
+</div>
+<!-- Operations -->
+<div>
+<p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Operasional</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">payments</span>
+<span class="text-sm font-medium">Payroll</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">description</span>
+<span class="text-sm font-medium">Laporan HR</span>
+</a>
+</div>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">Pengaturan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Keluar</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Top Navbar -->
+<header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-6">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary" placeholder="Cari karyawan, dokumen..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold leading-none">Admin HR</p>
+<p class="text-[11px] text-slate-500 mt-1 uppercase">Superadmin</p>
+</div>
+<div class="size-10 rounded-full bg-slate-200 bg-cover bg-center border border-slate-300 dark:border-slate-700" data-alt="User profile avatar of admin" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBMr9yYwzF4Ia8gOhQx-QKN4mjFcxh9uKOipv7OV02A6bt1cLWA-aQH1rH9X1bMSp-JEN55s8AzOHdYQwlRSGjjcdvOiO-db-G6z9xvMIQEFZNGdpdI9HwW4JRGYCp0mBhVrJlw7JaHoy9c0yeZoGVYldpoIgOWrMsvoXAvWRgww-Llag88DxuMpPrIPQV-JW3hXi-91M3SSXf4GZavXOr-VctsFnUDf6WmriIHlyaF0eO40vH-vKBIeybZJRfSRHDhZKWepGrcdcfV")'></div>
+</div>
+</div>
+</header>
+<!-- Scrollable Dashboard Content -->
+<div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-8">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+<a class="hover:text-primary" href="#">Beranda</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-medium text-slate-900 dark:text-slate-100">Ringkasan Eksekutif HR</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Ringkasan Eksekutif HR</h2>
+<p class="text-slate-500 mt-1">Selamat datang kembali, berikut adalah performa SDM hari ini.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-xl">file_download</span>
+                            Ekspor Data
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-xl">person_add</span>
+                            Tambah Karyawan
+                        </button>
+</div>
+</div>
+<!-- Stats Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">+2.4%</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Total Karyawan</p>
+<h3 class="text-2xl font-bold mt-1">1,248</h3>
+<p class="text-[11px] text-slate-400 mt-2">Update terakhir: 10m yang lalu</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600">
+<span class="material-symbols-outlined">apartment</span>
+</div>
+<span class="text-xs font-bold text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded">Tetap</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Departemen</p>
+<h3 class="text-2xl font-bold mt-1">15</h3>
+<p class="text-[11px] text-slate-400 mt-2">Tersebar di 3 lokasi kerja</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined">person_pin</span>
+</div>
+<span class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">-4.1%</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Izin/Cuti Hari Ini</p>
+<h3 class="text-2xl font-bold mt-1">12</h3>
+<p class="text-[11px] text-slate-400 mt-2">3 Pengajuan mendesak</p>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-start mb-4">
+<div class="size-12 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">how_to_reg</span>
+</div>
+<span class="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">98%</span>
+</div>
+<p class="text-sm font-medium text-slate-500">Tingkat Kehadiran</p>
+<h3 class="text-2xl font-bold mt-1">1,210</h3>
+<p class="text-[11px] text-slate-400 mt-2">Berdasarkan data mesin absen</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Statistics Visualization (Mockup) -->
+<div class="lg:col-span-2 space-y-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-bold">Distribusi Karyawan per Departemen</h4>
+<select class="text-xs border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
+<option>Bulan Ini</option>
+<option>Tahun Ini</option>
+</select>
+</div>
+<!-- Simple CSS-based bar chart mockup -->
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Operasional Produksi</span>
+<span class="text-slate-500">450 Karyawan</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%] rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Logistik &amp; Distribusi</span>
+<span class="text-slate-500">280 Karyawan</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+<div class="bg-primary/70 h-full w-[60%] rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Administrasi &amp; HR</span>
+<span class="text-slate-500">120 Karyawan</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+<div class="bg-primary/50 h-full w-[35%] rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Keuangan (Finance)</span>
+<span class="text-slate-500">85 Karyawan</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+<div class="bg-primary/30 h-full w-[20%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<h4 class="font-bold mb-6">Aktivitas Karyawan Terbaru</h4>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-slate-400 font-medium border-b border-slate-100 dark:border-slate-800">
+<tr>
+<th class="pb-3 pr-4">Nama Karyawan</th>
+<th class="pb-3 px-4">Departemen</th>
+<th class="pb-3 px-4">Status</th>
+<th class="pb-3 pl-4 text-right">Tanggal</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+<tr>
+<td class="py-4 pr-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover bg-center" data-alt="Employee portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA7GnFqVR0IY3Ca_8K7xvEWlp27DWasIozazIDfGNsPpqXS9bydcCOjHQ61p_WR7WNmw5opaU7z_1zwNgKzlwKQ0GOGoRZKE4Hk6gqYDJX0KWtJAF4FZw873jPGAb0fQ2JqdfPsFe1Jz2oUHdg2TS8k9bn3oGgkmPkWgK5Lus3Qox2FRxXiml9TFlOXD4VurTeYJJYSMB-dES58CmdJl-sUFxtroTUAr73kcpfQyANe8_thZNVCUPg960JSGuJuWDnjEC7qfxX6QaUq")'></div>
+<span class="font-semibold">Budi Santoso</span>
+</div>
+</td>
+<td class="py-4 px-4 text-slate-600 dark:text-slate-400">Logistik</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 uppercase">Baru</span>
+</td>
+<td class="py-4 pl-4 text-right text-slate-500">12 Okt 2023</td>
+</tr>
+<tr>
+<td class="py-4 pr-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover bg-center" data-alt="Employee portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBuo2KUP7AxovbfvcA93p7w5JHHn-H2nnnc30-1wQgA7U7hEF2Gv_Fxid5HF5v16jPq9jAgtpHzM1jD5WYCxfsmXC44gObUVkIgZea9U0ca4_7nwMSBq9Fkgn3fUNi-0hdyZ6AiwJajpz-lPvNrfF0baJsaaEnp8KQ7E6WcQkHiZQu6JVOvDCx98QbW1xqasRHo1LB2Qt3JI4dZNjUYkguv4LYg3fWi8I2iO0UoypYsGl6H-EmKQ-kB8dwXb8wPAHnvvc08S5cn41Gz")'></div>
+<span class="font-semibold">Siti Aminah</span>
+</div>
+</td>
+<td class="py-4 px-4 text-slate-600 dark:text-slate-400">Keuangan</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 uppercase">Promosi</span>
+</td>
+<td class="py-4 pl-4 text-right text-slate-500">11 Okt 2023</td>
+</tr>
+<tr>
+<td class="py-4 pr-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover bg-center" data-alt="Employee portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBNAMDdHHhCakiBj-4eGeKCqzrlnQTCMM1beDJ_BA1xciQhaKM6bu9T0BNCVgLyKVqpKUmbHGZAF4e9drZMQeNVWYQhsNJnMzvnKOXtFfwMpu9BeUcMF6MBnAUsqvV_plvr_-bGCPVPyFt04jnQZOVz8cV_PqkMIt0pZ4CsxDbp0eOLGVVKpiN2VfiERinzjcRsnhuB9-bPrtzdqvxZHGqDzrPErgVI77XtRVB-c_y5wD0Kna7keLjEioVWN1UTejDi82UGDMWajdv-")'></div>
+<span class="font-semibold">Andi Wijaya</span>
+</div>
+</td>
+<td class="py-4 px-4 text-slate-600 dark:text-slate-400">IT Support</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 uppercase">Cuti</span>
+</td>
+<td class="py-4 pl-4 text-right text-slate-500">10 Okt 2023</td>
+</tr>
+</tbody>
+</table>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5 rounded-lg transition-colors">Lihat Semua Aktivitas</button>
+</div>
+</div>
+<!-- Side Widgets -->
+<div class="space-y-8">
+<!-- Employment Status Chart Mockup -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+<h4 class="font-bold mb-6 text-left">Status Kepegawaian</h4>
+<div class="relative size-40 mx-auto mb-6">
+<!-- Donut chart simulation using double border and gradients -->
+<div class="size-full rounded-full border-[14px] border-slate-100 dark:border-slate-800 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-[14px] border-primary border-r-transparent border-b-transparent rotate-45"></div>
+<div>
+<p class="text-2xl font-black">74%</p>
+<p class="text-[10px] text-slate-500 uppercase font-bold">Tetap</p>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-6 text-xs font-medium">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-primary"></div>
+<span>Karyawan Tetap</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<span>Kontrak</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions Menu -->
+<div class="bg-primary p-6 rounded-xl text-white shadow-xl shadow-primary/20">
+<h4 class="font-bold mb-4">Akses Cepat Data Master</h4>
+<div class="grid grid-cols-2 gap-3">
+<a class="bg-white/10 hover:bg-white/20 p-3 rounded-lg flex flex-col items-center gap-2 transition-colors" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-[11px] font-medium uppercase tracking-wider">Divisi</span>
+</a>
+<a class="bg-white/10 hover:bg-white/20 p-3 rounded-lg flex flex-col items-center gap-2 transition-colors" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-[11px] font-medium uppercase tracking-wider">Departemen</span>
+</a>
+<a class="bg-white/10 hover:bg-white/20 p-3 rounded-lg flex flex-col items-center gap-2 transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="text-[11px] font-medium uppercase tracking-wider">Jabatan</span>
+</a>
+<a class="bg-white/10 hover:bg-white/20 p-3 rounded-lg flex flex-col items-center gap-2 transition-colors" href="#">
+<span class="material-symbols-outlined">rebase_edit</span>
+<span class="text-[11px] font-medium uppercase tracking-wider">Level</span>
+</a>
+</div>
+</div>
+<!-- Info Card -->
+<div class="bg-slate-900 dark:bg-black p-6 rounded-xl text-slate-300">
+<div class="flex items-center gap-3 mb-4 text-white">
+<span class="material-symbols-outlined">verified_user</span>
+<h4 class="font-bold text-sm">Keamanan Sistem</h4>
+</div>
+<p class="text-xs leading-relaxed mb-4">Database SDM PT Prima Sarana Gemilang dilindungi dengan enkripsi AES-256. Lakukan audit log berkala untuk memantau akses data sensitif.</p>
+<a class="text-xs text-primary font-bold hover:underline" href="#">Pelajari lebih lanjut →</a>
+</div>
+</div>
+</div>
+<footer class="mt-12 py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500">
+<p>© 2023 PT Prima Sarana Gemilang - Bebang Sistem Informasi. All rights reserved.</p>
+</footer>
+</div>
+</main>
+</div>
+</body></html>

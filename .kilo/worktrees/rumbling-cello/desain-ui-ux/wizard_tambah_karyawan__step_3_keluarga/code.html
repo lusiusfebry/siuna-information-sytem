@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wizard Tambah Karyawan - Data Keluarga</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-row overflow-hidden">
+<!-- Side Navigation -->
+<aside class="flex w-64 flex-col border-r border-[#e5e7eb] dark:border-gray-800 bg-white dark:bg-[#1a202c] shrink-0 h-screen fixed top-0 left-0 z-10 overflow-y-auto hidden lg:flex">
+<div class="flex flex-col h-full justify-between p-4">
+<div class="flex flex-col gap-6">
+<!-- User Profile -->
+<div class="flex gap-3 items-center px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shrink-0 border border-gray-200 dark:border-gray-700" data-alt="Profile picture of HR Admin" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9BZfilpsNVj76uRcorOWxVf--QZSauMuJLFuwLVcURHmNAvZJZ4444aN12VSkHhRX9twuPfDN3xwUiHMW_cF6jM5Fg6VE6JK-C0gcpH1Woi5d8QnsSK6QmGSB6bbibSywM-G2dHVdUDR1y8AdV5R4PKDT7Hk5MEeR3kZl-mDzrTDWI5RkOqoBwLp2wbV9Q7fwhc3CT2bYba6SPxZLqWrDXpFaSHnbBuSGWzaaDxshas3dNp8ZHs4WwbeCGwoMe7CGgUE_Ug3R-Lsw");'>
+</div>
+<div class="flex flex-col">
+<h1 class="text-[#0d121b] dark:text-white text-sm font-semibold leading-tight">Bebang Info</h1>
+<p class="text-[#4c669a] dark:text-gray-400 text-xs font-normal">HR Admin</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c669a] group-hover:text-primary dark:text-gray-400">home</span>
+<p class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined fill-1">person</span>
+<p class="text-sm font-medium">Karyawan</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c669a] group-hover:text-primary dark:text-gray-400">calendar_month</span>
+<p class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Kehadiran</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c669a] group-hover:text-primary dark:text-gray-400">payments</span>
+<p class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Gaji</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#4c669a] group-hover:text-primary dark:text-gray-400">settings</span>
+<p class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Pengaturan</p>
+</a>
+</nav>
+</div>
+<!-- Logout -->
+<button class="flex items-center gap-3 px-3 py-2 mt-auto rounded-lg hover:bg-red-50 text-red-600 hover:text-red-700 transition-colors w-full">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-medium">Keluar</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+<div class="flex-1 flex justify-center py-8 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-[960px] flex flex-col gap-6">
+<!-- Breadcrumbs -->
+<nav class="flex flex-wrap items-center gap-2 text-sm">
+<a class="text-[#4c669a] hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="text-[#4c669a] material-symbols-outlined text-base">chevron_right</span>
+<a class="text-[#4c669a] hover:text-primary transition-colors" href="#">Karyawan</a>
+<span class="text-[#4c669a] material-symbols-outlined text-base">chevron_right</span>
+<span class="text-[#0d121b] dark:text-white font-medium">Tambah Karyawan</span>
+</nav>
+<!-- Page Heading & Progress -->
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-6 bg-white dark:bg-[#1a202c] p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+<div class="flex flex-col gap-2 max-w-lg">
+<h1 class="text-2xl md:text-3xl font-bold text-[#0d121b] dark:text-white tracking-tight">Tambah Karyawan Baru</h1>
+<p class="text-[#4c669a] dark:text-gray-400 text-sm md:text-base">Lengkapi informasi keluarga untuk keperluan asuransi dan kontak darurat.</p>
+</div>
+<div class="flex flex-col gap-2 min-w-[240px]">
+<div class="flex justify-between items-center text-sm">
+<span class="font-medium text-primary">Langkah 3 dari 4</span>
+<span class="text-[#4c669a] dark:text-gray-500">75%</span>
+</div>
+<div class="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 75%;"></div>
+</div>
+<p class="text-xs text-[#4c669a] dark:text-gray-500 text-right">Step: Data Keluarga</p>
+</div>
+</div>
+<!-- Form Container -->
+<form class="flex flex-col gap-6" onsubmit="event.preventDefault();">
+<!-- Section: Pasangan & Anak -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">family_restroom</span>
+</div>
+<h2 class="text-lg font-bold text-[#0d121b] dark:text-white">Pasangan &amp; Anak</h2>
+</div>
+</div>
+<div class="p-6 flex flex-col gap-8">
+<!-- Spouse Data -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="col-span-1 md:col-span-2">
+<h3 class="text-sm font-semibold text-[#0d121b] dark:text-gray-200 mb-4 uppercase tracking-wider">Data Pasangan</h3>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Status Pernikahan <span class="text-red-500">*</span></label>
+<select class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white">
+<option>Menikah</option>
+<option>Belum Menikah</option>
+<option>Cerai Hidup</option>
+<option>Cerai Mati</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Nama Pasangan</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white placeholder:text-gray-400" placeholder="Masukkan nama pasangan" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Tanggal Lahir</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" type="date"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Pekerjaan</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white placeholder:text-gray-400" placeholder="Contoh: Pegawai Swasta" type="text"/>
+</div>
+</div>
+<hr class="border-gray-100 dark:border-gray-800"/>
+<!-- Children Data -->
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="text-sm font-semibold text-[#0d121b] dark:text-gray-200 uppercase tracking-wider">Data Anak</h3>
+<button class="text-sm text-primary font-medium hover:text-blue-700 flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                                            Tambah Anak
+                                        </button>
+</div>
+<!-- Dynamic Row 1 -->
+<div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700 relative group">
+<button class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100" type="button">
+<span class="material-symbols-outlined">delete</span>
+</button>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+<div class="md:col-span-4 flex flex-col gap-1.5">
+<label class="text-xs font-medium text-gray-500 dark:text-gray-400">Nama Anak</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2 focus:border-primary focus:ring-primary dark:text-white" type="text" value="Budi Santoso"/>
+</div>
+<div class="md:col-span-3 flex flex-col gap-1.5">
+<label class="text-xs font-medium text-gray-500 dark:text-gray-400">Tanggal Lahir</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2 focus:border-primary focus:ring-primary dark:text-white" type="date" value="2015-06-12"/>
+</div>
+<div class="md:col-span-2 flex flex-col gap-1.5">
+<label class="text-xs font-medium text-gray-500 dark:text-gray-400">Jenis Kelamin</label>
+<select class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2 focus:border-primary focus:ring-primary dark:text-white">
+<option selected="">Laki-laki</option>
+<option>Perempuan</option>
+</select>
+</div>
+<div class="md:col-span-3 flex flex-col gap-1.5">
+<label class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendidikan</label>
+<select class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2 focus:border-primary focus:ring-primary dark:text-white">
+<option selected="">SD</option>
+<option>SMP</option>
+<option>SMA</option>
+<option>Kuliah</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Empty State placeholder for next row -->
+<div class="border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4 flex justify-center items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<p class="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span>
+                                            Klik untuk tambah baris anak baru
+                                        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Orang Tua & Mertua -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">diversity_2</span>
+</div>
+<h2 class="text-lg font-bold text-[#0d121b] dark:text-white">Orang Tua &amp; Mertua</h2>
+</div>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+<!-- Parents -->
+<div class="col-span-1 md:col-span-2">
+<h3 class="text-sm font-semibold text-[#0d121b] dark:text-gray-200 mb-2 uppercase tracking-wider">Orang Tua Kandung</h3>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Nama Ayah</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Nama Ibu</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" type="text"/>
+</div>
+<div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Alamat Orang Tua</label>
+<textarea class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" rows="2"></textarea>
+</div>
+<!-- In-Laws -->
+<div class="col-span-1 md:col-span-2 pt-4">
+<h3 class="text-sm font-semibold text-[#0d121b] dark:text-gray-200 mb-2 uppercase tracking-wider">Mertua</h3>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Nama Ayah Mertua</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" type="text"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-[#0d121b] dark:text-gray-300">Nama Ibu Mertua</label>
+<input class="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm py-2.5 focus:border-primary focus:ring-primary dark:text-white" type="text"/>
+</div>
+</div>
+</div>
+<!-- Section: Saudara Kandung -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<h2 class="text-lg font-bold text-[#0d121b] dark:text-white">Saudara Kandung</h2>
+</div>
+<button class="text-sm text-primary font-medium hover:text-blue-700 flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                                    Tambah Saudara
+                                </button>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<!-- Empty State -->
+<div class="flex flex-col items-center justify-center py-8 text-center bg-gray-50 dark:bg-gray-800/30 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
+<div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-full mb-3">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-500">sentiment_satisfied</span>
+</div>
+<p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Belum ada data saudara ditambahkan</p>
+<p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Klik tombol di kanan atas untuk menambah data saudara kandung.</p>
+</div>
+</div>
+</div>
+<!-- Preview & Actions -->
+<div class="flex flex-col gap-4 mt-4 mb-10">
+<!-- Summary Panel -->
+<div class="bg-blue-50 dark:bg-primary/10 rounded-lg p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between border border-blue-100 dark:border-primary/20">
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Total Anak</span>
+<span class="text-lg font-bold text-[#0d121b] dark:text-white">1</span>
+</div>
+<div class="w-px bg-gray-300 dark:bg-gray-700 h-10"></div>
+<div class="flex flex-col">
+<span class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Total Saudara</span>
+<span class="text-lg font-bold text-[#0d121b] dark:text-white">0</span>
+</div>
+</div>
+<div class="text-sm text-blue-800 dark:text-blue-200 italic">
+                                    *Pastikan semua data sesuai dengan Kartu Keluarga (KK)
+                                </div>
+</div>
+<!-- Buttons -->
+<div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+<button class="px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-[#0d121b] dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-full sm:w-auto" type="button">
+                                    Kembali
+                                </button>
+<button class="px-6 py-3 rounded-lg bg-primary text-white font-medium hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30 w-full sm:w-auto flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-sm">save</span>
+                                    Simpan Seluruh Data
+                                </button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
+</body></html>

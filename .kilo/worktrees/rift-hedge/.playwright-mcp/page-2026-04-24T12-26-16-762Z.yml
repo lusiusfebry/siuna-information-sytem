@@ -1,0 +1,183 @@
+- generic [ref=e7]:
+  - complementary [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e13]: groups
+        - generic [ref=e14]:
+          - heading "Human Resources" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Manajemen SDM
+      - navigation [ref=e17]:
+        - link "home Halaman Utama" [ref=e19] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e20]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e22] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e23]: dashboard
+          - text: Dashboard
+        - generic [ref=e24]:
+          - button "database Master Data" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: database
+              - text: Master Data
+            - img [ref=e28]
+          - generic [ref=e30]:
+            - link "domain Divisi" [ref=e31] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e32]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e33] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e34]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e35] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e36]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e37] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e38]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e39] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e40]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e41] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e42]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e43] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e44]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e45] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e46]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e47] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e48]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e49] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e50]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e51]:
+          - button "groups Manajemen Karyawan" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e55]
+          - link "person Karyawan" [ref=e58] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e59]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e61] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e62]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e64] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e65]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e66]:
+    - banner [ref=e67]:
+      - generic [ref=e68]:
+        - heading "Human Resources" [level=2] [ref=e69]
+        - navigation [ref=e70]:
+          - link "Direktori" [ref=e71] [cursor=pointer]:
+            - /url: "#"
+          - link "Organisasi" [ref=e72] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - generic [ref=e75]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e76]
+        - generic [ref=e77]:
+          - button "apps" [ref=e78] [cursor=pointer]:
+            - generic [ref=e79]: apps
+          - button "notifications" [ref=e80] [cursor=pointer]:
+            - generic [ref=e81]: notifications
+          - button "settings" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: settings
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - generic [ref=e87]: "1234567890123456"
+            - generic [ref=e88]: Super Administrator
+          - button "person" [ref=e90] [cursor=pointer]:
+            - generic [ref=e91]: person
+    - main [ref=e92]:
+      - generic [ref=e221]:
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - img [ref=e229]
+              - 'generic "Status: Aktif" [ref=e231]'
+            - generic [ref=e233]:
+              - heading "Cahyo Wibowo" [level=3] [ref=e234]
+              - generic [ref=e235]:
+                - generic [ref=e236]:
+                  - generic [ref=e237]: id_card
+                  - generic [ref=e238]: "NIK: EMP003"
+                - generic [ref=e239]:
+                  - generic [ref=e240]: call
+                  - generic [ref=e241]: "081345678901"
+              - generic [ref=e242]:
+                - generic [ref=e243]: IT Infrastructure
+                - generic [ref=e244]: Kantor Pusat
+                - generic [ref=e245]: Aktif
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - img [ref=e249]
+              - generic [ref=e252]:
+                - paragraph [ref=e253]: Cahyo Wibowo
+                - paragraph [ref=e254]: EMP003
+            - generic [ref=e255]:
+              - generic [ref=e256]:
+                - button "badge LIHAT ID" [ref=e257] [cursor=pointer]:
+                  - generic [ref=e258]: badge
+                  - text: LIHAT ID
+                - button "print CETAK" [ref=e259] [cursor=pointer]:
+                  - generic [ref=e260]: print
+                  - text: CETAK
+              - button "delete HAPUS PROFIL" [ref=e261] [cursor=pointer]:
+                - generic [ref=e262]: delete
+                - text: HAPUS PROFIL
+              - button "edit EDIT PROFIL" [ref=e263] [cursor=pointer]:
+                - generic [ref=e264]: edit
+                - text: EDIT PROFIL
+        - generic [ref=e266]:
+          - button "Data Personal" [ref=e267] [cursor=pointer]
+          - button "Informasi HR" [ref=e269] [cursor=pointer]
+          - button "Data Keluarga" [ref=e270] [cursor=pointer]
+          - button "Payroll" [ref=e271] [cursor=pointer]
+          - button "Cuti & Izin" [ref=e272] [cursor=pointer]
+          - button "Aset" [ref=e273] [cursor=pointer]: Aset
+          - button "Dokumen" [ref=e274] [cursor=pointer]
+          - button "Riwayat" [ref=e275] [cursor=pointer]
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - generic [ref=e434]:
+              - heading "Aset Inventaris" [level=3] [ref=e435]
+              - paragraph [ref=e436]: 1 aset dipegang
+            - button "description Cetak Berita Acara" [ref=e437] [cursor=pointer]:
+              - generic [ref=e438]: description
+              - text: Cetak Berita Acara
+          - table [ref=e441]:
+            - rowgroup [ref=e442]:
+              - row "Produk Serial Number Status Gudang Asal Tanggal Terima" [ref=e443]:
+                - columnheader "Produk" [ref=e444]
+                - columnheader "Serial Number" [ref=e445]
+                - columnheader "Status" [ref=e446]
+                - columnheader "Gudang Asal" [ref=e447]
+                - columnheader "Tanggal Terima" [ref=e448]
+            - rowgroup [ref=e449]:
+              - row "Lenovo ThinkPad T14 IPRD001 SN-LNV-001 Digunakan - 24 Apr 2026" [ref=e450]:
+                - cell "Lenovo ThinkPad T14 IPRD001" [ref=e451]:
+                  - generic [ref=e452]: Lenovo ThinkPad T14
+                  - generic [ref=e453]: IPRD001
+                - cell "SN-LNV-001" [ref=e454]
+                - cell "Digunakan" [ref=e455]:
+                  - generic [ref=e456]: Digunakan
+                - cell "-" [ref=e457]
+                - cell "24 Apr 2026" [ref=e458]

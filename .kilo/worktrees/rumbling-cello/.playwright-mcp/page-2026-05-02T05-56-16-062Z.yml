@@ -1,0 +1,247 @@
+- generic [ref=e193]:
+  - complementary [ref=e195]:
+    - generic [ref=e196]:
+      - generic [ref=e197]:
+        - generic [ref=e199]: groups
+        - generic [ref=e200]:
+          - heading "Human Resources" [level=1] [ref=e201]
+          - paragraph [ref=e202]: Manajemen SDM
+      - navigation [ref=e203]:
+        - link "home Halaman Utama" [ref=e205] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e206]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e208] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e209]: dashboard
+          - text: Dashboard
+        - generic [ref=e210]:
+          - button "database Master Data" [ref=e211] [cursor=pointer]:
+            - generic [ref=e212]:
+              - generic [ref=e213]: database
+              - text: Master Data
+            - img [ref=e214]
+          - generic [ref=e216]:
+            - link "domain Divisi" [ref=e217] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e218]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e219] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e220]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e221] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e222]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e223] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e224]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e225] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e226]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e227] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e228]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e229] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e230]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e231] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e232]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e233] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e234]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e235] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e236]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e237]:
+          - button "groups Manajemen Karyawan" [ref=e238] [cursor=pointer]:
+            - generic [ref=e239]:
+              - generic [ref=e240]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e241]
+          - link "person Karyawan" [ref=e244] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e245]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e247] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e248]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e250] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e251]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e252]:
+    - banner [ref=e253]:
+      - generic [ref=e254]:
+        - heading "Human Resources" [level=2] [ref=e255]
+        - navigation [ref=e256]:
+          - button "Direktori" [ref=e257] [cursor=pointer]
+          - button "Organisasi" [ref=e258] [cursor=pointer]
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e261]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e262]
+        - generic [ref=e263]:
+          - button "apps" [ref=e264] [cursor=pointer]:
+            - generic [ref=e265]: apps
+          - button "notifications" [ref=e267] [cursor=pointer]:
+            - generic [ref=e268]: notifications
+          - button "settings" [ref=e269] [cursor=pointer]:
+            - generic [ref=e270]: settings
+        - generic [ref=e272]:
+          - generic [ref=e273]:
+            - generic [ref=e274]: "1234567890123456"
+            - generic [ref=e275]: Super Administrator
+          - button "person" [ref=e277] [cursor=pointer]:
+            - generic [ref=e278]: person
+    - main [ref=e279]:
+      - generic [ref=e281]:
+        - generic [ref=e282]:
+          - generic [ref=e283]:
+            - navigation [ref=e284]:
+              - generic [ref=e285]: Beranda
+              - generic [ref=e286]: ">"
+              - generic [ref=e287]: Ringkasan Eksekutif HR
+            - heading "Ringkasan Eksekutif HR" [level=1] [ref=e288]
+            - paragraph [ref=e289]: Gambaran umum performa SDM dan aktivitas terbaru.
+          - generic [ref=e290]:
+            - generic [ref=e291]:
+              - button "table_view Export Excel" [ref=e292] [cursor=pointer]:
+                - generic [ref=e293]: table_view
+                - text: Export Excel
+              - button "picture_as_pdf Export PDF" [ref=e294] [cursor=pointer]:
+                - generic [ref=e295]: picture_as_pdf
+                - text: Export PDF
+            - button "add Tambah Karyawan" [ref=e296] [cursor=pointer]:
+              - generic [ref=e297]: add
+              - text: Tambah Karyawan
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - paragraph [ref=e302]: Total Karyawan
+                - heading "2" [level=3] [ref=e303]
+              - generic [ref=e305]: groups
+            - generic [ref=e306]:
+              - generic [ref=e307]:
+                - generic [ref=e308]: trending_up
+                - text: +2.4%
+              - generic [ref=e309]: vs bulan lalu
+          - generic [ref=e310]:
+            - generic [ref=e311]:
+              - generic [ref=e312]:
+                - paragraph [ref=e313]: Departemen
+                - heading "3" [level=3] [ref=e314]
+              - generic [ref=e316]: apartment
+            - generic [ref=e318]: Total unit kerja
+          - generic [ref=e319]:
+            - generic [ref=e320]:
+              - generic [ref=e321]:
+                - paragraph [ref=e322]: Izin/Cuti Hari Ini
+                - heading "0" [level=3] [ref=e323]
+              - generic [ref=e325]: person_pin
+            - generic [ref=e326]:
+              - generic [ref=e327]:
+                - generic [ref=e328]: trending_down
+                - text: "-4.1%"
+              - generic [ref=e329]: vs minggu lalu
+          - generic [ref=e330]:
+            - generic [ref=e331]:
+              - generic [ref=e332]:
+                - paragraph [ref=e333]: Tingkat Kehadiran
+                - heading "0%" [level=3] [ref=e334]
+              - generic [ref=e336]: how_to_reg
+            - generic [ref=e338]: Rata-rata minggu ini
+        - generic [ref=e339]:
+          - generic [ref=e340]:
+            - generic [ref=e341]:
+              - heading "Distribusi Karyawan per Departemen" [level=3] [ref=e342]
+              - generic [ref=e344]:
+                - img [ref=e345]:
+                  - generic [ref=e349]:
+                    - generic [ref=e351]: "0"
+                    - generic [ref=e353]: "2"
+                    - generic [ref=e355]: "4"
+                    - generic [ref=e357]: "6"
+                    - generic [ref=e359]: "8"
+                  - generic [ref=e364]: Recruitment
+                - list [ref=e373]:
+                  - listitem [ref=e374]:
+                    - img [ref=e375]
+                    - text: Jumlah Karyawan
+            - generic [ref=e377]:
+              - generic [ref=e378]:
+                - heading "Aktivitas Terbaru" [level=3] [ref=e379]
+                - link "Lihat Semua" [ref=e380] [cursor=pointer]:
+                  - /url: /hr/audit-logs
+                  - button "Lihat Semua" [ref=e381]
+              - table [ref=e383]:
+                - rowgroup [ref=e384]:
+                  - row "User Aksi Data Waktu" [ref=e385]:
+                    - columnheader "User" [ref=e386]
+                    - columnheader "Aksi" [ref=e387]
+                    - columnheader "Data" [ref=e388]
+                    - columnheader "Waktu" [ref=e389]
+                - rowgroup [ref=e390]:
+                  - row "S System UPDATE Ani Lestari employees 02 Mei 2026, 11:32" [ref=e391]:
+                    - cell "S System" [ref=e392]:
+                      - generic [ref=e393]: S
+                      - text: System
+                    - cell "UPDATE" [ref=e394]:
+                      - generic [ref=e395]: UPDATE
+                    - cell "Ani Lestari employees" [ref=e396]:
+                      - generic [ref=e397]:
+                        - generic [ref=e398]: Ani Lestari
+                        - generic [ref=e399]: employees
+                    - cell "02 Mei 2026, 11:32" [ref=e400]
+          - generic [ref=e401]:
+            - generic [ref=e402]:
+              - heading "Status Kepegawaian" [level=3] [ref=e403]
+              - generic [ref=e404]:
+                - generic [ref=e406]:
+                  - img [ref=e407]:
+                    - img [ref=e411]
+                  - list [ref=e413]:
+                    - listitem [ref=e414]:
+                      - img [ref=e415]
+                      - text: Tetap
+                    - listitem [ref=e417]:
+                      - img [ref=e418]
+                      - text: Kontrak
+                - generic [ref=e420]:
+                  - generic [ref=e421]: 0%
+                  - paragraph [ref=e422]: Karyawan Tetap
+            - generic [ref=e423]:
+              - heading "Akses Cepat Master Data" [level=3] [ref=e424]
+              - generic [ref=e425]:
+                - link "domain Divisi" [ref=e426] [cursor=pointer]:
+                  - /url: /hr/master-data/divisi
+                  - generic [ref=e427]: domain
+                  - generic [ref=e428]: Divisi
+                - link "groups Departemen" [ref=e429] [cursor=pointer]:
+                  - /url: /hr/master-data/department
+                  - generic [ref=e430]: groups
+                  - generic [ref=e431]: Departemen
+                - link "badge Jabatan" [ref=e432] [cursor=pointer]:
+                  - /url: /hr/master-data/posisi-jabatan
+                  - generic [ref=e433]: badge
+                  - generic [ref=e434]: Jabatan
+                - link "stars Level" [ref=e435] [cursor=pointer]:
+                  - /url: /hr/master-data/golongan
+                  - generic [ref=e436]: stars
+                  - generic [ref=e437]: Level
+            - generic [ref=e438]:
+              - generic [ref=e439]: verified_user
+              - generic [ref=e440]:
+                - heading "Keamanan Sistem" [level=3] [ref=e441]
+                - paragraph [ref=e442]: "Sistem terproteksi dengan enkripsi end-to-end. Terakhir dibackup: Hari ini, 02:00 WIB."

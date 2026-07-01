@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital ID Card - Corporate Clean</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#111827", // Using dark grey as primary UI accent
+              "background-light": "#F3F4F6",
+              "background-dark": "#111827",
+              "brand-yellow": "#FFF200",
+              "brand-red": "#D50000",
+              "brand-blue": "#2563EB",
+              "access-blue": "#0070C0",
+              "access-yellow": "#FFFF00",
+              "access-green": "#00B050",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              'xl': '0.75rem',
+              '2xl': '1rem',
+              '3xl': '1.5rem',
+            },
+            boxShadow: {
+                'card': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                'glow': '0 0 20px rgba(37, 99, 235, 0.15)',
+            }
+          },
+        },
+      };
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center font-sans antialiased selection:bg-blue-200 dark:selection:bg-blue-900">
+<div class="w-full max-w-md bg-white dark:bg-gray-900 h-[850px] md:h-auto md:min-h-[800px] md:rounded-3xl shadow-2xl overflow-hidden relative border border-gray-200 dark:border-gray-800 flex flex-col">
+<div class="h-12 bg-white dark:bg-gray-900 flex justify-between items-end px-6 pb-2 text-xs font-semibold text-gray-900 dark:text-white">
+<span>9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-icons text-base">signal_cellular_alt</span>
+<span class="material-icons text-base">wifi</span>
+<span class="material-icons text-base">battery_full</span>
+</div>
+</div>
+<div class="px-6 py-4 flex justify-between items-center bg-white dark:bg-gray-900 z-10 sticky top-0">
+<button class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-300">
+<span class="material-icons">arrow_back</span>
+</button>
+<h1 class="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wider">My ID Card</h1>
+<button class="p-2 -mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition text-gray-600 dark:text-gray-300">
+<span class="material-icons">more_vert</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 p-6 flex flex-col items-center justify-center">
+<div class="flex items-center gap-2 mb-6 bg-green-100 dark:bg-green-900/30 px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+</span>
+<span class="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wide">Active Access</span>
+</div>
+<div class="w-full relative group perspective-1000">
+<div class="absolute -inset-1 bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-xl rounded-3xl opacity-75 dark:opacity-40"></div>
+<div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-card overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col transform transition-transform duration-500">
+<div class="bg-brand-yellow px-5 py-4 flex items-center justify-between border-b border-yellow-300">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white rounded-md border border-yellow-600 flex flex-col items-center justify-center p-0.5 shrink-0 shadow-sm">
+<div class="grid grid-cols-4 gap-0.5 w-full h-1/2 mb-0.5 opacity-30">
+<div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div>
+<div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div><div class="bg-black rounded-full w-full h-full"></div>
+</div>
+<span class="text-[10px] font-black text-black leading-none tracking-tighter">BMI</span>
+</div>
+<h2 class="text-sm font-black text-black uppercase tracking-tight leading-4">
+                                PT. Bintani Megahindah
+                            </h2>
+</div>
+<span class="material-icons text-black/20">verified</span>
+</div>
+<div class="bg-white dark:bg-gray-800 py-4 text-center border-b border-gray-100 dark:border-gray-700">
+<h3 class="text-brand-red font-black text-2xl tracking-widest uppercase drop-shadow-sm">Mine Permit</h3>
+</div>
+<div class="bg-blue-50/50 dark:bg-blue-900/10 py-2.5 text-center border-b border-gray-100 dark:border-gray-700">
+<p class="text-brand-blue dark:text-blue-400 font-bold text-xs uppercase tracking-wide">PT. Prima Sarana Gemilang</p>
+</div>
+<div class="p-6 flex flex-col items-center">
+<div class="relative mb-5 group">
+<div class="w-32 h-40 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden border-4 border-white dark:border-gray-600 shadow-lg relative">
+<div class="absolute inset-0 bg-[#A02020]"></div>
+<img alt="Employee Photo" class="relative w-full h-full object-cover mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhjon26DXiqDy4bT2F6_YHS40cCij6Lif7C5PingoGuVuURY_w1XuLzt-JufczOgHijAzpt9JCQqSCfGsP633FuLAUMHYL8i_OPdM09zwjKodDKpTq-cb3qdyUqBZQIh2XrFesLN0KRbVcqhLIxM8TUE2sSbJYrwg2SLxvGab6eUCuRBGQunfgCTXf2urve8D1iq_JpMHEA_QeYmXF1LfX6TAJlmTqkV9ki9h_OC_NzzMacbC9iz6AKsRwM_Fbz5GvyFX2r4iwZLY"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-lg"></div>
+</div>
+<div class="text-center w-full space-y-1">
+<p class="text-xs font-mono text-gray-500 dark:text-gray-400 tracking-widest uppercase mb-1">510.01.PSG-BMI.2026</p>
+<h2 class="text-xl font-black text-gray-900 dark:text-white uppercase leading-tight tracking-tight">Akhmad Amirudin</h2>
+<div class="mt-2 inline-flex items-center px-4 py-1 bg-gray-100 dark:bg-gray-700 rounded-full border border-gray-200 dark:border-gray-600">
+<span class="material-icons text-sm mr-1.5 text-gray-500 dark:text-gray-400">handyman</span>
+<span class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest">Welder</span>
+</div>
+</div>
+<div class="mt-8 w-full bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-4 border border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-between relative overflow-hidden group/qr transition-colors hover:bg-blue-50 dark:hover:bg-gray-700/50">
+<div class="flex flex-col relative z-10">
+<span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Access Code</span>
+<span class="text-lg font-mono font-bold text-gray-900 dark:text-white tracking-widest">8492-B7</span>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="h-1.5 w-1.5 rounded-full bg-access-green animate-pulse"></span>
+<span class="text-[10px] font-medium text-gray-500 dark:text-gray-300">Authorized</span>
+</div>
+</div>
+<div class="bg-white p-2 rounded-xl border border-gray-100 dark:border-gray-600 shadow-sm group-hover/qr:scale-105 transition-transform duration-300">
+<img alt="QR Access Code" class="h-14 w-14 mix-blend-multiply dark:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFQC6HDNnODYhmrknHddxKlUl8gaCwkXMlklh8jZ2g120iYo7HuehUf8sPOm2XKOn_sjUiilPJvtEeg76RqDUhJBYVZmECnfspwPIueyli8_IP52VTzN0wbC_Y58N5NCC1plj35YUfTlHNmLN7e6I8XcJV_P67NWsXQXXfADZZ1pIb-hmCtKazs3hiHYIGb6Veu33tVhhkJcIyupfOL8iSA4oRz0NH8rRhcbmckdQKAIoBxKAMwy_YmVmFKW9ZUkkUx79tvlGCQz8"/>
+</div>
+<div class="absolute -right-6 -bottom-6 w-20 h-20 bg-brand-blue/5 dark:bg-brand-blue/10 rounded-full blur-xl pointer-events-none"></div>
+</div>
+</div>
+<div class="grid grid-cols-3 h-14 border-t border-gray-200 dark:border-gray-700">
+<button class="bg-access-blue hover:bg-blue-700 transition flex flex-col items-center justify-center text-white group">
+<span class="material-icons text-lg mb-0.5 group-hover:scale-110 transition-transform">anchor</span>
+<span class="text-xs font-bold uppercase tracking-widest">Port</span>
+</button>
+<button class="bg-access-yellow hover:bg-yellow-300 transition flex flex-col items-center justify-center text-black group">
+<span class="material-icons text-lg mb-0.5 group-hover:scale-110 transition-transform">landscape</span>
+<span class="text-xs font-bold uppercase tracking-widest">Pit</span>
+</button>
+<button class="bg-access-green hover:bg-green-700 transition flex flex-col items-center justify-center text-white group">
+<span class="material-icons text-lg mb-0.5 group-hover:scale-110 transition-transform">business</span>
+<span class="text-xs font-bold uppercase tracking-widest">Office</span>
+</button>
+</div>
+</div>
+</div>
+<p class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 max-w-xs">
+                This digital card is valid for entry. Present QR code at the security checkpoint.
+            </p>
+</div>
+<div class="p-6 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
+<span class="material-icons text-base">share</span>
+                    Share Details
+                </button>
+<button class="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-primary text-white font-semibold text-sm shadow-lg hover:opacity-90 transition">
+<span class="material-icons text-base">download</span>
+                    Save to Wallet
+                </button>
+</div>
+</div>
+</div>
+</body></html>

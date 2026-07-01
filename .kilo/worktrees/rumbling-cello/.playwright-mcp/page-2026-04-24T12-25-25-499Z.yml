@@ -1,0 +1,305 @@
+- generic [ref=e7]:
+  - complementary [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e13]: groups
+        - generic [ref=e14]:
+          - heading "Human Resources" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Manajemen SDM
+      - navigation [ref=e17]:
+        - link "home Halaman Utama" [ref=e19] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e20]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e22] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e23]: dashboard
+          - text: Dashboard
+        - generic [ref=e24]:
+          - button "database Master Data" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: database
+              - text: Master Data
+            - img [ref=e28]
+          - generic [ref=e30]:
+            - link "domain Divisi" [ref=e31] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e32]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e33] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e34]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e35] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e36]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e37] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e38]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e39] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e40]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e41] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e42]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e43] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e44]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e45] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e46]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e47] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e48]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e49] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e50]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e51]:
+          - button "groups Manajemen Karyawan" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e55]
+          - link "person Karyawan" [ref=e58] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e59]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e61] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e62]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e64] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e65]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e66]:
+    - banner [ref=e67]:
+      - generic [ref=e68]:
+        - heading "Human Resources" [level=2] [ref=e69]
+        - navigation [ref=e70]:
+          - link "Direktori" [ref=e71] [cursor=pointer]:
+            - /url: "#"
+          - link "Organisasi" [ref=e72] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - generic [ref=e75]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e76]
+        - generic [ref=e77]:
+          - button "apps" [ref=e78] [cursor=pointer]:
+            - generic [ref=e79]: apps
+          - button "notifications" [ref=e80] [cursor=pointer]:
+            - generic [ref=e81]: notifications
+          - button "settings" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]: settings
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - generic [ref=e87]: "1234567890123456"
+            - generic [ref=e88]: Super Administrator
+          - button "person" [ref=e90] [cursor=pointer]:
+            - generic [ref=e91]: person
+    - main [ref=e92]:
+      - generic [ref=e221]:
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - img [ref=e229]
+              - 'generic "Status: Aktif" [ref=e231]'
+            - generic [ref=e233]:
+              - heading "Cahyo Wibowo" [level=3] [ref=e234]
+              - generic [ref=e235]:
+                - generic [ref=e236]:
+                  - generic [ref=e237]: id_card
+                  - generic [ref=e238]: "NIK: EMP003"
+                - generic [ref=e239]:
+                  - generic [ref=e240]: call
+                  - generic [ref=e241]: "081345678901"
+              - generic [ref=e242]:
+                - generic [ref=e243]: IT Infrastructure
+                - generic [ref=e244]: Kantor Pusat
+                - generic [ref=e245]: Aktif
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - img [ref=e249]
+              - generic [ref=e252]:
+                - paragraph [ref=e253]: Cahyo Wibowo
+                - paragraph [ref=e254]: EMP003
+            - generic [ref=e255]:
+              - generic [ref=e256]:
+                - button "badge LIHAT ID" [ref=e257] [cursor=pointer]:
+                  - generic [ref=e258]: badge
+                  - text: LIHAT ID
+                - button "print CETAK" [ref=e259] [cursor=pointer]:
+                  - generic [ref=e260]: print
+                  - text: CETAK
+              - button "delete HAPUS PROFIL" [ref=e261] [cursor=pointer]:
+                - generic [ref=e262]: delete
+                - text: HAPUS PROFIL
+              - button "edit EDIT PROFIL" [ref=e263] [cursor=pointer]:
+                - generic [ref=e264]: edit
+                - text: EDIT PROFIL
+        - generic [ref=e266]:
+          - button "Data Personal" [ref=e267] [cursor=pointer]: Data Personal
+          - button "Informasi HR" [ref=e269] [cursor=pointer]
+          - button "Data Keluarga" [ref=e270] [cursor=pointer]
+          - button "Payroll" [ref=e271] [cursor=pointer]
+          - button "Cuti & Izin" [ref=e272] [cursor=pointer]
+          - button "Aset" [ref=e273] [cursor=pointer]
+          - button "Dokumen" [ref=e274] [cursor=pointer]
+          - button "Riwayat" [ref=e275] [cursor=pointer]
+        - generic [ref=e276]:
+          - generic [ref=e277]:
+            - generic [ref=e278]:
+              - generic [ref=e279]:
+                - generic [ref=e281]: person
+                - heading "Biodata" [level=4] [ref=e282]
+              - generic [ref=e283]:
+                - generic [ref=e284]:
+                  - paragraph [ref=e285]: Nama Lengkap
+                  - paragraph [ref=e286]: Cahyo Wibowo
+                - generic [ref=e287]:
+                  - paragraph [ref=e288]: Jenis Kelamin
+                  - paragraph [ref=e289]: Laki-laki
+                - generic [ref=e290]:
+                  - paragraph [ref=e291]: Tempat, Tgl Lahir
+                  - paragraph [ref=e292]: Semarang, 1988-11-03
+                - generic [ref=e293]:
+                  - paragraph [ref=e294]: Status Pernikahan
+                  - paragraph [ref=e295]: Menikah
+            - generic [ref=e296]:
+              - generic [ref=e297]:
+                - generic [ref=e299]: fingerprint
+                - heading "Identifikasi" [level=4] [ref=e300]
+              - generic [ref=e301]:
+                - generic [ref=e302]:
+                  - paragraph [ref=e303]: Agama
+                  - paragraph [ref=e304]: Islam
+                - generic [ref=e305]:
+                  - paragraph [ref=e306]: Gol. Darah
+                  - paragraph [ref=e307]: B
+                - generic [ref=e308]:
+                  - paragraph [ref=e309]: No. KK
+                  - paragraph [ref=e310]: "-"
+                - generic [ref=e311]:
+                  - paragraph [ref=e312]: No. KTP
+                  - paragraph [ref=e313]: "3374030311880003"
+                - generic [ref=e314]:
+                  - paragraph [ref=e315]: NPWP
+                  - paragraph [ref=e316]: "-"
+                - generic [ref=e317]:
+                  - paragraph [ref=e318]: Status Pajak
+                  - paragraph [ref=e319]: "-"
+                - generic [ref=e320]:
+                  - paragraph [ref=e321]: BPJS Kesehatan
+                  - paragraph [ref=e322]: "-"
+                - generic [ref=e323]:
+                  - paragraph [ref=e324]: NIK KK
+                  - paragraph [ref=e325]: "-"
+          - generic [ref=e326]:
+            - generic [ref=e327]:
+              - generic [ref=e328]:
+                - generic [ref=e330]: location_on
+                - heading "Alamat" [level=4] [ref=e331]
+              - generic [ref=e332]:
+                - generic [ref=e333]:
+                  - heading "Alamat Domisili" [level=5] [ref=e334]
+                  - generic [ref=e335]:
+                    - generic [ref=e336]:
+                      - paragraph [ref=e337]: Jalan / No. Rumah
+                      - paragraph [ref=e338]: Jl. Pemuda No. 45
+                    - generic [ref=e339]:
+                      - paragraph [ref=e340]: Kota / Kabupaten
+                      - paragraph [ref=e341]: Semarang
+                    - generic [ref=e342]:
+                      - paragraph [ref=e343]: Provinsi
+                      - paragraph [ref=e344]: Jawa Tengah
+                    - generic [ref=e345]:
+                      - paragraph [ref=e346]: Kode Pos
+                      - paragraph [ref=e347]: "-"
+                - generic [ref=e348]:
+                  - heading "Alamat KTP" [level=5] [ref=e349]
+                  - generic [ref=e350]:
+                    - generic [ref=e351]:
+                      - paragraph [ref=e352]: Jalan / No. Rumah
+                      - paragraph [ref=e353]: "-"
+                    - generic [ref=e354]:
+                      - paragraph [ref=e355]: Kota / Kabupaten
+                      - paragraph [ref=e356]: "-"
+                    - generic [ref=e357]:
+                      - paragraph [ref=e358]: Provinsi
+                      - paragraph [ref=e359]: "-"
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - generic [ref=e363]: contact_phone
+                - heading "Informasi Kontak" [level=4] [ref=e364]
+              - generic [ref=e365]:
+                - generic [ref=e366]:
+                  - paragraph [ref=e367]: Email Pribadi
+                  - paragraph [ref=e368]: cahyo.w@gmail.com
+                - generic [ref=e369]:
+                  - paragraph [ref=e370]: Handphone 1 (Utama)
+                  - paragraph [ref=e371]: "081345678901"
+                - generic [ref=e372]:
+                  - paragraph [ref=e373]: Handphone 2
+                  - paragraph [ref=e374]: "-"
+                - generic [ref=e375]:
+                  - paragraph [ref=e376]: WhatsApp
+                  - paragraph [ref=e377]: "-"
+                - generic [ref=e378]:
+                  - paragraph [ref=e379]: Telepon Rumah 1
+                  - paragraph [ref=e380]: "-"
+                - generic [ref=e381]:
+                  - paragraph [ref=e382]: Telepon Rumah 2
+                  - paragraph [ref=e383]: "-"
+                - generic [ref=e384]:
+                  - paragraph [ref=e385]: Media Sosial
+                  - paragraph [ref=e386]: "-"
+          - generic [ref=e387]:
+            - generic [ref=e388]:
+              - generic [ref=e389]:
+                - generic [ref=e391]: family_restroom
+                - heading "Informasi Keluarga" [level=4] [ref=e392]
+              - generic [ref=e393]:
+                - generic [ref=e394]:
+                  - paragraph [ref=e395]: Nama Pasangan
+                  - paragraph [ref=e396]: Rina Kusuma
+                - generic [ref=e397]:
+                  - paragraph [ref=e398]: Tgl Menikah
+                  - paragraph [ref=e399]: "-"
+                - generic [ref=e400]:
+                  - paragraph [ref=e401]: Tgl Cerai
+                  - paragraph [ref=e402]: "-"
+                - generic [ref=e403]:
+                  - paragraph [ref=e404]: Tgl Wafat Pasangan
+                  - paragraph [ref=e405]: "-"
+                - generic [ref=e406]:
+                  - paragraph [ref=e407]: Pekerjaan Pasangan
+                  - paragraph [ref=e408]: "-"
+                - generic [ref=e409]:
+                  - paragraph [ref=e410]: Jumlah Anak
+                  - paragraph [ref=e411]: "1"
+            - generic [ref=e412]:
+              - generic [ref=e413]:
+                - generic [ref=e415]: account_balance
+                - heading "Informasi Perbankan" [level=4] [ref=e416]
+              - generic [ref=e417]:
+                - generic [ref=e418]:
+                  - paragraph [ref=e419]: Nomor Rekening
+                  - paragraph [ref=e420]: "-"
+                - generic [ref=e421]:
+                  - paragraph [ref=e422]: Nama Pemegang Rekening
+                  - paragraph [ref=e423]: "-"
+                - generic [ref=e424]:
+                  - paragraph [ref=e425]: Bank
+                  - paragraph [ref=e426]: "-"
+                - generic [ref=e427]:
+                  - paragraph [ref=e428]: Cabang
+                  - paragraph [ref=e429]: "-"

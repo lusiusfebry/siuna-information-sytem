@@ -1,0 +1,18 @@
+export const ERROR_MESSAGES = {
+    NIK_INVALID_FORMAT: 'NIK harus terdiri dari 16 digit angka',
+    NIK_ALREADY_EXISTS: 'NIK sudah terdaftar dalam sistem',
+    NPWP_INVALID_FORMAT: 'Format NPWP tidak valid (contoh: 12.345.678.9-012.345)',
+    BPJS_INVALID_FORMAT: 'BPJS harus terdiri dari 13 digit angka',
+    PHONE_INVALID_FORMAT: 'Format nomor telepon tidak valid',
+    EMAIL_INVALID_FORMAT: 'Format email tidak valid',
+    AGE_BELOW_MINIMUM: 'Umur minimal karyawan adalah 17 tahun',
+    MANAGER_INVALID_POSITION: 'Manager harus memiliki posisi jabatan Head/Kepala/Manager',
+    ATASAN_NOT_ACTIVE: 'Atasan langsung harus karyawan dengan status Aktif',
+    DEPARTMENT_NOT_IN_DIVISI: 'Departemen tidak sesuai dengan Divisi yang dipilih',
+    POSISI_NOT_IN_DEPARTMENT: 'Posisi Jabatan tidak sesuai dengan Departemen yang dipilih',
+    CONTRACT_DATE_INVALID: 'Tanggal Akhir Kontrak harus setelah Tanggal Kontrak',
+    PERMANENT_DATE_INVALID: 'Tanggal Permanent harus setelah Tanggal Masuk',
+    EMPLOYEE_NOT_FOUND: 'Karyawan tidak ditemukan',
+    VALIDATION_ERROR: 'Terjadi kesalahan validasi',
+    INTERNAL_SERVER_ERROR: 'Terjadi kesalahan internal server',
+};

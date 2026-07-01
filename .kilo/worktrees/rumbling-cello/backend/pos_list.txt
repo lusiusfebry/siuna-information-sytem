@@ -1,0 +1,72 @@
+                    nama                     
+---------------------------------------------
+ Act Gl Produksi
+ Drivel Lube Truck
+ Driver Fuel Truck
+ Driver Manhaul
+ Driver Water Truck
+ Electrician G1
+ Electrician G2
+ Electrician G3
+ Engineering Head
+ Equipment & Manpower Section Head
+ Fgdp Engineering
+ Fgdp Engineering Department
+ Fgdp Ir & Ga Department
+ Fgdp Production
+ Fgdp Purchasing & Logistic
+ Fgdp Purchasing & Logistic Department
+ Fgdp She
+ Fuelman
+ General Administration
+ General Affair Crew
+ Grade Control Group Leader
+ Ir & Ga Group Leader
+ Ir & Ga Head
+ Logistic Crew
+ Mechanic Crew
+ Mechanic G1
+ Mechanic G3
+ Mechanic G4
+ Mine Engineer
+ Mine Engineer Junior
+ Mine Survey Crew
+ Mine Surveyor
+ Mine Surveyor Junior
+ Operator 4
+ Plant Group Leader
+ Plant Head
+ Plant Section Head
+ Production Group Leader
+ Production Head
+ Production Section Head
+ Project Control Center Crew
+ Project Control Group Leader
+ Project Control Section Head
+ Project Manager
+ Purchasing & Logistic Group Leader
+ Purchasing & Logistic Head
+ Purchasing & Logistic Section Head
+ Safety, Health & Environment Administration
+ Safety, Health & Environment Group Leader
+ Safety, Health & Environment Head
+ Safety, Health & Environment Section Head
+ Safetyman
+ Security
+ Technical Analyst
+ Tod Mechanic Junior
+ Tod Operator Junior
+ Tod Operator Section Head
+ Tool Keeper
+ Tyre Group Leader
+ Warehouseman
+ Welder G1
+ Welder G3
+ Welder G4
+ Operator 3
+ Checker
+ Group Leader Plant
+ Operator 3 Purlog
+ Operator 3 Plant
+(68 rows)
+

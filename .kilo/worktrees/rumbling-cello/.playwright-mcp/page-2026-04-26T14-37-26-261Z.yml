@@ -1,0 +1,145 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e9]: inventory_2
+        - generic [ref=e10]:
+          - heading "Inventory" [level=1] [ref=e11]
+          - paragraph [ref=e12]: Manajemen Inventaris
+      - navigation [ref=e13]:
+        - link "home Halaman Utama" [ref=e15] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e16]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e18] [cursor=pointer]:
+          - /url: /inventory/dashboard
+          - generic [ref=e19]: dashboard
+          - text: Dashboard
+        - generic [ref=e20]:
+          - button "database Master Data Inventory" [ref=e21] [cursor=pointer]:
+            - generic [ref=e22]:
+              - generic [ref=e23]: database
+              - text: Master Data Inventory
+            - img [ref=e24]
+          - generic [ref=e26]:
+            - link "category Kategori" [ref=e27] [cursor=pointer]:
+              - /url: /inventory/master-data/kategori
+              - generic [ref=e28]: category
+              - text: Kategori
+            - link "account_tree Sub Kategori" [ref=e29] [cursor=pointer]:
+              - /url: /inventory/master-data/sub-kategori
+              - generic [ref=e30]: account_tree
+              - text: Sub Kategori
+            - link "branding_watermark Brand" [ref=e31] [cursor=pointer]:
+              - /url: /inventory/master-data/brand
+              - generic [ref=e32]: branding_watermark
+              - text: Brand
+            - link "straighten UOM" [ref=e33] [cursor=pointer]:
+              - /url: /inventory/master-data/uom
+              - generic [ref=e34]: straighten
+              - text: UOM
+            - link "shopping_bag Produk" [ref=e35] [cursor=pointer]:
+              - /url: /inventory/master-data/produk
+              - generic [ref=e36]: shopping_bag
+              - text: Produk
+            - link "warehouse Gudang" [ref=e37] [cursor=pointer]:
+              - /url: /inventory/master-data/gudang
+              - generic [ref=e38]: warehouse
+              - text: Gudang
+        - generic [ref=e39]:
+          - button "inventory Manajemen Stok" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: inventory
+              - text: Manajemen Stok
+            - img [ref=e43]
+          - generic [ref=e45]:
+            - link "shelves Stok Inventaris" [ref=e46] [cursor=pointer]:
+              - /url: /inventory/stok
+              - generic [ref=e47]: shelves
+              - text: Stok Inventaris
+            - link "swap_horiz Transaksi Stok" [ref=e48] [cursor=pointer]:
+              - /url: /inventory/transaksi
+              - generic [ref=e49]: swap_horiz
+              - text: Transaksi Stok
+            - link "receipt_long Kartu Stok" [ref=e50] [cursor=pointer]:
+              - /url: /inventory/kartu-stok
+              - generic [ref=e51]: receipt_long
+              - text: Kartu Stok
+            - link "qr_code_2 Label & QR Code" [ref=e52] [cursor=pointer]:
+              - /url: /inventory/label
+              - generic [ref=e53]: qr_code_2
+              - text: Label & QR Code
+        - link "upload_file Import Data" [ref=e55] [cursor=pointer]:
+          - /url: /inventory/import
+          - generic [ref=e56]: upload_file
+          - text: Import Data
+        - link "summarize Laporan" [ref=e58] [cursor=pointer]:
+          - /url: /inventory/laporan
+          - generic [ref=e59]: summarize
+          - text: Laporan
+  - generic [ref=e60]:
+    - banner [ref=e61]:
+      - generic [ref=e62]:
+        - heading "Inventory Management" [level=2] [ref=e63]
+        - navigation [ref=e64]:
+          - button "Stok" [ref=e65] [cursor=pointer]
+          - button "Laporan" [ref=e66] [cursor=pointer]
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e70]
+        - generic [ref=e71]:
+          - button "apps" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]: apps
+          - button "notifications" [ref=e75] [cursor=pointer]:
+            - generic [ref=e76]: notifications
+          - button "settings" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]: settings
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: "1234567890123456"
+            - generic [ref=e83]: Super Administrator
+          - button "person" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]: person
+    - main [ref=e87]:
+      - generic [ref=e359]:
+        - generic [ref=e361]:
+          - heading "Laporan Inventory" [level=1] [ref=e362]
+          - paragraph [ref=e363]: Unduh laporan inventaris dalam format Excel atau PDF
+        - generic [ref=e364]:
+          - generic [ref=e365]:
+            - button "inventory_2 Stok Gudang" [ref=e366] [cursor=pointer]:
+              - generic [ref=e367]: inventory_2
+              - text: Stok Gudang
+            - button "swap_horiz Transaksi" [ref=e368] [cursor=pointer]:
+              - generic [ref=e369]: swap_horiz
+              - text: Transaksi
+            - button "devices Aset & Serial Number" [ref=e370] [cursor=pointer]:
+              - generic [ref=e371]: devices
+              - text: Aset & Serial Number
+            - button "warning Stok Rendah" [ref=e372] [cursor=pointer]:
+              - generic [ref=e373]: warning
+              - text: Stok Rendah
+            - button "trending_up Pergerakan Barang" [ref=e374] [cursor=pointer]:
+              - generic [ref=e375]: trending_up
+              - text: Pergerakan Barang
+          - generic [ref=e376]:
+            - generic [ref=e377]:
+              - generic [ref=e378]: info
+              - paragraph [ref=e379]: Laporan stok inventaris per gudang, termasuk breakdown kategori dan brand.
+            - generic [ref=e381]:
+              - generic [ref=e382]: Gudang
+              - combobox [ref=e383]:
+                - option "Semua Gudang" [selected]
+                - option "Gudang Utama Jakarta"
+                - option "Gudang IT Jakarta"
+                - option "Gudang Produksi Bekasi"
+                - option "Gudang Cabang Bandung"
+                - option "Gudang Cabang Surabaya"
+            - generic [ref=e384]:
+              - button "table_view Download Excel" [ref=e385] [cursor=pointer]:
+                - generic [ref=e386]: table_view
+                - text: Download Excel
+              - button "picture_as_pdf Download PDF" [ref=e387] [cursor=pointer]:
+                - generic [ref=e388]: picture_as_pdf
+                - text: Download PDF

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital ID Card - Classic Variant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&amp;family=Roboto:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#FFFF00", // The specific vivid yellow from the screenshot
+              "background-light": "#F3F4F6", // Light gray background for app
+              "background-dark": "#111827", // Dark gray background for app
+              "card-bg": "#FFFFFF",
+              "card-bg-dim": "#F9FAFB",
+            },
+            fontFamily: {
+              display: ["Oswald", "sans-serif"],
+              body: ["Roboto", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              'xl': '0.75rem',
+            },
+          },
+        },
+      };
+    </script>
+<style>.bmi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+        }
+        .bmi-cell {
+            background-color: #D97706;}::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col items-center font-body antialiased transition-colors duration-300 py-8 px-4 selection:bg-yellow-200 selection:text-black">
+<header class="w-full max-w-sm flex justify-between items-center mb-8 text-gray-800 dark:text-gray-100">
+<button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+<span class="material-icons">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-wide">My ID Card</h1>
+<button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+<span class="material-icons">more_vert</span>
+</button>
+</header>
+<main class="w-full max-w-[340px] bg-card-bg dark:bg-gray-50 rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-1 relative group">
+<div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+<div class="bg-primary h-16 w-full flex items-center px-4 space-x-3 border-b-2 border-yellow-500">
+<div class="h-10 w-10 bg-white p-0.5 shadow-sm shrink-0 flex items-center justify-center">
+<div class="font-display font-bold text-black text-xs leading-none tracking-tighter text-center">
+<span class="block text-lg">BMI</span>
+</div>
+</div>
+<div class="flex-1">
+<h2 class="font-display font-bold text-lg leading-5 text-black uppercase tracking-tight">
+                    PT. BINTANI MEGAHINDAH
+                </h2>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-50 py-3 text-center border-b border-gray-200 dark:border-gray-300">
+<h3 class="font-display font-bold text-3xl text-red-600 uppercase tracking-wide drop-shadow-sm">
+                Mine Permit
+            </h3>
+</div>
+<div class="bg-white dark:bg-gray-50 py-1.5 px-2 text-center border-b border-gray-200 dark:border-gray-300">
+<p class="font-body font-bold text-blue-800 text-sm uppercase tracking-tight">
+                PT. PRIMA SARANA GEMILANG
+            </p>
+</div>
+<div class="bg-white dark:bg-gray-50 px-6 pt-6 pb-6 flex flex-col items-center">
+<div class="w-32 h-40 bg-red-700 mb-5 shadow-inner flex items-end justify-center overflow-hidden border border-gray-200">
+<img alt="Employee Profile Photo" class="w-full h-full object-cover object-center mix-blend-normal brightness-110 contrast-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApO2qwB1XufdcAjhy9KL6hxMK_ffPGUbzuTDdrq7BWa4XfbI8BgGCx8kOyIdhe2tOkr0T_lFj8BgXa-o1sRCny9jpXMPRF6pDrxzrkjsyAzgbnWzOq-REOo9kZG1uTyWvoLN3RRlv9Cmj2DkTYLH5tFIZ-1ieqWq_Ntjsl2HcaECOKOAbmTzyhDiBZlYgjXYcnABQNLF1sru6jj9W58-XvmB136fCGNxZTx1AcqBiMNu4ysCtANPgueyGeroPmCTDG3z3RIzV29C4"/>
+</div>
+<div class="text-center w-full space-y-1">
+<p class="font-body text-gray-900 font-medium text-lg tracking-wide border-b border-transparent inline-block">
+                    510.01.PSG-BMI.2026
+                </p>
+<h4 class="font-display font-bold text-2xl text-black uppercase tracking-wide leading-tight mt-2">
+                    Akhmad Amirudin
+                </h4>
+<p class="font-body font-bold text-lg text-black uppercase mt-1">
+                    Welder
+                </p>
+</div>
+</div>
+<div class="flex h-12 w-full text-center font-display font-bold text-base uppercase tracking-wider">
+<div class="flex-1 bg-blue-600 flex items-center justify-center text-white border-r border-blue-700">
+                Port
+            </div>
+<div class="flex-1 bg-primary flex items-center justify-center text-black border-r border-yellow-400">
+                Pit
+            </div>
+<div class="flex-1 bg-green-600 flex items-center justify-center text-white">
+                Office
+            </div>
+</div>
+</main>
+<div class="w-full max-w-[340px] mt-8 grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center space-x-2 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<span class="material-icons text-blue-600 dark:text-blue-400">qr_code</span>
+<span class="font-medium text-gray-700 dark:text-gray-200">Show QR</span>
+</button>
+<button class="flex items-center justify-center space-x-2 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+<span class="material-icons text-gray-600 dark:text-gray-400">share</span>
+<span class="font-medium text-gray-700 dark:text-gray-200">Share ID</span>
+</button>
+</div>
+<div class="mt-8 flex items-center space-x-2 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-4 py-2 rounded-full">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+</span>
+<span>Active Permit</span>
+</div>
+
+</body></html>

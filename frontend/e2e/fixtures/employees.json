@@ -1,0 +1,20 @@
+[
+    {
+        "nama_lengkap": "E2E Test Employee",
+        "nomor_induk_karyawan": "E2E9990001",
+        "divisi_id": 1,
+        "department_id": 1,
+        "posisi_jabatan_id": 1,
+        "status_karyawan_id": 1,
+        "lokasi_kerja_id": 1,
+        "tempat_lahir": "Jakarta",
+        "tanggal_lahir": "1990-01-01",
+        "jenis_kelamin": "L",
+        "agama": "Islam",
+        "golongan_darah": "O",
+        "nomor_ktp": "1234567890123456",
+        "alamat_ktp": "Jl. E2E Test No. 1",
+        "nomor_handphone": "081234567890",
+        "email_pribadi": "e2e@test.com"
+    }
+]

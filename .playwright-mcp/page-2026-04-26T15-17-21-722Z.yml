@@ -1,0 +1,234 @@
+- generic [ref=e7]:
+  - complementary [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e13]: inventory_2
+        - generic [ref=e14]:
+          - heading "Inventory" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Manajemen Inventaris
+      - navigation [ref=e17]:
+        - link "home Halaman Utama" [ref=e19] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e20]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e22] [cursor=pointer]:
+          - /url: /inventory/dashboard
+          - generic [ref=e23]: dashboard
+          - text: Dashboard
+        - generic [ref=e24]:
+          - button "database Master Data Inventory" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: database
+              - text: Master Data Inventory
+            - img [ref=e28]
+          - generic [ref=e30]:
+            - link "category Kategori" [ref=e31] [cursor=pointer]:
+              - /url: /inventory/master-data/kategori
+              - generic [ref=e32]: category
+              - text: Kategori
+            - link "account_tree Sub Kategori" [ref=e33] [cursor=pointer]:
+              - /url: /inventory/master-data/sub-kategori
+              - generic [ref=e34]: account_tree
+              - text: Sub Kategori
+            - link "branding_watermark Brand" [ref=e35] [cursor=pointer]:
+              - /url: /inventory/master-data/brand
+              - generic [ref=e36]: branding_watermark
+              - text: Brand
+            - link "straighten UOM" [ref=e37] [cursor=pointer]:
+              - /url: /inventory/master-data/uom
+              - generic [ref=e38]: straighten
+              - text: UOM
+            - link "shopping_bag Produk" [ref=e39] [cursor=pointer]:
+              - /url: /inventory/master-data/produk
+              - generic [ref=e40]: shopping_bag
+              - text: Produk
+            - link "warehouse Gudang" [ref=e41] [cursor=pointer]:
+              - /url: /inventory/master-data/gudang
+              - generic [ref=e42]: warehouse
+              - text: Gudang
+        - generic [ref=e43]:
+          - button "inventory Manajemen Stok" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45]:
+              - generic [ref=e46]: inventory
+              - text: Manajemen Stok
+            - img [ref=e47]
+          - generic [ref=e49]:
+            - link "shelves Stok Inventaris" [ref=e50] [cursor=pointer]:
+              - /url: /inventory/stok
+              - generic [ref=e51]: shelves
+              - text: Stok Inventaris
+            - link "swap_horiz Transaksi Stok" [ref=e52] [cursor=pointer]:
+              - /url: /inventory/transaksi
+              - generic [ref=e53]: swap_horiz
+              - text: Transaksi Stok
+            - link "receipt_long Kartu Stok" [ref=e54] [cursor=pointer]:
+              - /url: /inventory/kartu-stok
+              - generic [ref=e55]: receipt_long
+              - text: Kartu Stok
+            - link "qr_code_2 Label & QR Code" [ref=e56] [cursor=pointer]:
+              - /url: /inventory/label
+              - generic [ref=e57]: qr_code_2
+              - text: Label & QR Code
+        - link "upload_file Import Data" [ref=e59] [cursor=pointer]:
+          - /url: /inventory/import
+          - generic [ref=e60]: upload_file
+          - text: Import Data
+        - link "summarize Laporan" [ref=e62] [cursor=pointer]:
+          - /url: /inventory/laporan
+          - generic [ref=e63]: summarize
+          - text: Laporan
+  - generic [ref=e64]:
+    - banner [ref=e65]:
+      - generic [ref=e66]:
+        - heading "Inventory Management" [level=2] [ref=e67]
+        - navigation [ref=e68]:
+          - button "Stok" [ref=e69] [cursor=pointer]
+          - button "Laporan" [ref=e70] [cursor=pointer]
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e74]
+        - generic [ref=e75]:
+          - button "apps" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: apps
+          - button "notifications" [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: notifications
+          - button "settings" [ref=e81] [cursor=pointer]:
+            - generic [ref=e82]: settings
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: "1234567890123456"
+            - generic [ref=e87]: Super Administrator
+          - button "person" [ref=e89] [cursor=pointer]:
+            - generic [ref=e90]: person
+    - main [ref=e91]:
+      - generic [ref=e94]:
+        - generic [ref=e96]:
+          - heading "Gudang" [level=1] [ref=e97]
+          - paragraph [ref=e98]: Kelola gudang dan lokasi penyimpanan
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - generic:
+                - img
+              - textbox "Cari data..." [ref=e102]
+            - generic [ref=e103]:
+              - generic:
+                - img
+              - combobox [ref=e104]:
+                - option "Semua Status" [selected]
+                - option "Aktif"
+                - option "Tidak Aktif"
+          - button "Tambah Gudang" [ref=e105] [cursor=pointer]:
+            - img [ref=e106]
+            - text: Tambah Gudang
+        - generic [ref=e109]:
+          - button "list" [ref=e110] [cursor=pointer]:
+            - generic [ref=e111]: list
+          - button "view_list" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: view_list
+          - button "view_headline" [ref=e114] [cursor=pointer]:
+            - generic [ref=e115]: view_headline
+          - button "grid_view" [ref=e116] [cursor=pointer]:
+            - generic [ref=e117]: grid_view
+          - button "fullscreen" [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: fullscreen
+          - button "table_rows" [ref=e120] [cursor=pointer]:
+            - generic [ref=e121]: table_rows
+          - button "vertical_split" [ref=e122] [cursor=pointer]:
+            - generic [ref=e123]: vertical_split
+        - generic [ref=e124]:
+          - table [ref=e126]:
+            - rowgroup [ref=e127]:
+              - row "No Code Nama Gudang Penanggung Jawab Department Lokasi Kerja Lokasi Status Aksi" [ref=e128]:
+                - columnheader "No" [ref=e129]
+                - columnheader "Code" [ref=e130]
+                - columnheader "Nama Gudang" [ref=e131]
+                - columnheader "Penanggung Jawab" [ref=e132]
+                - columnheader "Department" [ref=e133]
+                - columnheader "Lokasi Kerja" [ref=e134]
+                - columnheader "Lokasi" [ref=e135]
+                - columnheader "Status" [ref=e136]
+                - columnheader "Aksi" [ref=e137]
+            - rowgroup [ref=e138]:
+              - row "1 GDG-001 Gudang Utama Jakarta Sari Indah Permatasari General Affairs Kantor Pusat Jakarta Lantai B1, Gedung Utama Aktif" [ref=e139]:
+                - cell "1" [ref=e140]
+                - cell "GDG-001" [ref=e141]
+                - cell "Gudang Utama Jakarta" [ref=e142]
+                - cell "Sari Indah Permatasari" [ref=e143]
+                - cell "General Affairs" [ref=e144]
+                - cell "Kantor Pusat Jakarta" [ref=e145]
+                - cell "Lantai B1, Gedung Utama" [ref=e146]
+                - cell "Aktif" [ref=e147]
+                - cell [ref=e148]:
+                  - generic [ref=e149]:
+                    - button [ref=e150] [cursor=pointer]:
+                      - img [ref=e151]
+                    - button [ref=e153] [cursor=pointer]:
+                      - img [ref=e154]
+              - row "2 GDG-002 Gudang IT Jakarta Reza Mahendra IT Infrastructure Kantor Pusat Jakarta Lantai 3, Ruang Server Aktif" [ref=e156]:
+                - cell "2" [ref=e157]
+                - cell "GDG-002" [ref=e158]
+                - cell "Gudang IT Jakarta" [ref=e159]
+                - cell "Reza Mahendra" [ref=e160]
+                - cell "IT Infrastructure" [ref=e161]
+                - cell "Kantor Pusat Jakarta" [ref=e162]
+                - cell "Lantai 3, Ruang Server" [ref=e163]
+                - cell "Aktif" [ref=e164]
+                - cell [ref=e165]:
+                  - generic [ref=e166]:
+                    - button [ref=e167] [cursor=pointer]:
+                      - img [ref=e168]
+                    - button [ref=e170] [cursor=pointer]:
+                      - img [ref=e171]
+              - row "3 GDG-003 Gudang Produksi Bekasi Wahyu Hidayat Produksi Site Bekasi Area Pabrik Bekasi Aktif" [ref=e173]:
+                - cell "3" [ref=e174]
+                - cell "GDG-003" [ref=e175]
+                - cell "Gudang Produksi Bekasi" [ref=e176]
+                - cell "Wahyu Hidayat" [ref=e177]
+                - cell "Produksi" [ref=e178]
+                - cell "Site Bekasi" [ref=e179]
+                - cell "Area Pabrik Bekasi" [ref=e180]
+                - cell "Aktif" [ref=e181]
+                - cell [ref=e182]:
+                  - generic [ref=e183]:
+                    - button [ref=e184] [cursor=pointer]:
+                      - img [ref=e185]
+                    - button [ref=e187] [cursor=pointer]:
+                      - img [ref=e188]
+              - row "4 GDG-004 Gudang Cabang Bandung Budi Hartono - Site Bandung Ruang Gudang Lt. 1 Aktif" [ref=e190]:
+                - cell "4" [ref=e191]
+                - cell "GDG-004" [ref=e192]
+                - cell "Gudang Cabang Bandung" [ref=e193]
+                - cell "Budi Hartono" [ref=e194]
+                - cell "-" [ref=e195]
+                - cell "Site Bandung" [ref=e196]
+                - cell "Ruang Gudang Lt. 1" [ref=e197]
+                - cell "Aktif" [ref=e198]
+                - cell [ref=e199]:
+                  - generic [ref=e200]:
+                    - button [ref=e201] [cursor=pointer]:
+                      - img [ref=e202]
+                    - button [ref=e204] [cursor=pointer]:
+                      - img [ref=e205]
+              - row "5 GDG-005 Gudang Cabang Surabaya - - Site Surabaya Area Gudang Belakang Aktif" [ref=e207]:
+                - cell "5" [ref=e208]
+                - cell "GDG-005" [ref=e209]
+                - cell "Gudang Cabang Surabaya" [ref=e210]
+                - cell "-" [ref=e211]
+                - cell "-" [ref=e212]
+                - cell "Site Surabaya" [ref=e213]
+                - cell "Area Gudang Belakang" [ref=e214]
+                - cell "Aktif" [ref=e215]
+                - cell [ref=e216]:
+                  - generic [ref=e217]:
+                    - button [ref=e218] [cursor=pointer]:
+                      - img [ref=e219]
+                    - button [ref=e221] [cursor=pointer]:
+                      - img [ref=e222]
+          - generic [ref=e224]:
+            - button [disabled]:
+              - img
+            - generic [ref=e225]: Halaman 1
+            - button [disabled]:
+              - img

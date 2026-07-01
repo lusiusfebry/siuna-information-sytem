@@ -1,0 +1,382 @@
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]: inventory_2
+          - generic [ref=e12]:
+            - heading "Inventory" [level=1] [ref=e13]
+            - paragraph [ref=e14]: Manajemen Inventaris
+        - navigation [ref=e15]:
+          - link "home Halaman Utama" [ref=e17] [cursor=pointer]:
+            - /url: /welcome
+            - generic [ref=e18]: home
+            - text: Halaman Utama
+          - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+            - /url: /inventory/dashboard
+            - generic [ref=e21]: dashboard
+            - text: Dashboard
+          - generic [ref=e22]:
+            - button "database Master Data Inventory" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]:
+                - generic [ref=e25]: database
+                - text: Master Data Inventory
+              - img [ref=e26]
+            - generic [ref=e28]:
+              - link "category Kategori" [ref=e29] [cursor=pointer]:
+                - /url: /inventory/master-data/kategori
+                - generic [ref=e30]: category
+                - text: Kategori
+              - link "account_tree Sub Kategori" [ref=e31] [cursor=pointer]:
+                - /url: /inventory/master-data/sub-kategori
+                - generic [ref=e32]: account_tree
+                - text: Sub Kategori
+              - link "branding_watermark Brand" [ref=e33] [cursor=pointer]:
+                - /url: /inventory/master-data/brand
+                - generic [ref=e34]: branding_watermark
+                - text: Brand
+              - link "straighten UOM" [ref=e35] [cursor=pointer]:
+                - /url: /inventory/master-data/uom
+                - generic [ref=e36]: straighten
+                - text: UOM
+              - link "shopping_bag Produk" [ref=e37] [cursor=pointer]:
+                - /url: /inventory/master-data/produk
+                - generic [ref=e38]: shopping_bag
+                - text: Produk
+              - link "warehouse Gudang" [ref=e39] [cursor=pointer]:
+                - /url: /inventory/master-data/gudang
+                - generic [ref=e40]: warehouse
+                - text: Gudang
+          - generic [ref=e41]:
+            - button "inventory Manajemen Stok" [ref=e42] [cursor=pointer]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: inventory
+                - text: Manajemen Stok
+              - img [ref=e45]
+            - generic [ref=e47]:
+              - link "shelves Stok Inventaris" [ref=e48] [cursor=pointer]:
+                - /url: /inventory/stok
+                - generic [ref=e49]: shelves
+                - text: Stok Inventaris
+              - link "swap_horiz Transaksi Stok" [ref=e50] [cursor=pointer]:
+                - /url: /inventory/transaksi
+                - generic [ref=e51]: swap_horiz
+                - text: Transaksi Stok
+              - link "receipt_long Kartu Stok" [ref=e52] [cursor=pointer]:
+                - /url: /inventory/kartu-stok
+                - generic [ref=e53]: receipt_long
+                - text: Kartu Stok
+              - link "qr_code_2 Label & QR Code" [ref=e54] [cursor=pointer]:
+                - /url: /inventory/label
+                - generic [ref=e55]: qr_code_2
+                - text: Label & QR Code
+          - link "upload_file Import Data" [ref=e57] [cursor=pointer]:
+            - /url: /inventory/import
+            - generic [ref=e58]: upload_file
+            - text: Import Data
+    - generic [ref=e59]:
+      - banner [ref=e60]:
+        - generic [ref=e61]:
+          - heading "Inventory Management" [level=2] [ref=e62]
+          - navigation [ref=e63]:
+            - link "Stok" [ref=e64] [cursor=pointer]:
+              - /url: "#"
+            - link "Laporan" [ref=e65] [cursor=pointer]:
+              - /url: "#"
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]: search
+            - textbox "Cari karyawan, departemen, atau NIK..." [ref=e69]
+          - generic [ref=e70]:
+            - button "apps" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: apps
+            - button "notifications" [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: notifications
+            - button "settings" [ref=e76] [cursor=pointer]:
+              - generic [ref=e77]: settings
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: "1234567890123456"
+              - generic [ref=e82]: Super Administrator
+            - button "person" [ref=e84] [cursor=pointer]:
+              - generic [ref=e85]: person
+      - main [ref=e86]:
+        - generic [ref=e89]:
+          - generic [ref=e91]:
+            - heading "Produk" [level=1] [ref=e92]
+            - paragraph [ref=e93]: Kelola produk inventaris
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic:
+                  - img
+                - textbox "Cari data..." [ref=e97]
+              - generic [ref=e98]:
+                - generic:
+                  - img
+                - combobox [ref=e99]:
+                  - option "Semua Status" [selected]
+                  - option "Aktif"
+                  - option "Tidak Aktif"
+            - button "Tambah Produk" [ref=e100] [cursor=pointer]:
+              - img [ref=e101]
+              - text: Tambah Produk
+          - generic [ref=e104]:
+            - button "list" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]: list
+            - button "view_list" [ref=e107] [cursor=pointer]:
+              - generic [ref=e108]: view_list
+            - button "view_headline" [ref=e109] [cursor=pointer]:
+              - generic [ref=e110]: view_headline
+            - button "grid_view" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: grid_view
+            - button "fullscreen" [ref=e113] [cursor=pointer]:
+              - generic [ref=e114]: fullscreen
+            - button "table_rows" [ref=e115] [cursor=pointer]:
+              - generic [ref=e116]: table_rows
+            - button "vertical_split" [ref=e117] [cursor=pointer]:
+              - generic [ref=e118]: vertical_split
+          - generic [ref=e119]:
+            - table [ref=e121]:
+              - rowgroup [ref=e122]:
+                - row "No Foto Code Nama Produk Brand Serial Number Tag Number Stok Min Status Aksi" [ref=e123]:
+                  - columnheader "No" [ref=e124]
+                  - columnheader "Foto" [ref=e125]
+                  - columnheader "Code" [ref=e126]
+                  - columnheader "Nama Produk" [ref=e127]
+                  - columnheader "Brand" [ref=e128]
+                  - columnheader "Serial Number" [ref=e129]
+                  - columnheader "Tag Number" [ref=e130]
+                  - columnheader "Stok Min" [ref=e131]
+                  - columnheader "Status" [ref=e132]
+                  - columnheader "Aksi" [ref=e133]
+              - rowgroup [ref=e134]:
+                - row "1 image IPRD001 Lenovo ThinkPad T14 Lenovo Ya Tidak 5 Aktif" [ref=e135]:
+                  - cell "1" [ref=e136]
+                  - cell "image" [ref=e137]:
+                    - generic [ref=e138]: image
+                  - cell "IPRD001" [ref=e139]
+                  - cell "Lenovo ThinkPad T14" [ref=e140]
+                  - cell "Lenovo" [ref=e141]
+                  - cell "Ya" [ref=e142]
+                  - cell "Tidak" [ref=e143]
+                  - cell "5" [ref=e144]
+                  - cell "Aktif" [ref=e145]
+                  - cell [ref=e146]:
+                    - generic [ref=e147]:
+                      - button [active] [ref=e148] [cursor=pointer]:
+                        - img [ref=e149]
+                      - button [ref=e151] [cursor=pointer]:
+                        - img [ref=e152]
+                - row "2 image IPRD002 Dell OptiPlex 3090 Dell Ya Tidak 5 Aktif" [ref=e154]:
+                  - cell "2" [ref=e155]
+                  - cell "image" [ref=e156]:
+                    - generic [ref=e157]: image
+                  - cell "IPRD002" [ref=e158]
+                  - cell "Dell OptiPlex 3090" [ref=e159]
+                  - cell "Dell" [ref=e160]
+                  - cell "Ya" [ref=e161]
+                  - cell "Tidak" [ref=e162]
+                  - cell "5" [ref=e163]
+                  - cell "Aktif" [ref=e164]
+                  - cell [ref=e165]:
+                    - generic [ref=e166]:
+                      - button [ref=e167] [cursor=pointer]:
+                        - img [ref=e168]
+                      - button [ref=e170] [cursor=pointer]:
+                        - img [ref=e171]
+                - row "3 image IPRD003 HP LaserJet Pro M404dn HP Ya Tidak 5 Aktif" [ref=e173]:
+                  - cell "3" [ref=e174]
+                  - cell "image" [ref=e175]:
+                    - generic [ref=e176]: image
+                  - cell "IPRD003" [ref=e177]
+                  - cell "HP LaserJet Pro M404dn" [ref=e178]
+                  - cell "HP" [ref=e179]
+                  - cell "Ya" [ref=e180]
+                  - cell "Tidak" [ref=e181]
+                  - cell "5" [ref=e182]
+                  - cell "Aktif" [ref=e183]
+                  - cell [ref=e184]:
+                    - generic [ref=e185]:
+                      - button [ref=e186] [cursor=pointer]:
+                        - img [ref=e187]
+                      - button [ref=e189] [cursor=pointer]:
+                        - img [ref=e190]
+                - row "4 image IPRD004 Canon PIXMA G3020 Canon Ya Tidak 5 Aktif" [ref=e192]:
+                  - cell "4" [ref=e193]
+                  - cell "image" [ref=e194]:
+                    - generic [ref=e195]: image
+                  - cell "IPRD004" [ref=e196]
+                  - cell "Canon PIXMA G3020" [ref=e197]
+                  - cell "Canon" [ref=e198]
+                  - cell "Ya" [ref=e199]
+                  - cell "Tidak" [ref=e200]
+                  - cell "5" [ref=e201]
+                  - cell "Aktif" [ref=e202]
+                  - cell [ref=e203]:
+                    - generic [ref=e204]:
+                      - button [ref=e205] [cursor=pointer]:
+                        - img [ref=e206]
+                      - button [ref=e208] [cursor=pointer]:
+                        - img [ref=e209]
+                - row "5 image IPRD005 Kertas A4 70gsm PaperOne Tidak Tidak 5 Aktif" [ref=e211]:
+                  - cell "5" [ref=e212]
+                  - cell "image" [ref=e213]:
+                    - generic [ref=e214]: image
+                  - cell "IPRD005" [ref=e215]
+                  - cell "Kertas A4 70gsm" [ref=e216]
+                  - cell "PaperOne" [ref=e217]
+                  - cell "Tidak" [ref=e218]
+                  - cell "Tidak" [ref=e219]
+                  - cell "5" [ref=e220]
+                  - cell "Aktif" [ref=e221]
+                  - cell [ref=e222]:
+                    - generic [ref=e223]:
+                      - button [ref=e224] [cursor=pointer]:
+                        - img [ref=e225]
+                      - button [ref=e227] [cursor=pointer]:
+                        - img [ref=e228]
+                - row "6 image IPRD006 Pulpen Pilot G-2 Pilot Tidak Tidak 5 Aktif" [ref=e230]:
+                  - cell "6" [ref=e231]
+                  - cell "image" [ref=e232]:
+                    - generic [ref=e233]: image
+                  - cell "IPRD006" [ref=e234]
+                  - cell "Pulpen Pilot G-2" [ref=e235]
+                  - cell "Pilot" [ref=e236]
+                  - cell "Tidak" [ref=e237]
+                  - cell "Tidak" [ref=e238]
+                  - cell "5" [ref=e239]
+                  - cell "Aktif" [ref=e240]
+                  - cell [ref=e241]:
+                    - generic [ref=e242]:
+                      - button [ref=e243] [cursor=pointer]:
+                        - img [ref=e244]
+                      - button [ref=e246] [cursor=pointer]:
+                        - img [ref=e247]
+                - row "7 image IPRD007 Meja Kerja 120x60 IKEA Ya Tidak 5 Aktif" [ref=e249]:
+                  - cell "7" [ref=e250]
+                  - cell "image" [ref=e251]:
+                    - generic [ref=e252]: image
+                  - cell "IPRD007" [ref=e253]
+                  - cell "Meja Kerja 120x60" [ref=e254]
+                  - cell "IKEA" [ref=e255]
+                  - cell "Ya" [ref=e256]
+                  - cell "Tidak" [ref=e257]
+                  - cell "5" [ref=e258]
+                  - cell "Aktif" [ref=e259]
+                  - cell [ref=e260]:
+                    - generic [ref=e261]:
+                      - button [ref=e262] [cursor=pointer]:
+                        - img [ref=e263]
+                      - button [ref=e265] [cursor=pointer]:
+                        - img [ref=e266]
+                - row "8 image IPRD008 Kursi Ergonomic Mesh IKEA Ergonomic Ya Tidak 5 Aktif" [ref=e268]:
+                  - cell "8" [ref=e269]
+                  - cell "image" [ref=e270]:
+                    - generic [ref=e271]: image
+                  - cell "IPRD008" [ref=e272]
+                  - cell "Kursi Ergonomic Mesh" [ref=e273]
+                  - cell "IKEA Ergonomic" [ref=e274]
+                  - cell "Ya" [ref=e275]
+                  - cell "Tidak" [ref=e276]
+                  - cell "5" [ref=e277]
+                  - cell "Aktif" [ref=e278]
+                  - cell [ref=e279]:
+                    - generic [ref=e280]:
+                      - button [ref=e281] [cursor=pointer]:
+                        - img [ref=e282]
+                      - button [ref=e284] [cursor=pointer]:
+                        - img [ref=e285]
+                - row "9 image IPRD009 Tinta Printer Canon GI-71 Canon Tidak Tidak 5 Aktif" [ref=e287]:
+                  - cell "9" [ref=e288]
+                  - cell "image" [ref=e289]:
+                    - generic [ref=e290]: image
+                  - cell "IPRD009" [ref=e291]
+                  - cell "Tinta Printer Canon GI-71" [ref=e292]
+                  - cell "Canon" [ref=e293]
+                  - cell "Tidak" [ref=e294]
+                  - cell "Tidak" [ref=e295]
+                  - cell "5" [ref=e296]
+                  - cell "Aktif" [ref=e297]
+                  - cell [ref=e298]:
+                    - generic [ref=e299]:
+                      - button [ref=e300] [cursor=pointer]:
+                        - img [ref=e301]
+                      - button [ref=e303] [cursor=pointer]:
+                        - img [ref=e304]
+                - row "10 image IPRD010 Amplop Coklat A4 Pilot Tidak Tidak 5 Aktif" [ref=e306]:
+                  - cell "10" [ref=e307]
+                  - cell "image" [ref=e308]:
+                    - generic [ref=e309]: image
+                  - cell "IPRD010" [ref=e310]
+                  - cell "Amplop Coklat A4" [ref=e311]
+                  - cell "Pilot" [ref=e312]
+                  - cell "Tidak" [ref=e313]
+                  - cell "Tidak" [ref=e314]
+                  - cell "5" [ref=e315]
+                  - cell "Aktif" [ref=e316]
+                  - cell [ref=e317]:
+                    - generic [ref=e318]:
+                      - button [ref=e319] [cursor=pointer]:
+                        - img [ref=e320]
+                      - button [ref=e322] [cursor=pointer]:
+                        - img [ref=e323]
+            - generic [ref=e325]:
+              - button [disabled]:
+                - img
+              - generic [ref=e326]: Halaman 1
+              - button [disabled]:
+                - img
+  - generic [ref=e329]:
+    - generic [ref=e330]:
+      - heading "Edit Produk" [level=3] [ref=e332]
+      - button [ref=e333] [cursor=pointer]:
+        - img [ref=e334]
+    - generic [ref=e336]:
+      - generic [ref=e337]:
+        - generic [ref=e338]: Foto Produk
+        - generic [ref=e339]:
+          - generic [ref=e341]: image
+          - generic [ref=e342]:
+            - button "Upload Foto" [ref=e343] [cursor=pointer]
+            - paragraph [ref=e344]: Maks 2MB, format JPG/PNG
+      - generic [ref=e345]:
+        - generic [ref=e346]:
+          - generic [ref=e347]: Nama Produk *
+          - textbox [ref=e349]: Lenovo ThinkPad T14
+        - generic [ref=e350]:
+          - generic [ref=e351]: Brand *
+          - combobox [ref=e352]:
+            - option "Pilih Brand"
+            - option "Lenovo" [selected]
+            - option "Dell"
+            - option "HP"
+            - option "Canon"
+            - option "PaperOne"
+            - option "IKEA"
+            - option "Pilot"
+            - option "IKEA Ergonomic"
+        - generic [ref=e353]:
+          - generic [ref=e354]: Memiliki Serial Number
+          - generic [ref=e355]:
+            - button [pressed] [ref=e356] [cursor=pointer]
+            - generic [ref=e357]: Aktif
+        - generic [ref=e358]:
+          - generic [ref=e359]: Memiliki Tag Number
+          - generic [ref=e360]:
+            - button [ref=e361] [cursor=pointer]
+            - generic [ref=e362]: Tidak Aktif
+        - generic [ref=e363]:
+          - generic [ref=e364]: Stok Minimum
+          - spinbutton [ref=e366]: "5"
+        - generic [ref=e367]:
+          - generic [ref=e368]: Keterangan
+          - textbox [ref=e369]
+        - generic [ref=e370]:
+          - generic [ref=e371]: Status
+          - generic [ref=e372]:
+            - button [pressed] [ref=e373] [cursor=pointer]
+            - generic [ref=e374]: Aktif
+        - generic [ref=e375]:
+          - button "Batal" [ref=e376] [cursor=pointer]
+          - button "Simpan" [ref=e377] [cursor=pointer]

@@ -1,0 +1,89 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e9]: inventory_2
+        - generic [ref=e10]:
+          - heading "Inventory" [level=1] [ref=e11]
+          - paragraph [ref=e12]: Manajemen Inventaris
+      - navigation [ref=e13]:
+        - link "home Halaman Utama" [ref=e15] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e16]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e18] [cursor=pointer]:
+          - /url: /inventory/dashboard
+          - generic [ref=e19]: dashboard
+          - text: Dashboard
+        - generic [ref=e20]:
+          - button "database Master Data Inventory" [ref=e21] [cursor=pointer]:
+            - generic [ref=e22]:
+              - generic [ref=e23]: database
+              - text: Master Data Inventory
+            - img [ref=e24]
+          - generic [ref=e26]:
+            - link "category Kategori" [ref=e27] [cursor=pointer]:
+              - /url: /inventory/master-data/kategori
+              - generic [ref=e28]: category
+              - text: Kategori
+            - link "account_tree Sub Kategori" [ref=e29] [cursor=pointer]:
+              - /url: /inventory/master-data/sub-kategori
+              - generic [ref=e30]: account_tree
+              - text: Sub Kategori
+            - link "branding_watermark Brand" [ref=e31] [cursor=pointer]:
+              - /url: /inventory/master-data/brand
+              - generic [ref=e32]: branding_watermark
+              - text: Brand
+            - link "straighten UOM" [ref=e33] [cursor=pointer]:
+              - /url: /inventory/master-data/uom
+              - generic [ref=e34]: straighten
+              - text: UOM
+            - link "shopping_bag Produk" [ref=e35] [cursor=pointer]:
+              - /url: /inventory/master-data/produk
+              - generic [ref=e36]: shopping_bag
+              - text: Produk
+            - link "warehouse Gudang" [ref=e37] [cursor=pointer]:
+              - /url: /inventory/master-data/gudang
+              - generic [ref=e38]: warehouse
+              - text: Gudang
+        - generic [ref=e39]:
+          - button "inventory Manajemen Stok" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: inventory
+              - text: Manajemen Stok
+            - img [ref=e43]
+          - generic [ref=e45]:
+            - link "shelves Stok Inventaris" [ref=e46] [cursor=pointer]:
+              - /url: /inventory/stok
+              - generic [ref=e47]: shelves
+              - text: Stok Inventaris
+            - link "swap_horiz Transaksi Stok" [ref=e48] [cursor=pointer]:
+              - /url: /inventory/transaksi
+              - generic [ref=e49]: swap_horiz
+              - text: Transaksi Stok
+            - link "receipt_long Kartu Stok" [ref=e50] [cursor=pointer]:
+              - /url: /inventory/kartu-stok
+              - generic [ref=e51]: receipt_long
+              - text: Kartu Stok
+            - link "qr_code_2 Label & QR Code" [ref=e52] [cursor=pointer]:
+              - /url: /inventory/label
+              - generic [ref=e53]: qr_code_2
+              - text: Label & QR Code
+  - generic [ref=e54]:
+    - banner [ref=e55]:
+      - heading "Inventory Management" [level=2] [ref=e57]
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - button "apps" [ref=e60] [cursor=pointer]:
+            - generic [ref=e61]: apps
+          - button "notifications" [ref=e62] [cursor=pointer]:
+            - generic [ref=e63]: notifications
+          - button "settings" [ref=e64] [cursor=pointer]:
+            - generic [ref=e65]: settings
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]: "1234567890123456"
+            - generic [ref=e70]: Super Administrator
+          - button "person" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]: person
+    - main [ref=e74]

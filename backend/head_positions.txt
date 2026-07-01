@@ -1,0 +1,10 @@
+              posisi               |               department               
+-----------------------------------+----------------------------------------
+ Engineering Head                  | Mine Engineering
+ Ir & Ga Head                      | Industrial Relation And General Affair
+ Plant Head                        | Plant
+ Production Head                   | Production
+ Purchasing & Logistic Head        | Purchasing And Logistic
+ Safety, Health & Environment Head | Health & Safery Environtment
+(6 rows)
+

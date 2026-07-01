@@ -1,0 +1,237 @@
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]: corporate_fare
+          - generic [ref=e12]:
+            - heading "PSG HRMS" [level=1] [ref=e13]
+            - paragraph [ref=e14]: Enterprise System
+        - navigation [ref=e15]:
+          - link "dashboard_customize Halaman Utama" [ref=e17] [cursor=pointer]:
+            - /url: /welcome
+            - generic [ref=e18]: dashboard_customize
+            - text: Halaman Utama
+          - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+            - /url: /dashboard
+            - generic [ref=e21]: dashboard
+            - text: Dashboard
+          - generic [ref=e22]:
+            - button "database Master Data" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]:
+                - generic [ref=e25]: database
+                - text: Master Data
+              - img [ref=e26]
+            - generic [ref=e28]:
+              - link "domain Divisi" [ref=e29] [cursor=pointer]:
+                - /url: /hr/master-data/divisi
+                - generic [ref=e30]: domain
+                - text: Divisi
+              - link "groups Departemen" [ref=e31] [cursor=pointer]:
+                - /url: /hr/master-data/department
+                - generic [ref=e32]: groups
+                - text: Departemen
+              - link "badge Posisi Jabatan" [ref=e33] [cursor=pointer]:
+                - /url: /hr/master-data/posisi-jabatan
+                - generic [ref=e34]: badge
+                - text: Posisi Jabatan
+              - link "military_tech Kategori Pangkat" [ref=e35] [cursor=pointer]:
+                - /url: /hr/master-data/kategori-pangkat
+                - generic [ref=e36]: military_tech
+                - text: Kategori Pangkat
+              - link "stars Golongan" [ref=e37] [cursor=pointer]:
+                - /url: /hr/master-data/golongan
+                - generic [ref=e38]: stars
+                - text: Golongan
+              - link "hotel_class Sub Golongan" [ref=e39] [cursor=pointer]:
+                - /url: /hr/master-data/sub-golongan
+                - generic [ref=e40]: hotel_class
+                - text: Sub Golongan
+              - link "handshake Jenis Hubungan" [ref=e41] [cursor=pointer]:
+                - /url: /hr/master-data/jenis-hubungan-kerja
+                - generic [ref=e42]: handshake
+                - text: Jenis Hubungan
+              - link "label Tag" [ref=e43] [cursor=pointer]:
+                - /url: /hr/master-data/tag
+                - generic [ref=e44]: label
+                - text: Tag
+              - link "location_on Lokasi Kerja" [ref=e45] [cursor=pointer]:
+                - /url: /hr/master-data/lokasi-kerja
+                - generic [ref=e46]: location_on
+                - text: Lokasi Kerja
+              - link "verified_user Status Karyawan" [ref=e47] [cursor=pointer]:
+                - /url: /hr/master-data/status-karyawan
+                - generic [ref=e48]: verified_user
+                - text: Status Karyawan
+          - generic [ref=e49]:
+            - button "groups Manajemen Karyawan" [ref=e50] [cursor=pointer]:
+              - generic [ref=e51]:
+                - generic [ref=e52]: groups
+                - text: Manajemen Karyawan
+              - img [ref=e53]
+            - link "person Karyawan" [ref=e56] [cursor=pointer]:
+              - /url: /hr/employees
+              - generic [ref=e57]: person
+              - text: Karyawan
+          - link "calendar_month Absensi & Cuti" [ref=e59] [cursor=pointer]:
+            - /url: /hr/attendance
+            - generic [ref=e60]: calendar_month
+            - text: Absensi & Cuti
+          - link "history Riwayat Aktivitas" [ref=e62] [cursor=pointer]:
+            - /url: /hr/audit-logs
+            - generic [ref=e63]: history
+            - text: Riwayat Aktivitas
+          - generic [ref=e64]:
+            - button "settings Pengaturan" [ref=e65] [cursor=pointer]:
+              - generic [ref=e66]:
+                - generic [ref=e67]: settings
+                - text: Pengaturan
+              - img [ref=e68]
+            - generic [ref=e70]:
+              - link "manage_accounts Manajemen User" [ref=e71] [cursor=pointer]:
+                - /url: /settings/users
+                - generic [ref=e72]: manage_accounts
+                - text: Manajemen User
+              - link "admin_panel_settings Role & Akses" [ref=e73] [cursor=pointer]:
+                - /url: /settings/roles
+                - generic [ref=e74]: admin_panel_settings
+                - text: Role & Akses
+    - generic [ref=e75]:
+      - banner [ref=e76]:
+        - generic [ref=e77]:
+          - heading "Profil Karyawan" [level=2] [ref=e78]
+          - navigation [ref=e79]:
+            - link "Direktori" [ref=e80] [cursor=pointer]:
+              - /url: "#"
+            - link "Organisasi" [ref=e81] [cursor=pointer]:
+              - /url: "#"
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]: search
+            - textbox "Cari karyawan, departemen, atau NIK..." [ref=e85]
+          - generic [ref=e86]:
+            - button "apps" [ref=e87] [cursor=pointer]:
+              - generic [ref=e88]: apps
+            - button "notifications" [ref=e89] [cursor=pointer]:
+              - generic [ref=e90]: notifications
+            - button "settings" [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]: settings
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - generic [ref=e96]: "1234567890123456"
+              - generic [ref=e97]: Super Administrator
+            - button "person" [ref=e99] [cursor=pointer]:
+              - generic [ref=e100]: person
+      - main [ref=e101]:
+        - generic [ref=e104]:
+          - generic [ref=e106]:
+            - heading "Divisi" [level=1] [ref=e107]
+            - paragraph [ref=e108]: Manage company divisions
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - generic:
+                  - img
+                - textbox "Cari data..." [ref=e112]
+              - generic [ref=e113]:
+                - generic:
+                  - img
+                - combobox [ref=e114]:
+                  - option "Semua Status" [selected]
+                  - option "Aktif"
+                  - option "Tidak Aktif"
+            - button "Tambah Divisi" [active] [ref=e115] [cursor=pointer]:
+              - img [ref=e116]
+              - text: Tambah Divisi
+          - generic [ref=e119]:
+            - button "list" [ref=e120] [cursor=pointer]:
+              - generic [ref=e121]: list
+            - button "view_list" [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]: view_list
+            - button "view_headline" [ref=e124] [cursor=pointer]:
+              - generic [ref=e125]: view_headline
+            - button "grid_view" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: grid_view
+            - button "fullscreen" [ref=e128] [cursor=pointer]:
+              - generic [ref=e129]: fullscreen
+            - button "table_rows" [ref=e130] [cursor=pointer]:
+              - generic [ref=e131]: table_rows
+            - button "vertical_split" [ref=e132] [cursor=pointer]:
+              - generic [ref=e133]: vertical_split
+          - generic [ref=e134]:
+            - table [ref=e136]:
+              - rowgroup [ref=e137]:
+                - row "No Code Nama Divisi Keterangan Jumlah Dept. Status Aksi" [ref=e138]:
+                  - columnheader "No" [ref=e139]
+                  - columnheader "Code" [ref=e140]
+                  - columnheader "Nama Divisi" [ref=e141]
+                  - columnheader "Keterangan" [ref=e142]
+                  - columnheader "Jumlah Dept." [ref=e143]
+                  - columnheader "Status" [ref=e144]
+                  - columnheader "Aksi" [ref=e145]
+              - rowgroup [ref=e146]:
+                - row "1 DIV-0001 SDM & Umum Human Resources and General Affairs 2 Aktif" [ref=e147]:
+                  - cell "1" [ref=e148]
+                  - cell "DIV-0001" [ref=e149]
+                  - cell "SDM & Umum" [ref=e150]
+                  - cell "Human Resources and General Affairs" [ref=e151]
+                  - cell "2" [ref=e152]
+                  - cell "Aktif" [ref=e153]
+                  - cell [ref=e154]:
+                    - generic [ref=e155]:
+                      - button [ref=e156] [cursor=pointer]:
+                        - img [ref=e157]
+                      - button [ref=e159] [cursor=pointer]:
+                        - img [ref=e160]
+                - row "2 DIV-0002 Information Technology IT Infrastructure and Development 1 Aktif" [ref=e162]:
+                  - cell "2" [ref=e163]
+                  - cell "DIV-0002" [ref=e164]
+                  - cell "Information Technology" [ref=e165]
+                  - cell "IT Infrastructure and Development" [ref=e166]
+                  - cell "1" [ref=e167]
+                  - cell "Aktif" [ref=e168]
+                  - cell [ref=e169]:
+                    - generic [ref=e170]:
+                      - button [ref=e171] [cursor=pointer]:
+                        - img [ref=e172]
+                      - button [ref=e174] [cursor=pointer]:
+                        - img [ref=e175]
+                - row "3 DIV-0003 Operasional Production and Operations 0 Aktif" [ref=e177]:
+                  - cell "3" [ref=e178]
+                  - cell "DIV-0003" [ref=e179]
+                  - cell "Operasional" [ref=e180]
+                  - cell "Production and Operations" [ref=e181]
+                  - cell "0" [ref=e182]
+                  - cell "Aktif" [ref=e183]
+                  - cell [ref=e184]:
+                    - generic [ref=e185]:
+                      - button [ref=e186] [cursor=pointer]:
+                        - img [ref=e187]
+                      - button [ref=e189] [cursor=pointer]:
+                        - img [ref=e190]
+            - generic [ref=e192]:
+              - button [disabled]:
+                - img
+              - generic [ref=e193]: Halaman 1
+              - button [disabled]:
+                - img
+  - generic [ref=e222]:
+    - generic [ref=e223]:
+      - heading "Tambah Divisi" [level=3] [ref=e225]
+      - button [ref=e226] [cursor=pointer]:
+        - img [ref=e227]
+    - generic [ref=e230]:
+      - generic [ref=e231]:
+        - generic [ref=e232]: Nama Divisi *
+        - 'textbox "Contoh: IT, HR, Finance" [ref=e234]'
+      - generic [ref=e235]:
+        - generic [ref=e236]: Keterangan
+        - textbox "Deskripsi singkat divisi" [ref=e237]
+      - generic [ref=e238]:
+        - generic [ref=e239]: Status
+        - generic [ref=e240]:
+          - button [pressed] [ref=e241] [cursor=pointer]
+          - generic [ref=e242]: Aktif
+      - generic [ref=e243]:
+        - button "Batal" [ref=e244] [cursor=pointer]
+        - button "Simpan" [ref=e245] [cursor=pointer]

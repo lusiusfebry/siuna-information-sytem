@@ -1,0 +1,114 @@
+- generic [ref=e2]:
+  - status [ref=e123]: Pengaturan perusahaan berhasil disimpan
+  - generic [ref=e7]:
+    - complementary [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e13]: settings
+          - generic [ref=e14]:
+            - heading "Pengaturan" [level=1] [ref=e15]
+            - paragraph [ref=e16]: Konfigurasi Sistem
+        - navigation [ref=e17]:
+          - link "home Halaman Utama" [ref=e19] [cursor=pointer]:
+            - /url: /welcome
+            - generic [ref=e20]: home
+            - text: Halaman Utama
+          - generic [ref=e21]:
+            - button "settings Pengaturan" [ref=e22] [cursor=pointer]:
+              - generic [ref=e23]:
+                - generic [ref=e24]: settings
+                - text: Pengaturan
+              - img [ref=e25]
+            - generic [ref=e27]:
+              - link "manage_accounts Manajemen User" [ref=e28] [cursor=pointer]:
+                - /url: /settings/users
+                - generic [ref=e29]: manage_accounts
+                - text: Manajemen User
+              - link "admin_panel_settings Role & Akses" [ref=e30] [cursor=pointer]:
+                - /url: /settings/roles
+                - generic [ref=e31]: admin_panel_settings
+                - text: Role & Akses
+              - link "business Perusahaan" [ref=e32] [cursor=pointer]:
+                - /url: /settings/company
+                - generic [ref=e33]: business
+                - text: Perusahaan
+    - generic [ref=e34]:
+      - banner [ref=e35]:
+        - generic [ref=e36]:
+          - heading "Pengaturan Sistem" [level=2] [ref=e37]
+          - navigation [ref=e38]:
+            - button "Konfigurasi" [ref=e39] [cursor=pointer]
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: search
+            - textbox "Cari karyawan, departemen, atau NIK..." [ref=e43]
+          - generic [ref=e44]:
+            - button "apps" [ref=e45] [cursor=pointer]:
+              - generic [ref=e46]: apps
+            - button "notifications" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]: notifications
+            - button "settings" [ref=e50] [cursor=pointer]:
+              - generic [ref=e51]: settings
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e55]: "1234567890123456"
+              - generic [ref=e56]: Super Administrator
+            - button "person" [ref=e58] [cursor=pointer]:
+              - generic [ref=e59]: person
+      - main [ref=e60]:
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - heading "Pengaturan Perusahaan" [level=1] [ref=e64]
+            - paragraph [ref=e65]: Kelola identitas dan branding perusahaan
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - heading "Logo Perusahaan" [level=2] [ref=e68]
+              - generic [ref=e69]:
+                - generic [ref=e71]: image
+                - generic [ref=e72]:
+                  - button "upload Upload Logo" [ref=e73] [cursor=pointer]:
+                    - generic [ref=e74]: upload
+                    - text: Upload Logo
+                  - paragraph [ref=e75]: JPG, PNG. Maksimal 2MB.
+            - generic [ref=e76]:
+              - heading "Identitas Perusahaan" [level=2] [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - generic [ref=e80]: Nama Perusahaan
+                  - 'textbox "Contoh: Bebang Sistem Informasi" [ref=e81]': Bebang Sistem Informasi
+                - generic [ref=e82]:
+                  - generic [ref=e83]: Nama Singkat
+                  - 'textbox "Contoh: BIS" [ref=e84]': BIS
+                - generic [ref=e85]:
+                  - generic [ref=e86]: Nama Badan Hukum
+                  - 'textbox "Contoh: PT Prima Sarana Gemilang" [ref=e87]': PT Prima Sarana Gemilang
+                - generic [ref=e88]:
+                  - generic [ref=e89]: Tagline
+                  - 'textbox "Contoh: Sistem Informasi Terintegrasi" [ref=e90]': Sistem Informasi Terintegrasi
+            - generic [ref=e91]:
+              - heading "Kontak" [level=2] [ref=e92]
+              - generic [ref=e93]:
+                - generic [ref=e94]:
+                  - generic [ref=e95]: Alamat
+                  - textbox "Alamat lengkap perusahaan" [ref=e96]
+                - generic [ref=e97]:
+                  - generic [ref=e98]: Telepon
+                  - textbox "021-xxx-xxxx" [ref=e99]
+                - generic [ref=e100]:
+                  - generic [ref=e101]: Email
+                  - textbox "info@perusahaan.com" [ref=e102]
+                - generic [ref=e103]:
+                  - generic [ref=e104]: Website
+                  - textbox "https://perusahaan.com" [ref=e105]
+            - generic [ref=e106]:
+              - heading "Aplikasi" [level=2] [ref=e107]
+              - generic [ref=e108]:
+                - generic [ref=e109]:
+                  - generic [ref=e110]: Versi Aplikasi
+                  - textbox "1.0.0" [ref=e111]
+                - generic [ref=e112]:
+                  - generic [ref=e113]: Footer Text
+                  - textbox "Teks yang ditampilkan di footer laporan" [ref=e114]: Dicetak oleh BIS
+            - button "save Simpan Pengaturan" [ref=e116] [cursor=pointer]:
+              - generic [ref=e117]: save
+              - text: Simpan Pengaturan

@@ -1,0 +1,143 @@
+- generic [ref=e443]:
+  - complementary [ref=e445]:
+    - generic [ref=e446]:
+      - generic [ref=e447]:
+        - generic [ref=e449]: apartment
+        - generic [ref=e450]:
+          - heading "Facility" [level=1] [ref=e451]
+          - paragraph [ref=e452]: Manajemen Fasilitas
+      - navigation [ref=e453]:
+        - link "home Halaman Utama" [ref=e455] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e456]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e458] [cursor=pointer]:
+          - /url: /facility/dashboard
+          - generic [ref=e459]: dashboard
+          - text: Dashboard
+        - generic [ref=e460]:
+          - button "database Master Data Fasilitas" [ref=e461] [cursor=pointer]:
+            - generic [ref=e462]:
+              - generic [ref=e463]: database
+              - text: Master Data Fasilitas
+            - img [ref=e464]
+          - generic [ref=e466]:
+            - link "apartment Gedung" [ref=e467] [cursor=pointer]:
+              - /url: /facility/master-data/building
+              - generic [ref=e468]: apartment
+              - text: Gedung
+            - link "door_open Tipe Ruangan" [ref=e469] [cursor=pointer]:
+              - /url: /facility/master-data/room-type
+              - generic [ref=e470]: door_open
+              - text: Tipe Ruangan
+            - link "meeting_room Ruangan" [ref=e471] [cursor=pointer]:
+              - /url: /facility/master-data/room
+              - generic [ref=e472]: meeting_room
+              - text: Ruangan
+            - link "build Kategori Maintenance" [ref=e473] [cursor=pointer]:
+              - /url: /facility/master-data/maintenance-category
+              - generic [ref=e474]: build
+              - text: Kategori Maintenance
+        - generic [ref=e475]:
+          - button "engineering Operasional" [ref=e476] [cursor=pointer]:
+            - generic [ref=e477]:
+              - generic [ref=e478]: engineering
+              - text: Operasional
+            - img [ref=e479]
+          - generic [ref=e481]:
+            - link "assignment Work Order" [ref=e482] [cursor=pointer]:
+              - /url: /facility/work-orders
+              - generic [ref=e483]: assignment
+              - text: Work Order
+            - link "person_pin Penghuni" [ref=e484] [cursor=pointer]:
+              - /url: /facility/occupants
+              - generic [ref=e485]: person_pin
+              - text: Penghuni
+            - link "devices Aset Ruangan" [ref=e486] [cursor=pointer]:
+              - /url: /facility/assets
+              - generic [ref=e487]: devices
+              - text: Aset Ruangan
+  - generic [ref=e488]:
+    - banner [ref=e489]:
+      - generic [ref=e490]:
+        - heading "Human Resources" [level=2] [ref=e491]
+        - navigation [ref=e492]:
+          - button "Direktori" [ref=e493] [cursor=pointer]
+          - button "Organisasi" [ref=e494] [cursor=pointer]
+      - generic [ref=e495]:
+        - generic [ref=e496]:
+          - generic [ref=e497]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e498]
+        - generic [ref=e499]:
+          - button "apps" [ref=e500] [cursor=pointer]:
+            - generic [ref=e501]: apps
+          - button "notifications" [ref=e503] [cursor=pointer]:
+            - generic [ref=e504]: notifications
+          - button "settings" [ref=e505] [cursor=pointer]:
+            - generic [ref=e506]: settings
+        - generic [ref=e508]:
+          - generic [ref=e509]:
+            - generic [ref=e510]: "1234567890123456"
+            - generic [ref=e511]: Super Administrator
+          - button "person" [ref=e513] [cursor=pointer]:
+            - generic [ref=e514]: person
+    - main [ref=e515]:
+      - generic [ref=e518]:
+        - generic [ref=e520]:
+          - heading "Work Order" [level=1] [ref=e521]
+          - paragraph [ref=e522]: Kelola work order fasilitas
+        - generic [ref=e523]:
+          - generic [ref=e524]:
+            - generic [ref=e525]:
+              - generic:
+                - img
+              - textbox "Cari data..." [ref=e526]
+            - generic [ref=e527]:
+              - generic:
+                - img
+              - combobox [ref=e528]:
+                - option "Semua Status" [selected]
+                - option "Open"
+                - option "In Progress"
+                - option "Resolved"
+                - option "Closed"
+          - button "Tambah Work Order" [ref=e529] [cursor=pointer]:
+            - img [ref=e530]
+            - text: Tambah Work Order
+        - generic [ref=e533]:
+          - button "list" [ref=e534] [cursor=pointer]:
+            - generic [ref=e535]: list
+          - button "view_list" [ref=e536] [cursor=pointer]:
+            - generic [ref=e537]: view_list
+          - button "view_headline" [ref=e538] [cursor=pointer]:
+            - generic [ref=e539]: view_headline
+          - button "grid_view" [ref=e540] [cursor=pointer]:
+            - generic [ref=e541]: grid_view
+          - button "fullscreen" [ref=e542] [cursor=pointer]:
+            - generic [ref=e543]: fullscreen
+          - button "table_rows" [ref=e544] [cursor=pointer]:
+            - generic [ref=e545]: table_rows
+          - button "vertical_split" [ref=e546] [cursor=pointer]:
+            - generic [ref=e547]: vertical_split
+        - generic [ref=e548]:
+          - table [ref=e550]:
+            - rowgroup [ref=e551]:
+              - row "No Code Judul Ruangan Prioritas Status Assigned To Tanggal Lapor Aksi" [ref=e552]:
+                - columnheader "No" [ref=e553]
+                - columnheader "Code" [ref=e554]
+                - columnheader "Judul" [ref=e555]
+                - columnheader "Ruangan" [ref=e556]
+                - columnheader "Prioritas" [ref=e557]
+                - columnheader "Status" [ref=e558]
+                - columnheader "Assigned To" [ref=e559]
+                - columnheader "Tanggal Lapor" [ref=e560]
+                - columnheader "Aksi" [ref=e561]
+            - rowgroup [ref=e562]:
+              - row "Tidak ada data untuk ditampilkan" [ref=e563]:
+                - cell "Tidak ada data untuk ditampilkan" [ref=e564]
+          - generic [ref=e565]:
+            - button [disabled]:
+              - img
+            - generic [ref=e566]: Halaman 1
+            - button [disabled]:
+              - img

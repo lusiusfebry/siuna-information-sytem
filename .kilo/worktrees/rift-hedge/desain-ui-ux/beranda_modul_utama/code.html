@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Beranda Modul Utama - PT Prima Sarana Gemilang</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .module-card:hover {
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d121b] dark:text-slate-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7ebf3] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 lg:px-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div class="flex flex-col">
+<h2 class="text-[#0d121b] dark:text-white text-base font-bold leading-tight tracking-tight">PT Prima Sarana Gemilang</h2>
+<span class="text-[10px] font-semibold uppercase tracking-wider text-[#4c669a]">Bebang Sistem Informasi</span>
+</div>
+</div>
+<div class="hidden md:flex">
+<label class="flex flex-col min-w-64 !h-10">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-[#e7ebf3] dark:bg-slate-800">
+<div class="text-[#4c669a] flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-sm placeholder:text-[#4c669a] dark:text-slate-200" placeholder="Cari modul atau data..." value=""/>
+</div>
+</label>
+</div>
+</div>
+<div class="flex items-center gap-4 lg:gap-8">
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-[#0d121b] dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Beranda</a>
+<a class="text-[#0d121b] dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Laporan</a>
+<a class="text-[#0d121b] dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Bantuan</a>
+</nav>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden lg:block"></div>
+<div class="flex items-center gap-4">
+<button class="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-red-500"></span>
+</button>
+<div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-4">
+<div class="hidden sm:flex flex-col items-end">
+<span class="text-xs font-bold dark:text-white">Admin Utama</span>
+<span class="text-[10px] text-[#4c669a]">Administrator</span>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-slate-800" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCicVNE9Jm_pyGEpnpnhVlz3yL2srEoYr4hAuCsoVg8br4Utx-UEJdql-CRHF99rjvyHN9CEXKmyOlxDL32CS_TqVDqMndzh4gdiAOTaxx628BYMqbQ-j9bLQsdWddjKGcIyQXP9at9vnQ_D_zbKUhLqGz8_68NuwlW7dGvOAbXeDORcsjx8Tl1mxgZXZ7SpqFz4uXFJgPwOByYy90qa290oAy0LWa1jvhFFYz-5x2J0x_MoaPT7BN69Sqgh7ga8fwzs_GhPcYKwsr1");'></div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 justify-center">
+<div class="layout-content-container flex flex-col w-full max-w-[1280px] px-6 lg:px-10 py-8">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<a class="text-[#4c669a] text-xs font-semibold hover:text-primary flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[14px]">dashboard</span> Dashboard
+                    </a>
+<span class="text-[#4c669a] text-xs">/</span>
+<span class="text-[#0d121b] dark:text-slate-400 text-xs font-bold">Beranda Modul Utama</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-[#0d121b] dark:text-white text-3xl lg:text-4xl font-black leading-tight tracking-tight">Selamat Datang, Admin</h1>
+<p class="text-[#4c669a] dark:text-slate-400 text-base font-medium">Enterprise Resource Planning &amp; Integrated Management System</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 cursor-pointer justify-center rounded-lg h-10 px-5 bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-white text-sm font-bold transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span>Aktivitas</span>
+</button>
+<button class="flex items-center gap-2 cursor-pointer justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-blue-700 transition-all">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<span>Quick Actions</span>
+</button>
+</div>
+</div>
+<!-- Section Title -->
+<div class="flex items-center gap-3 mb-6">
+<div class="h-6 w-1 bg-primary rounded-full"></div>
+<h3 class="text-lg font-bold text-[#0d121b] dark:text-white">Daftar Modul Terintegrasi</h3>
+</div>
+<!-- Main Module Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+<!-- Human Resources Card -->
+<div class="module-card group flex flex-col bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all">
+<div class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">groups</span>
+</div>
+<div class="flex flex-col gap-1 mb-4">
+<p class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Human Resources</p>
+<p class="text-[#4c669a] dark:text-slate-400 text-sm font-medium leading-relaxed">Manajemen Karyawan, Payroll &amp; Presensi</p>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded">Active</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Inventory Card -->
+<div class="module-card group flex flex-col bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all">
+<div class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">inventory_2</span>
+</div>
+<div class="flex flex-col gap-1 mb-4">
+<p class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Inventory</p>
+<p class="text-[#4c669a] dark:text-slate-400 text-sm font-medium leading-relaxed">Stok Barang &amp; Logistik Inventaris</p>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded">Stock Control</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Mess Management Card -->
+<div class="module-card group flex flex-col bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all">
+<div class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-teal-50 dark:bg-teal-900/20 text-teal-600 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">hotel</span>
+</div>
+<div class="flex flex-col gap-1 mb-4">
+<p class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Mess Management</p>
+<p class="text-[#4c669a] dark:text-slate-400 text-sm font-medium leading-relaxed">Manajemen Mess &amp; Akomodasi Site</p>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-2 py-1 rounded">Facility</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Building Management Card -->
+<div class="module-card group flex flex-col bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all">
+<div class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">domain</span>
+</div>
+<div class="flex flex-col gap-1 mb-4">
+<p class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Building Mgmt</p>
+<p class="text-[#4c669a] dark:text-slate-400 text-sm font-medium leading-relaxed">Pemeliharaan &amp; Aset Gedung Kantor</p>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded">Maintenance</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- User Access Management Card -->
+<div class="module-card group flex flex-col bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all">
+<div class="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[32px]">admin_panel_settings</span>
+</div>
+<div class="flex flex-col gap-1 mb-4">
+<p class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">User Access</p>
+<p class="text-[#4c669a] dark:text-slate-400 text-sm font-medium leading-relaxed">Keamanan &amp; Hak Akses Pengguna</p>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">Security</span>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Secondary Row (Status & Summary) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12">
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-[#0d121b] dark:text-white">Pemberitahuan Sistem</h4>
+<button class="text-xs font-bold text-primary">Lihat Semua</button>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 p-3 rounded-lg bg-background-light dark:bg-slate-800/50">
+<div class="text-primary"><span class="material-symbols-outlined">info</span></div>
+<div>
+<p class="text-sm font-bold">Update Sistem v2.4 Berhasil</p>
+<p class="text-xs text-[#4c669a]">Integrasi modul Inventory dan HR telah diperbarui.</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-lg">
+<div class="text-orange-500"><span class="material-symbols-outlined">warning</span></div>
+<div>
+<p class="text-sm font-bold">Maintenance Jadwal Mess</p>
+<p class="text-xs text-[#4c669a]">Akan dilakukan pembersihan data mess lama pada hari Sabtu.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-primary rounded-xl p-6 text-white shadow-xl shadow-primary/20 flex flex-col justify-between">
+<div>
+<p class="text-blue-100 text-sm font-medium mb-1">Status Kehadiran Hari Ini</p>
+<p class="text-3xl font-black">94.2%</p>
+</div>
+<div class="mt-6">
+<div class="flex justify-between text-xs mb-1">
+<span>Target Efisiensi</span>
+<span>98%</span>
+</div>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-white h-full rounded-full" style="width: 94.2%"></div>
+</div>
+</div>
+<button class="mt-6 w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-xs font-bold border border-white/20">
+                            Buka Laporan HR
+                        </button>
+</div>
+</div>
+</div>
+</main>
+<!-- System Footer -->
+<footer class="border-t border-[#e7ebf3] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-6">
+<div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<p class="text-[#4c669a] text-xs font-medium">© 2024 PT Prima Sarana Gemilang. Hak Cipta Dilindungi.</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-green-500"></span>
+<span class="text-[10px] font-bold text-[#4c669a] uppercase tracking-widest">Server: Production-01 (Online)</span>
+</div>
+<div class="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
+<p class="text-[#4c669a] text-[10px] font-bold uppercase tracking-widest">Versi Aplikasi 4.12.0-Stable</p>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

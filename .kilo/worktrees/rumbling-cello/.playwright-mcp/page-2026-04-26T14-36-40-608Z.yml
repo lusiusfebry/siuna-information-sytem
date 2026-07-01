@@ -1,0 +1,172 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e9]: inventory_2
+        - generic [ref=e10]:
+          - heading "Inventory" [level=1] [ref=e11]
+          - paragraph [ref=e12]: Manajemen Inventaris
+      - navigation [ref=e13]:
+        - link "home Halaman Utama" [ref=e15] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e16]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e18] [cursor=pointer]:
+          - /url: /inventory/dashboard
+          - generic [ref=e19]: dashboard
+          - text: Dashboard
+        - generic [ref=e20]:
+          - button "database Master Data Inventory" [ref=e21] [cursor=pointer]:
+            - generic [ref=e22]:
+              - generic [ref=e23]: database
+              - text: Master Data Inventory
+            - img [ref=e24]
+          - generic [ref=e26]:
+            - link "category Kategori" [ref=e27] [cursor=pointer]:
+              - /url: /inventory/master-data/kategori
+              - generic [ref=e28]: category
+              - text: Kategori
+            - link "account_tree Sub Kategori" [ref=e29] [cursor=pointer]:
+              - /url: /inventory/master-data/sub-kategori
+              - generic [ref=e30]: account_tree
+              - text: Sub Kategori
+            - link "branding_watermark Brand" [ref=e31] [cursor=pointer]:
+              - /url: /inventory/master-data/brand
+              - generic [ref=e32]: branding_watermark
+              - text: Brand
+            - link "straighten UOM" [ref=e33] [cursor=pointer]:
+              - /url: /inventory/master-data/uom
+              - generic [ref=e34]: straighten
+              - text: UOM
+            - link "shopping_bag Produk" [ref=e35] [cursor=pointer]:
+              - /url: /inventory/master-data/produk
+              - generic [ref=e36]: shopping_bag
+              - text: Produk
+            - link "warehouse Gudang" [ref=e37] [cursor=pointer]:
+              - /url: /inventory/master-data/gudang
+              - generic [ref=e38]: warehouse
+              - text: Gudang
+        - generic [ref=e39]:
+          - button "inventory Manajemen Stok" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: inventory
+              - text: Manajemen Stok
+            - img [ref=e43]
+          - generic [ref=e45]:
+            - link "shelves Stok Inventaris" [ref=e46] [cursor=pointer]:
+              - /url: /inventory/stok
+              - generic [ref=e47]: shelves
+              - text: Stok Inventaris
+            - link "swap_horiz Transaksi Stok" [ref=e48] [cursor=pointer]:
+              - /url: /inventory/transaksi
+              - generic [ref=e49]: swap_horiz
+              - text: Transaksi Stok
+            - link "receipt_long Kartu Stok" [ref=e50] [cursor=pointer]:
+              - /url: /inventory/kartu-stok
+              - generic [ref=e51]: receipt_long
+              - text: Kartu Stok
+            - link "qr_code_2 Label & QR Code" [ref=e52] [cursor=pointer]:
+              - /url: /inventory/label
+              - generic [ref=e53]: qr_code_2
+              - text: Label & QR Code
+        - link "upload_file Import Data" [ref=e55] [cursor=pointer]:
+          - /url: /inventory/import
+          - generic [ref=e56]: upload_file
+          - text: Import Data
+        - link "summarize Laporan" [ref=e58] [cursor=pointer]:
+          - /url: /inventory/laporan
+          - generic [ref=e59]: summarize
+          - text: Laporan
+  - generic [ref=e60]:
+    - banner [ref=e61]:
+      - generic [ref=e62]:
+        - heading "Inventory Management" [level=2] [ref=e63]
+        - navigation [ref=e64]:
+          - button "Stok" [ref=e65] [cursor=pointer]
+          - button "Laporan" [ref=e66] [cursor=pointer]
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e70]
+        - generic [ref=e71]:
+          - button "apps" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]: apps
+          - button "notifications" [ref=e75] [cursor=pointer]:
+            - generic [ref=e76]: notifications
+          - button "settings" [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]: settings
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: "1234567890123456"
+            - generic [ref=e83]: Super Administrator
+          - button "person" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]: person
+    - main [ref=e87]:
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - heading "Stok Inventaris" [level=1] [ref=e91]
+          - paragraph [ref=e92]:
+            - text: Saldo stok per gudang — klik baris bertanda
+            - generic [ref=e93]: Tracked
+            - text: untuk melihat detail asset tag
+        - generic [ref=e94]:
+          - textbox "Cari produk..." [ref=e95]
+          - combobox [ref=e96]:
+            - option "Semua Gudang" [selected]
+        - table [ref=e99]:
+          - rowgroup [ref=e100]:
+            - row "No Kode Produk Nama Produk Brand Gudang Jumlah UOM Tracking" [ref=e101]:
+              - columnheader "No" [ref=e102]
+              - columnheader "Kode Produk" [ref=e103]
+              - columnheader "Nama Produk" [ref=e104]
+              - columnheader "Brand" [ref=e105]
+              - columnheader "Gudang" [ref=e106]
+              - columnheader "Jumlah" [ref=e107]
+              - columnheader "UOM" [ref=e108]
+              - columnheader "Tracking" [ref=e109]
+          - rowgroup [ref=e110]:
+            - row [ref=e111]:
+              - cell [ref=e112]
+              - cell [ref=e114]
+              - cell [ref=e116]
+              - cell [ref=e118]
+              - cell [ref=e120]
+              - cell [ref=e122]
+              - cell [ref=e124]
+              - cell [ref=e126]
+            - row [ref=e128]:
+              - cell [ref=e129]
+              - cell [ref=e131]
+              - cell [ref=e133]
+              - cell [ref=e135]
+              - cell [ref=e137]
+              - cell [ref=e139]
+              - cell [ref=e141]
+              - cell [ref=e143]
+            - row [ref=e145]:
+              - cell [ref=e146]
+              - cell [ref=e148]
+              - cell [ref=e150]
+              - cell [ref=e152]
+              - cell [ref=e154]
+              - cell [ref=e156]
+              - cell [ref=e158]
+              - cell [ref=e160]
+            - row [ref=e162]:
+              - cell [ref=e163]
+              - cell [ref=e165]
+              - cell [ref=e167]
+              - cell [ref=e169]
+              - cell [ref=e171]
+              - cell [ref=e173]
+              - cell [ref=e175]
+              - cell [ref=e177]
+            - row [ref=e179]:
+              - cell [ref=e180]
+              - cell [ref=e182]
+              - cell [ref=e184]
+              - cell [ref=e186]
+              - cell [ref=e188]
+              - cell [ref=e190]
+              - cell [ref=e192]
+              - cell [ref=e194]

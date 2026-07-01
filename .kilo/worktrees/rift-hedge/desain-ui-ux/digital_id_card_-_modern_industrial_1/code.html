@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital ID Card - Modern Industrial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&amp;family=Rajdhani:wght@400;500;600;700&amp;family=Roboto+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FFD700", // Industrial Yellow
+                        "primary-dark": "#BFA300",
+                        danger: "#FF3B30",
+                        "danger-glow": "rgba(255, 59, 48, 0.6)",
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#111827", // Very dark blue/gray
+                        "surface-dark": "#1F2937",
+                        "surface-light": "#FFFFFF",
+                        "accent-blue": "#007AFF",
+                        "accent-green": "#34C759",
+                    },
+                    fontFamily: {
+                        display: ["'Chakra Petch'", "sans-serif"],
+                        mono: ["'Roboto Mono'", "monospace"],
+                        body: ["'Rajdhani'", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'neon-red': '0 0 10px rgba(255, 59, 48, 0.7), 0 0 20px rgba(255, 59, 48, 0.4)',
+                        'metallic': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.5)',
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        .industrial-pattern {
+            background-image: radial-gradient(#374151 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(255, 59, 48, 0.8);
+        }
+        .border-metallic {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen font-body flex items-center justify-center p-4">
+<div class="w-full max-w-sm bg-surface-light dark:bg-surface-dark rounded-3xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+<div class="h-6 w-full bg-primary flex justify-between px-4 items-center text-[10px] font-mono text-black font-bold">
+<span>9:41</span>
+<div class="flex gap-1">
+<span class="material-icons-outlined text-sm">signal_cellular_alt</span>
+<span class="material-icons-outlined text-sm">wifi</span>
+<span class="material-icons-outlined text-sm">battery_full</span>
+</div>
+</div>
+<header class="bg-primary p-4 pb-6 flex items-center justify-between relative z-10 shadow-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+<div class="grid grid-cols-3 gap-0.5 w-6 h-6">
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm col-span-2 w-full"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm col-span-2 w-full"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm"></div>
+<div class="bg-yellow-500 h-1.5 w-1.5 rounded-sm"></div>
+</div>
+</div>
+<div>
+<h1 class="font-display font-bold text-lg leading-tight text-black tracking-tighter">PT. BINTANI MEGAHINDAH</h1>
+<p class="text-xs font-mono font-bold text-black/70">INDUSTRIAL MINING CORP</p>
+</div>
+</div>
+<button class="text-black hover:bg-black/10 p-2 rounded-full transition-colors">
+<span class="material-icons-outlined">menu</span>
+</button>
+</header>
+<main class="relative bg-white dark:bg-[#111827] industrial-pattern pb-8">
+<div class="h-1 bg-gradient-to-r from-gray-300 via-gray-100 to-gray-300 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 shadow-sm"></div>
+<div class="text-center py-6 relative overflow-hidden">
+<div class="absolute inset-0 bg-danger/5 dark:bg-danger/10 blur-xl"></div>
+<h2 class="relative font-display font-black text-3xl tracking-widest text-danger dark:text-red-500 uppercase text-glow animate-pulse">
+                    Mine Permit
+                </h2>
+<div class="mt-2 inline-block px-4 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+<p class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wide">
+                        PT. PRIMA SARANA GEMILANG
+                    </p>
+</div>
+</div>
+<div class="px-6 flex flex-col items-center relative z-10">
+<div class="relative w-40 h-48 rounded-xl overflow-hidden shadow-metallic border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800">
+<img alt="Employee Portrait" class="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL-_FnN2ugLbFVIFtcmmTPsK6eCdpI_OumVXUbU8T3G6GIE0ySHB4oIQ8-p5uA_f6Eqb2HWPN-glLGGhFK9FGhYGkYlzI6FWGEQ0Y7O9SD5ZP_Nvl3qR4sY4BISvrixtqbMM9ltVCZ7vSh2wKx56hGPH59u44XrCLDgnXL8u2_rdE8rD725kfcpSw3nbV4Xj0xo26lnCuX7keienBMLJdikgE94xzGCRBXkM2TLwWeO830FUQ_f_0RkJDr1TwDc0ku-W5EieTihFU"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent opacity-30 animate-scan pointer-events-none"></div>
+<div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-primary"></div>
+<div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-primary"></div>
+<div class="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-primary"></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-primary"></div>
+</div>
+<div class="mt-6 text-center w-full">
+<div class="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded font-mono text-sm text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 mb-2">
+<span class="material-icons-outlined text-xs">qr_code</span>
+<span>510.01.PSG-BMI.2026</span>
+</div>
+<h3 class="text-2xl font-display font-bold text-gray-900 dark:text-white uppercase mt-1 tracking-tight">
+                        Akhmad Amirudin
+                    </h3>
+<div class="mt-2 flex items-center justify-center gap-2">
+<span class="h-px w-8 bg-primary"></span>
+<span class="text-lg font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest font-display">Welder</span>
+<span class="h-px w-8 bg-primary"></span>
+</div>
+</div>
+</div>
+<div class="mt-8 px-4 grid grid-cols-3 gap-3">
+<div class="group relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 border border-blue-500/30 p-3 flex flex-col items-center justify-center transition-all hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+<div class="absolute inset-0 bg-blue-500/5 dark:bg-blue-500/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-icons-outlined text-blue-600 dark:text-blue-400 mb-1 group-hover:scale-110 transition-transform">anchor</span>
+<span class="font-display font-bold text-blue-700 dark:text-blue-300 tracking-wider">PORT</span>
+<div class="w-full h-1 bg-gray-300 dark:bg-gray-700 mt-2 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 w-full shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 border border-primary/30 p-3 flex flex-col items-center justify-center transition-all hover:border-primary hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+<div class="absolute inset-0 bg-primary/5 dark:bg-primary/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-icons-outlined text-yellow-600 dark:text-yellow-400 mb-1 group-hover:scale-110 transition-transform">landscape</span>
+<span class="font-display font-bold text-yellow-700 dark:text-yellow-400 tracking-wider">PIT</span>
+<div class="w-full h-1 bg-gray-300 dark:bg-gray-700 mt-2 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full shadow-[0_0_8px_rgba(255,215,0,0.8)]"></div>
+</div>
+</div>
+<div class="group relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 border border-green-500/30 p-3 flex flex-col items-center justify-center transition-all hover:border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+<div class="absolute inset-0 bg-green-500/5 dark:bg-green-500/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-icons-outlined text-green-600 dark:text-green-400 mb-1 group-hover:scale-110 transition-transform">business</span>
+<span class="font-display font-bold text-green-700 dark:text-green-400 tracking-wider">OFFICE</span>
+<div class="w-full h-1 bg-gray-300 dark:bg-gray-700 mt-2 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-full shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 px-6 pb-4">
+<div class="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 backdrop-blur-sm">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons-outlined text-sm">verified_user</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">Status</span>
+<span class="text-xs font-bold text-green-600 dark:text-green-400">Active - Authorized</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-gray-500 dark:text-gray-400 block uppercase font-bold">Expires</span>
+<span class="text-xs font-mono font-medium text-gray-900 dark:text-gray-200">DEC 2026</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-4 flex justify-around items-center">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons-outlined">badge</span>
+<span class="text-[10px] font-bold">ID Card</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+<span class="material-icons-outlined">history</span>
+<span class="text-[10px] font-medium">History</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+<span class="material-icons-outlined">notifications</span>
+<span class="text-[10px] font-medium">Alerts</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+<span class="material-icons-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</div>
+</main>
+</div>
+<style>
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .animate-scan {
+            animation: scan 3s linear infinite;
+        }
+    </style>
+
+</body></html>

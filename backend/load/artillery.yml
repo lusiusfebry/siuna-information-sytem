@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 20
+      rampTo: 50
+      name: "Ramp up load"
+    - duration: 600
+      arrivalRate: 50
+      name: "Sustained load"
+  plugins:
+    metrics-by-endpoint: {}
+  defaults:
+    headers:
+      Authorization: "Bearer ${TOKEN}"
+
+scenarios:
+  - name: "Fetch Employees"
+    flow:
+      - get:
+          url: "/api/hr/employees"
+          qs:
+            page: 1
+            limit: 50
+      - think: 1
+      - get:
+          url: "/api/hr/employees"
+          qs:
+            page: 2
+            limit: 50

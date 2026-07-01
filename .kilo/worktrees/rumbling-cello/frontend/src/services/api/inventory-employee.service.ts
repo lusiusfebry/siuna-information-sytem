@@ -1,0 +1,34 @@
+import client from './client';
+import { InvSerialNumber, InvTransaksi } from '../../types/inventory';
+
+interface EmployeeSearchResult {
+    id: number;
+    nama_lengkap: string;
+    nomor_induk_karyawan: string;
+}
+
+const searchEmployees = async (query: string): Promise<{ status: string; data: EmployeeSearchResult[] }> => {
+    const response = await client.get(`/inventory/employees/search`, { params: { q: query } });
+    return response.data;
+};
+
+const getEmployeeAssets = async (employeeId: number): Promise<{ status: string; data: InvSerialNumber[] }> => {
+    const response = await client.get(`/inventory/employee/${employeeId}/assets`);
+    return response.data;
+};
+
+const getAssetHistory = async (employeeId: number): Promise<{ status: string; data: InvTransaksi[] }> => {
+    const response = await client.get(`/inventory/employee/${employeeId}/asset-history`);
+    return response.data;
+};
+
+const downloadBeritaAcara = async (employeeId: number, transaksiId?: number): Promise<Blob> => {
+    const url = transaksiId
+        ? `/inventory/employee/${employeeId}/berita-acara/${transaksiId}`
+        : `/inventory/employee/${employeeId}/berita-acara`;
+    const response = await client.get(url, { responseType: 'blob' });
+    return response.data;
+};
+
+const inventoryEmployeeService = { searchEmployees, getEmployeeAssets, getAssetHistory, downloadBeritaAcara };
+export default inventoryEmployeeService;

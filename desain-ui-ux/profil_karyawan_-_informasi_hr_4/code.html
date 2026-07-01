@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Profil: Informasi HR Lengkap | PT Prima Sarana Gemilang</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-select-search {
+            @apply block w-full text-xs font-semibold bg-transparent border-none focus:ring-0 p-0 cursor-pointer text-right;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d121b] dark:text-[#f8f9fc] min-h-screen">
+<div class="flex h-full min-h-screen">
+<aside class="w-64 border-r border-[#e7ebf3] dark:border-[#2a3447] bg-white dark:bg-[#161e2e] hidden lg:flex flex-col sticky top-0 h-screen">
+<div class="p-6 flex flex-col h-full justify-between">
+<div class="flex flex-col gap-8">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-[#0d121b] dark:text-white text-base font-bold leading-none">PSG HRMS</h1>
+<p class="text-[#4c669a] text-xs font-normal mt-1">Bebang Sistem Informasi</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-[#4c669a] hover:bg-[#e7ebf3] dark:hover:bg-[#2a3447] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">group</span>
+<p class="text-sm font-semibold">Manajemen Karyawan</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#4c669a] hover:bg-[#e7ebf3] dark:hover:bg-[#2a3447] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<p class="text-sm font-medium">Payroll</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#4c669a] hover:bg-[#e7ebf3] dark:hover:bg-[#2a3447] rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<p class="text-sm font-medium">Presensi</p>
+</a>
+</nav>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col">
+<header class="h-16 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-white dark:bg-[#161e2e] flex items-center justify-between px-8 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<h2 class="text-lg font-bold">Detail Profil</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#4c669a] text-xl">search</span>
+<input class="bg-[#e7ebf3] dark:bg-[#2a3447] border-none rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-primary outline-none" placeholder="Cari karyawan..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-[#2a3447]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA7SnqmmP7zlg-WApeN43Anr2i6db4jdUFJPcR941fG9OPPWJ_JD_38ViITEn9nuVfucNY_XnPGcD21ErmtEZ58MfyI5cTSdOHs_jn87hyd8pKdtyNoEmXzWQZJ8OZ8bzGsRVWZSXG3FaUaT0iCaXBW2TUDAHVfbPcuXqI25QnHY9VKODlVceceSfPeIv_KLm7fgaxuE3LH6MchusNoL2eT2ViKiQBL-IS0MOryTQ7T5GpWiHgjuSHut85m6Il48p_HhcDMhQ8FgViH");'></div>
+<span class="text-sm font-semibold hidden md:block">HR Manager</span>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto w-full space-y-6">
+<div class="bg-white dark:bg-[#161e2e] rounded-xl p-6 border border-[#e7ebf3] dark:border-[#2a3447]">
+<div class="flex flex-col lg:flex-row gap-8 items-start">
+<div class="flex-1 flex flex-col md:flex-row gap-6">
+<div class="relative shrink-0">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-32 border border-[#cfd7e7] dark:border-[#2a3447]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9DeOdZhri-4vq5E5_R6B98vq8HN0v2Ahc2tTNGzkfexo7Mi7imouf48FPpOJFG9aSB6g3zRrhAvgvIy1rfEJD1_U5HVLKEa2VjbimoGBU_5PJBXEJUxFpfn0ALyFmz6W5JJLsGF6R-CSyVheP4w7mrYWVG35wU2XaMsqVYzkHaoAl8H_ycxu7vUrUBbBvylQ2zRL573xyTISlUu5Nxf6Z1cisl6DxiBzJwaDSb-xx_MpjK40uPhOrB0dIcPJqivuy0a-mOLxKN6xV");'></div>
+<div class="absolute -bottom-2 -right-2 bg-green-500 border-4 border-white dark:border-[#161e2e] size-6 rounded-full" title="Status: Aktif"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 w-full">
+<div class="col-span-1 md:col-span-2 lg:col-span-3">
+<h3 class="text-2xl font-bold">Budi Santoso</h3>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">Tag: Operasional</span>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold rounded uppercase">Status: Aktif</span>
+</div>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">NIK</p>
+<p class="font-bold">202300456</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">Posisi</p>
+<p class="font-bold">Senior Operator</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">Divisi / Dept</p>
+<p class="font-bold">Produksi / Mining Ops</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">Manager / Atasan</p>
+<p class="font-bold">Andi Wijaya / Supardi</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">Email Co</p>
+<p class="font-bold">budi.s@psg-group.com</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">No HP</p>
+<p class="font-bold">0812-3456-7890</p>
+</div>
+<div class="text-xs">
+<p class="text-[#4c669a]">Lokasi</p>
+<p class="font-bold">Site Bebang, Kalimantan Timur</p>
+</div>
+</div>
+</div>
+<div class="shrink-0 flex flex-col items-center gap-2 p-4 bg-gray-50 dark:bg-[#1c2638] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447]">
+<svg class="text-black dark:text-white" fill="none" height="80" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="80"><rect height="7" width="7" x="3" y="3"></rect><rect height="7" width="7" x="14" y="3"></rect><rect height="7" width="7" x="14" y="14"></rect><rect height="7" width="7" x="3" y="14"></rect><path d="M7 7h.01"></path><path d="M17 7h.01"></path><path d="M7 17h.01"></path><path d="M17 17h.01"></path><path d="M7 12h.01"></path><path d="M12 7h.01"></path></svg>
+<p class="text-[10px] font-bold text-[#4c669a] uppercase tracking-wider">Employee ID QR</p>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto border-b border-[#cfd7e7] dark:border-[#2a3447]">
+<div class="flex min-w-max">
+<a class="px-6 py-3 border-b-2 border-transparent text-[#4c669a] dark:text-gray-400 text-sm font-bold hover:text-primary transition-colors" href="#">Data Personal</a>
+<a class="px-6 py-3 border-b-2 border-primary text-primary text-sm font-bold bg-primary/5" href="#">Informasi HR</a>
+<a class="px-6 py-3 border-b-2 border-transparent text-[#4c669a] dark:text-gray-400 text-sm font-bold hover:text-primary transition-colors" href="#">Payroll &amp; Benefit</a>
+<a class="px-6 py-3 border-b-2 border-transparent text-[#4c669a] dark:text-gray-400 text-sm font-bold hover:text-primary transition-colors" href="#">Kinerja</a>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">badge</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Kepegawaian</h4>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">NIK</span>
+<span class="text-sm font-semibold">202300456</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Posisi</span>
+<select class="form-select-search"><option>Senior Operator</option><option>Supervisor</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Divisi</span>
+<select class="form-select-search"><option>Produksi</option><option>Engineering</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Departemen</span>
+<select class="form-select-search"><option>Mining Operations</option><option>Civil</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Email Perusahaan</span>
+<span class="text-sm font-semibold">budi.s@psg-group.com</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Manager</span>
+<select class="form-select-search"><option>Andi Wijaya</option><option>Sutrisno</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Atasan</span>
+<select class="form-select-search"><option>Supardi</option><option>Rahmat</option></select>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">history_edu</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Kontrak &amp; Masa Kerja</h4>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Jenis Hubungan Kerja</span>
+<select class="form-select-search"><option>PKWTT (Tetap)</option><option>PKWT (Kontrak)</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tgl Masuk Group</span>
+<span class="text-sm font-semibold">01 Jan 2023</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tgl Masuk</span>
+<span class="text-sm font-semibold">12 Jan 2023</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tgl Permanent</span>
+<span class="text-sm font-semibold">12 Jan 2024</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tgl Kontrak</span>
+<span class="text-sm font-semibold">12 Jan 2023</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tgl Akhir Kontrak</span>
+<span class="text-sm font-semibold">-</span>
+</div>
+<div class="flex justify-between items-center py-1 text-red-500">
+<span class="text-sm">Tgl Berhenti</span>
+<span class="text-sm font-semibold">-</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">school</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Pendidikan Terakhir</h4>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Tingkat</span>
+<select class="form-select-search"><option>S1</option><option>S2</option><option>D3</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Bidang</span>
+<select class="form-select-search"><option>Teknik Pertambangan</option><option>Geologi</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Sekolah / Univ</span>
+<span class="text-sm font-semibold">Institut Teknologi Bandung</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Kota</span>
+<span class="text-sm font-semibold">Bandung</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Status Lulus</span>
+<select class="form-select-search"><option>Lulus</option><option>Belum Lulus</option></select>
+</div>
+<div class="pt-2">
+<p class="text-xs text-[#4c669a] mb-1">Keterangan</p>
+<p class="text-sm font-medium italic">Predikat Cum Laude, IPK 3.85/4.00</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">military_tech</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Pangkat &amp; Golongan</h4>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Kategori</span>
+<select class="form-select-search"><option>Staff</option><option>Non-Staff</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Golongan</span>
+<select class="form-select-search"><option>Grade 4</option><option>Grade 5</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Sub-Golongan</span>
+<select class="form-select-search"><option>4A</option><option>4B</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">No Pensiun</span>
+<span class="text-sm font-semibold">PEN-2023-00456</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden md:col-span-2">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">emergency</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Kontak Darurat</h4>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-3 border-r border-[#e7ebf3] dark:border-[#2a3447] pr-8 last:border-0">
+<h5 class="text-xs font-bold text-primary mb-2">Kontak Utama</h5>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Nama</span><span class="text-sm font-semibold">Siti Aminah</span></div>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Tgl Lahir</span><span class="text-sm font-semibold">15 Mei 1985</span></div>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Hubungan</span><select class="form-select-search"><option>Istri</option><option>Orang Tua</option></select></div>
+<div class="flex flex-col gap-1"><span class="text-sm text-[#4c669a]">Alamat</span><p class="text-xs font-medium">Jl. Mawar No. 123, Balikpapan Selatan, Kalimantan Timur</p></div>
+</div>
+<div class="space-y-3">
+<h5 class="text-xs font-bold text-primary mb-2">Kontak Sekunder</h5>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Nama</span><span class="text-sm font-semibold">Herman Santoso</span></div>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Tgl Lahir</span><span class="text-sm font-semibold">10 Okt 1960</span></div>
+<div class="flex justify-between"><span class="text-sm text-[#4c669a]">Hubungan</span><select class="form-select-search"><option>Ayah</option><option>Kakak</option></select></div>
+<div class="flex flex-col gap-1"><span class="text-sm text-[#4c669a]">Alamat</span><p class="text-xs font-medium">Perum Green City Blok A2, Samarinda</p></div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">travel_explore</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Logistik &amp; Mobilisasi</h4>
+</div>
+<div class="p-6 space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-[#4c669a] mb-1">POO / POH</p>
+<select class="block w-full text-sm font-semibold bg-gray-50 border-gray-200 rounded focus:ring-primary dark:bg-[#20293a] dark:border-[#2a3447]">
+<option>Balikpapan (BPN)</option>
+<option>Jakarta (JKT)</option>
+</select>
+</div>
+<div>
+<p class="text-xs text-[#4c669a] mb-1">Seragam / Sepatu</p>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-gray-100 dark:bg-[#2a3447] rounded text-xs font-bold">L</span>
+<span class="px-2 py-1 bg-gray-100 dark:bg-[#2a3447] rounded text-xs font-bold">42</span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-gray-100 dark:border-[#2a3447]">
+<h5 class="text-xs font-bold mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-base">move_down</span> Pergerakan</h5>
+<div class="flex justify-between mb-2">
+<span class="text-sm text-[#4c669a]">Lokasi Sebelumnya</span>
+<span class="text-sm font-semibold">Head Office</span>
+</div>
+<div class="flex justify-between">
+<span class="text-sm text-[#4c669a]">Tgl Mutasi</span>
+<span class="text-sm font-semibold">15 Feb 2024</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#161e2e] rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] overflow-hidden">
+<div class="px-6 py-4 border-b border-[#e7ebf3] dark:border-[#2a3447] bg-[#fbfbfc] dark:bg-[#1c2638] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">account_balance_wallet</span>
+<h4 class="text-sm font-bold uppercase tracking-wide">Costing &amp; Allocation</h4>
+</div>
+<div class="p-6 space-y-3">
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Siklus</span>
+<select class="form-select-search"><option>Bulanan</option><option>Proyek</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Costing Center</span>
+<select class="form-select-search"><option>CC-OPS-001</option><option>CC-ADM-002</option></select>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Assign Location</span>
+<span class="text-sm font-semibold">Site Bebang</span>
+</div>
+<div class="flex justify-between items-center py-1">
+<span class="text-sm text-[#4c669a]">Actual Site</span>
+<span class="text-sm font-semibold">Site Bebang</span>
+</div>
+<div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-[11px] text-[#4c669a] dark:text-gray-400">Alokasi biaya diverifikasi secara otomatis oleh Sistem Bebang sesuai presensi GPS.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-[#e7ebf3] dark:border-[#2a3447]">
+<p class="text-xs text-[#4c669a]">Terakhir diperbarui: 24 Mei 2024, 09:12 WIB oleh HR Admin</p>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#161e2e] border border-[#e7ebf3] dark:border-[#2a3447] rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-base">print</span>
+                        Cetak Profil
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+<span class="material-symbols-outlined text-base">save</span>
+                        Simpan Perubahan
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

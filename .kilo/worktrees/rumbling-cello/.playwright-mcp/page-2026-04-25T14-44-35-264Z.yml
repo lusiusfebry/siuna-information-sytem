@@ -1,0 +1,225 @@
+- generic [ref=e2]:
+  - status [ref=e156]: Transaksi berhasil dibuat
+  - generic [ref=e5]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]: inventory_2
+          - generic [ref=e12]:
+            - heading "Inventory" [level=1] [ref=e13]
+            - paragraph [ref=e14]: Manajemen Inventaris
+        - navigation [ref=e15]:
+          - link "home Halaman Utama" [ref=e17] [cursor=pointer]:
+            - /url: /welcome
+            - generic [ref=e18]: home
+            - text: Halaman Utama
+          - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+            - /url: /inventory/dashboard
+            - generic [ref=e21]: dashboard
+            - text: Dashboard
+          - generic [ref=e22]:
+            - button "database Master Data Inventory" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]:
+                - generic [ref=e25]: database
+                - text: Master Data Inventory
+              - img [ref=e26]
+            - generic [ref=e28]:
+              - link "category Kategori" [ref=e29] [cursor=pointer]:
+                - /url: /inventory/master-data/kategori
+                - generic [ref=e30]: category
+                - text: Kategori
+              - link "account_tree Sub Kategori" [ref=e31] [cursor=pointer]:
+                - /url: /inventory/master-data/sub-kategori
+                - generic [ref=e32]: account_tree
+                - text: Sub Kategori
+              - link "branding_watermark Brand" [ref=e33] [cursor=pointer]:
+                - /url: /inventory/master-data/brand
+                - generic [ref=e34]: branding_watermark
+                - text: Brand
+              - link "straighten UOM" [ref=e35] [cursor=pointer]:
+                - /url: /inventory/master-data/uom
+                - generic [ref=e36]: straighten
+                - text: UOM
+              - link "shopping_bag Produk" [ref=e37] [cursor=pointer]:
+                - /url: /inventory/master-data/produk
+                - generic [ref=e38]: shopping_bag
+                - text: Produk
+              - link "warehouse Gudang" [ref=e39] [cursor=pointer]:
+                - /url: /inventory/master-data/gudang
+                - generic [ref=e40]: warehouse
+                - text: Gudang
+          - generic [ref=e41]:
+            - button "inventory Manajemen Stok" [ref=e42] [cursor=pointer]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: inventory
+                - text: Manajemen Stok
+              - img [ref=e45]
+            - generic [ref=e47]:
+              - link "shelves Stok Inventaris" [ref=e48] [cursor=pointer]:
+                - /url: /inventory/stok
+                - generic [ref=e49]: shelves
+                - text: Stok Inventaris
+              - link "swap_horiz Transaksi Stok" [ref=e50] [cursor=pointer]:
+                - /url: /inventory/transaksi
+                - generic [ref=e51]: swap_horiz
+                - text: Transaksi Stok
+              - link "receipt_long Kartu Stok" [ref=e52] [cursor=pointer]:
+                - /url: /inventory/kartu-stok
+                - generic [ref=e53]: receipt_long
+                - text: Kartu Stok
+              - link "qr_code_2 Label & QR Code" [ref=e54] [cursor=pointer]:
+                - /url: /inventory/label
+                - generic [ref=e55]: qr_code_2
+                - text: Label & QR Code
+          - link "upload_file Import Data" [ref=e57] [cursor=pointer]:
+            - /url: /inventory/import
+            - generic [ref=e58]: upload_file
+            - text: Import Data
+    - generic [ref=e59]:
+      - banner [ref=e60]:
+        - generic [ref=e61]:
+          - heading "Inventory Management" [level=2] [ref=e62]
+          - navigation [ref=e63]:
+            - link "Stok" [ref=e64] [cursor=pointer]:
+              - /url: "#"
+            - link "Laporan" [ref=e65] [cursor=pointer]:
+              - /url: "#"
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]: search
+            - textbox "Cari karyawan, departemen, atau NIK..." [ref=e69]
+          - generic [ref=e70]:
+            - button "apps" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: apps
+            - button "notifications" [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: notifications
+            - button "settings" [ref=e76] [cursor=pointer]:
+              - generic [ref=e77]: settings
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: "1234567890123456"
+              - generic [ref=e82]: Super Administrator
+            - button "person" [ref=e84] [cursor=pointer]:
+              - generic [ref=e85]: person
+      - main [ref=e86]:
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - heading "Transaksi Stok" [level=1] [ref=e160]
+              - paragraph [ref=e161]: Riwayat transaksi masuk, keluar, dan adjustment
+            - button "add Buat Transaksi" [ref=e162] [cursor=pointer]:
+              - generic [ref=e163]: add
+              - text: Buat Transaksi
+          - generic [ref=e164]:
+            - textbox "Cari kode/supplier/referensi..." [ref=e165]
+            - combobox [ref=e166]:
+              - option "Semua Tipe" [selected]
+              - option "Masuk"
+              - option "Keluar"
+              - option "Adjustment"
+            - combobox [ref=e167]:
+              - option "Semua Gudang" [selected]
+              - option "Gudang Utama Jakarta"
+              - option "Gudang IT Bandung"
+              - option "Gudang Operasional"
+            - textbox [ref=e168]:
+              - /placeholder: Dari tanggal
+            - textbox [ref=e169]:
+              - /placeholder: Sampai tanggal
+          - table [ref=e172]:
+            - rowgroup [ref=e173]:
+              - row "No Kode Tanggal Tipe Sub Tipe Gudang Keterangan Dibuat Oleh Aksi" [ref=e174]:
+                - columnheader "No" [ref=e175]
+                - columnheader "Kode" [ref=e176]
+                - columnheader "Tanggal" [ref=e177]
+                - columnheader "Tipe" [ref=e178]
+                - columnheader "Sub Tipe" [ref=e179]
+                - columnheader "Gudang" [ref=e180]
+                - columnheader "Keterangan" [ref=e181]
+                - columnheader "Dibuat Oleh" [ref=e182]
+                - columnheader "Aksi" [ref=e183]
+            - rowgroup [ref=e184]:
+              - 'row "1 STM-0001 25 Apr 2026 Masuk Supplier Gudang Utama Jakarta Supplier: PT Test Supplier Superadmin Full Detail" [ref=e185]':
+                - cell "1" [ref=e186]
+                - cell "STM-0001" [ref=e187]
+                - cell "25 Apr 2026" [ref=e188]
+                - cell "Masuk" [ref=e189]:
+                  - generic [ref=e190]: Masuk
+                - cell "Supplier" [ref=e191]
+                - cell "Gudang Utama Jakarta" [ref=e192]
+                - 'cell "Supplier: PT Test Supplier" [ref=e193]'
+                - cell "Superadmin Full" [ref=e194]
+                - cell "Detail" [ref=e195]:
+                  - button "Detail" [ref=e196] [cursor=pointer]
+              - 'row "2 TRX-ADJ-001 24 Apr 2026 Adjustment Opname Gudang Utama Jakarta Hasil stock opname: selisih -5 pulpen Superadmin Example Detail" [ref=e197]':
+                - cell "2" [ref=e198]
+                - cell "TRX-ADJ-001" [ref=e199]
+                - cell "24 Apr 2026" [ref=e200]
+                - cell "Adjustment" [ref=e201]:
+                  - generic [ref=e202]: Adjustment
+                - cell "Opname" [ref=e203]
+                - cell "Gudang Utama Jakarta" [ref=e204]
+                - 'cell "Hasil stock opname: selisih -5 pulpen" [ref=e205]'
+                - cell "Superadmin Example" [ref=e206]
+                - cell "Detail" [ref=e207]:
+                  - button "Detail" [ref=e208] [cursor=pointer]
+              - 'row "3 TRX-OUT-002 24 Apr 2026 Keluar Transfer Gudang Gudang Utama Jakarta Ke: Gudang IT Bandung Superadmin Example Detail" [ref=e209]':
+                - cell "3" [ref=e210]
+                - cell "TRX-OUT-002" [ref=e211]
+                - cell "24 Apr 2026" [ref=e212]
+                - cell "Keluar" [ref=e213]:
+                  - generic [ref=e214]: Keluar
+                - cell "Transfer Gudang" [ref=e215]
+                - cell "Gudang Utama Jakarta" [ref=e216]
+                - 'cell "Ke: Gudang IT Bandung" [ref=e217]'
+                - cell "Superadmin Example" [ref=e218]
+                - cell "Detail" [ref=e219]:
+                  - button "Detail" [ref=e220] [cursor=pointer]
+              - 'row "4 TRX-OUT-001 24 Apr 2026 Keluar Ke Karyawan Gudang Utama Jakarta Karyawan: Cahyo Wibowo Superadmin Example Detail" [ref=e221]':
+                - cell "4" [ref=e222]
+                - cell "TRX-OUT-001" [ref=e223]
+                - cell "24 Apr 2026" [ref=e224]
+                - cell "Keluar" [ref=e225]:
+                  - generic [ref=e226]: Keluar
+                - cell "Ke Karyawan" [ref=e227]
+                - cell "Gudang Utama Jakarta" [ref=e228]
+                - 'cell "Karyawan: Cahyo Wibowo" [ref=e229]'
+                - cell "Superadmin Example" [ref=e230]
+                - cell "Detail" [ref=e231]:
+                  - button "Detail" [ref=e232] [cursor=pointer]
+              - 'row "5 TRX-IN-003 24 Apr 2026 Masuk Supplier Gudang IT Bandung Supplier: PT Furnitek Indonesia Superadmin Example Detail" [ref=e233]':
+                - cell "5" [ref=e234]
+                - cell "TRX-IN-003" [ref=e235]
+                - cell "24 Apr 2026" [ref=e236]
+                - cell "Masuk" [ref=e237]:
+                  - generic [ref=e238]: Masuk
+                - cell "Supplier" [ref=e239]
+                - cell "Gudang IT Bandung" [ref=e240]
+                - 'cell "Supplier: PT Furnitek Indonesia" [ref=e241]'
+                - cell "Superadmin Example" [ref=e242]
+                - cell "Detail" [ref=e243]:
+                  - button "Detail" [ref=e244] [cursor=pointer]
+              - 'row "6 TRX-IN-002 24 Apr 2026 Masuk Supplier Gudang Utama Jakarta Supplier: CV Alat Tulis Jaya Superadmin Example Detail" [ref=e245]':
+                - cell "6" [ref=e246]
+                - cell "TRX-IN-002" [ref=e247]
+                - cell "24 Apr 2026" [ref=e248]
+                - cell "Masuk" [ref=e249]:
+                  - generic [ref=e250]: Masuk
+                - cell "Supplier" [ref=e251]
+                - cell "Gudang Utama Jakarta" [ref=e252]
+                - 'cell "Supplier: CV Alat Tulis Jaya" [ref=e253]'
+                - cell "Superadmin Example" [ref=e254]
+                - cell "Detail" [ref=e255]:
+                  - button "Detail" [ref=e256] [cursor=pointer]
+              - 'row "7 TRX-IN-001 24 Apr 2026 Masuk Supplier Gudang Utama Jakarta Supplier: PT Techno Indonesia Superadmin Example Detail" [ref=e257]':
+                - cell "7" [ref=e258]
+                - cell "TRX-IN-001" [ref=e259]
+                - cell "24 Apr 2026" [ref=e260]
+                - cell "Masuk" [ref=e261]:
+                  - generic [ref=e262]: Masuk
+                - cell "Supplier" [ref=e263]
+                - cell "Gudang Utama Jakarta" [ref=e264]
+                - 'cell "Supplier: PT Techno Indonesia" [ref=e265]'
+                - cell "Superadmin Example" [ref=e266]
+                - cell "Detail" [ref=e267]:
+                  - button "Detail" [ref=e268] [cursor=pointer]

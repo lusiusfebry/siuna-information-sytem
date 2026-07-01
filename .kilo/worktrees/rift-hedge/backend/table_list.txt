@@ -1,0 +1,28 @@
+                 List of relations
+ Schema |          Name          | Type  |  Owner   
+--------+------------------------+-------+----------
+ public | SequelizeMeta          | table | postgres
+ public | attendances            | table | postgres
+ public | audit_logs             | table | postgres
+ public | department             | table | postgres
+ public | divisi                 | table | postgres
+ public | employee_documents     | table | postgres
+ public | employee_family_info   | table | postgres
+ public | employee_hr_info       | table | postgres
+ public | employee_personal_info | table | postgres
+ public | employees              | table | postgres
+ public | golongan               | table | postgres
+ public | jenis_hubungan_kerja   | table | postgres
+ public | kategori_pangkat       | table | postgres
+ public | leaves                 | table | postgres
+ public | lokasi_kerja           | table | postgres
+ public | permissions            | table | postgres
+ public | posisi_jabatan         | table | postgres
+ public | role_permissions       | table | postgres
+ public | roles                  | table | postgres
+ public | status_karyawan        | table | postgres
+ public | sub_golongan           | table | postgres
+ public | tag                    | table | postgres
+ public | users                  | table | postgres
+(23 rows)
+

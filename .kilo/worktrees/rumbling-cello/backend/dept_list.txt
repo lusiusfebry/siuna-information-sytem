@@ -1,0 +1,11 @@
+                  nama                  
+----------------------------------------
+ Plant
+ Health & Safery Environtment
+ Industrial Relation And General Affair
+ Purchasing And Logistic
+ Production
+ Mine Engineering
+ Operation
+(7 rows)
+

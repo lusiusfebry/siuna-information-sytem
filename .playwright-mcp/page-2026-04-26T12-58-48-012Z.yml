@@ -1,0 +1,391 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - complementary [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - generic [ref=e11]: inventory_2
+          - generic [ref=e12]:
+            - heading "Inventory" [level=1] [ref=e13]
+            - paragraph [ref=e14]: Manajemen Inventaris
+        - navigation [ref=e15]:
+          - link "home Halaman Utama" [ref=e17] [cursor=pointer]:
+            - /url: /welcome
+            - generic [ref=e18]: home
+            - text: Halaman Utama
+          - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+            - /url: /inventory/dashboard
+            - generic [ref=e21]: dashboard
+            - text: Dashboard
+          - generic [ref=e22]:
+            - button "database Master Data Inventory" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]:
+                - generic [ref=e25]: database
+                - text: Master Data Inventory
+              - img [ref=e26]
+            - generic [ref=e28]:
+              - link "category Kategori" [ref=e29] [cursor=pointer]:
+                - /url: /inventory/master-data/kategori
+                - generic [ref=e30]: category
+                - text: Kategori
+              - link "account_tree Sub Kategori" [ref=e31] [cursor=pointer]:
+                - /url: /inventory/master-data/sub-kategori
+                - generic [ref=e32]: account_tree
+                - text: Sub Kategori
+              - link "branding_watermark Brand" [ref=e33] [cursor=pointer]:
+                - /url: /inventory/master-data/brand
+                - generic [ref=e34]: branding_watermark
+                - text: Brand
+              - link "straighten UOM" [ref=e35] [cursor=pointer]:
+                - /url: /inventory/master-data/uom
+                - generic [ref=e36]: straighten
+                - text: UOM
+              - link "shopping_bag Produk" [ref=e37] [cursor=pointer]:
+                - /url: /inventory/master-data/produk
+                - generic [ref=e38]: shopping_bag
+                - text: Produk
+              - link "warehouse Gudang" [ref=e39] [cursor=pointer]:
+                - /url: /inventory/master-data/gudang
+                - generic [ref=e40]: warehouse
+                - text: Gudang
+          - generic [ref=e41]:
+            - button "inventory Manajemen Stok" [ref=e42] [cursor=pointer]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: inventory
+                - text: Manajemen Stok
+              - img [ref=e45]
+            - generic [ref=e47]:
+              - link "shelves Stok Inventaris" [ref=e48] [cursor=pointer]:
+                - /url: /inventory/stok
+                - generic [ref=e49]: shelves
+                - text: Stok Inventaris
+              - link "swap_horiz Transaksi Stok" [ref=e50] [cursor=pointer]:
+                - /url: /inventory/transaksi
+                - generic [ref=e51]: swap_horiz
+                - text: Transaksi Stok
+              - link "receipt_long Kartu Stok" [ref=e52] [cursor=pointer]:
+                - /url: /inventory/kartu-stok
+                - generic [ref=e53]: receipt_long
+                - text: Kartu Stok
+              - link "qr_code_2 Label & QR Code" [ref=e54] [cursor=pointer]:
+                - /url: /inventory/label
+                - generic [ref=e55]: qr_code_2
+                - text: Label & QR Code
+          - link "upload_file Import Data" [ref=e57] [cursor=pointer]:
+            - /url: /inventory/import
+            - generic [ref=e58]: upload_file
+            - text: Import Data
+    - generic [ref=e59]:
+      - banner [ref=e60]:
+        - generic [ref=e61]:
+          - heading "Inventory Management" [level=2] [ref=e62]
+          - navigation [ref=e63]:
+            - link "Stok" [ref=e64] [cursor=pointer]:
+              - /url: "#"
+            - link "Laporan" [ref=e65] [cursor=pointer]:
+              - /url: "#"
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - button "apps" [ref=e68] [cursor=pointer]:
+              - generic [ref=e69]: apps
+            - button "notifications" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: notifications
+            - button "settings" [ref=e73] [cursor=pointer]:
+              - generic [ref=e74]: settings
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]: "111111"
+              - generic [ref=e79]: Super Administrator
+            - button "person" [ref=e81] [cursor=pointer]:
+              - generic [ref=e82]: person
+      - main [ref=e83]:
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - heading "Stok Inventaris" [level=1] [ref=e87]
+            - paragraph [ref=e88]:
+              - text: Saldo stok per gudang — klik baris bertanda
+              - generic [ref=e89]: Tracked
+              - text: untuk melihat detail asset tag
+          - generic [ref=e90]:
+            - textbox "Cari produk..." [ref=e91]
+            - combobox [ref=e92]:
+              - option "Semua Gudang" [selected]
+              - option "Gudang Utama Jakarta"
+              - option "Gudang IT Jakarta"
+              - option "Gudang Produksi Bekasi"
+              - option "Gudang Cabang Bandung"
+              - option "Gudang Cabang Surabaya"
+          - generic [ref=e93]:
+            - table [ref=e95]:
+              - rowgroup [ref=e96]:
+                - row "No Kode Produk Nama Produk Brand Gudang Jumlah UOM Tracking" [ref=e97]:
+                  - columnheader "No" [ref=e98]
+                  - columnheader "Kode Produk" [ref=e99]
+                  - columnheader "Nama Produk" [ref=e100]
+                  - columnheader "Brand" [ref=e101]
+                  - columnheader "Gudang" [ref=e102]
+                  - columnheader "Jumlah" [ref=e103]
+                  - columnheader "UOM" [ref=e104]
+                  - columnheader "Tracking" [ref=e105]
+              - rowgroup [ref=e106]:
+                - row "1 PRD-008 Kursi Kantor Ergonomis IKEA Gudang Cabang Bandung 5 Unit sell Tracked" [ref=e107] [cursor=pointer]:
+                  - cell "1" [ref=e108]
+                  - cell "PRD-008" [ref=e109]
+                  - cell "Kursi Kantor Ergonomis" [ref=e110]
+                  - cell "IKEA" [ref=e111]
+                  - cell "Gudang Cabang Bandung" [ref=e112]
+                  - cell "5" [ref=e113]
+                  - cell "Unit" [ref=e114]
+                  - cell "sell Tracked" [ref=e115]:
+                    - generic [ref=e116]:
+                      - generic [ref=e117]: sell
+                      - text: Tracked
+                - row "2 PRD-007 Meja Kerja 120x60 Informa Gudang Cabang Bandung 5 Unit sell Tracked" [ref=e118] [cursor=pointer]:
+                  - cell "2" [ref=e119]
+                  - cell "PRD-007" [ref=e120]
+                  - cell "Meja Kerja 120x60" [ref=e121]
+                  - cell "Informa" [ref=e122]
+                  - cell "Gudang Cabang Bandung" [ref=e123]
+                  - cell "5" [ref=e124]
+                  - cell "Unit" [ref=e125]
+                  - cell "sell Tracked" [ref=e126]:
+                    - generic [ref=e127]:
+                      - generic [ref=e128]: sell
+                      - text: Tracked
+                - row "3 PRD-013 Sepatu Safety Hitam Cheetah Gudang Produksi Bekasi 29 Pasang —" [ref=e129]:
+                  - cell "3" [ref=e130]
+                  - cell "PRD-013" [ref=e131]
+                  - cell "Sepatu Safety Hitam" [ref=e132]
+                  - cell "Cheetah" [ref=e133]
+                  - cell "Gudang Produksi Bekasi" [ref=e134]
+                  - cell "29" [ref=e135]
+                  - cell "Pasang" [ref=e136]
+                  - cell "—" [ref=e137]
+                - row "4 PRD-012 Helm Safety Kuning Krisbow Gudang Produksi Bekasi 49 Unit —" [ref=e138]:
+                  - cell "4" [ref=e139]
+                  - cell "PRD-012" [ref=e140]
+                  - cell "Helm Safety Kuning" [ref=e141]
+                  - cell "Krisbow" [ref=e142]
+                  - cell "Gudang Produksi Bekasi" [ref=e143]
+                  - cell "49" [ref=e144]
+                  - cell "Unit" [ref=e145]
+                  - cell "—" [ref=e146]
+                - row "5 PRD-009 Lemari Arsip 4 Laci Olympic Gudang Produksi Bekasi 10 Unit sell Tracked" [ref=e147] [cursor=pointer]:
+                  - cell "5" [ref=e148]
+                  - cell "PRD-009" [ref=e149]
+                  - cell "Lemari Arsip 4 Laci" [ref=e150]
+                  - cell "Olympic" [ref=e151]
+                  - cell "Gudang Produksi Bekasi" [ref=e152]
+                  - cell "10" [ref=e153]
+                  - cell "Unit" [ref=e154]
+                  - cell "sell Tracked" [ref=e155]:
+                    - generic [ref=e156]:
+                      - generic [ref=e157]: sell
+                      - text: Tracked
+                - row "6 PRD-015 ASUS ZenBook 14 ASUS Gudang IT Jakarta 5 Unit sell Tracked" [ref=e158] [cursor=pointer]:
+                  - cell "6" [ref=e159]
+                  - cell "PRD-015" [ref=e160]
+                  - cell "ASUS ZenBook 14" [ref=e161]
+                  - cell "ASUS" [ref=e162]
+                  - cell "Gudang IT Jakarta" [ref=e163]
+                  - cell "5" [ref=e164]
+                  - cell "Unit" [ref=e165]
+                  - cell "sell Tracked" [ref=e166]:
+                    - generic [ref=e167]:
+                      - generic [ref=e168]: sell
+                      - text: Tracked
+                - row "7 PRD-005 LG 24\" Monitor LG Gudang IT Jakarta 15 Unit sell Tracked" [ref=e169] [cursor=pointer]:
+                  - cell "7" [ref=e170]
+                  - cell "PRD-005" [ref=e171]
+                  - cell "LG 24\" Monitor" [ref=e172]
+                  - cell "LG" [ref=e173]
+                  - cell "Gudang IT Jakarta" [ref=e174]
+                  - cell "15" [ref=e175]
+                  - cell "Unit" [ref=e176]
+                  - cell "sell Tracked" [ref=e177]:
+                    - generic [ref=e178]:
+                      - generic [ref=e179]: sell
+                      - text: Tracked
+                - row "8 PRD-003 HP ProDesk 400 G7 HP (Hewlett-Packard) Gudang IT Jakarta 5 Unit sell Tracked" [ref=e180] [cursor=pointer]:
+                  - cell "8" [ref=e181]
+                  - cell "PRD-003" [ref=e182]
+                  - cell "HP ProDesk 400 G7" [ref=e183]
+                  - cell "HP (Hewlett-Packard)" [ref=e184]
+                  - cell "Gudang IT Jakarta" [ref=e185]
+                  - cell "5" [ref=e186]
+                  - cell "Unit" [ref=e187]
+                  - cell "sell Tracked" [ref=e188]:
+                    - generic [ref=e189]:
+                      - generic [ref=e190]: sell
+                      - text: Tracked
+                - row "9 PRD-002 Dell Latitude 5540 Dell Gudang IT Jakarta 8 Unit sell Tracked" [ref=e191] [cursor=pointer]:
+                  - cell "9" [ref=e192]
+                  - cell "PRD-002" [ref=e193]
+                  - cell "Dell Latitude 5540" [ref=e194]
+                  - cell "Dell" [ref=e195]
+                  - cell "Gudang IT Jakarta" [ref=e196]
+                  - cell "8" [ref=e197]
+                  - cell "Unit" [ref=e198]
+                  - cell "sell Tracked" [ref=e199]:
+                    - generic [ref=e200]:
+                      - generic [ref=e201]: sell
+                      - text: Tracked
+                - row "10 PRD-011 Pulpen Pilot G2 Pilot Gudang Utama Jakarta 10 Lusin —" [ref=e202]:
+                  - cell "10" [ref=e203]
+                  - cell "PRD-011" [ref=e204]
+                  - cell "Pulpen Pilot G2" [ref=e205]
+                  - cell "Pilot" [ref=e206]
+                  - cell "Gudang Utama Jakarta" [ref=e207]
+                  - cell "10" [ref=e208]
+                  - cell "Lusin" [ref=e209]
+                  - cell "—" [ref=e210]
+                - row "11 PRD-010 Kertas HVS A4 80gsm Sinar Dunia Gudang Utama Jakarta 95 Rim —" [ref=e211]:
+                  - cell "11" [ref=e212]
+                  - cell "PRD-010" [ref=e213]
+                  - cell "Kertas HVS A4 80gsm" [ref=e214]
+                  - cell "Sinar Dunia" [ref=e215]
+                  - cell "Gudang Utama Jakarta" [ref=e216]
+                  - cell "95" [ref=e217]
+                  - cell "Rim" [ref=e218]
+                  - cell "—" [ref=e219]
+                - row "12 PRD-008 Kursi Kantor Ergonomis IKEA Gudang Utama Jakarta 15 Unit sell Tracked" [ref=e220] [cursor=pointer]:
+                  - cell "12" [ref=e221]
+                  - cell "PRD-008" [ref=e222]
+                  - cell "Kursi Kantor Ergonomis" [ref=e223]
+                  - cell "IKEA" [ref=e224]
+                  - cell "Gudang Utama Jakarta" [ref=e225]
+                  - cell "15" [ref=e226]
+                  - cell "Unit" [ref=e227]
+                  - cell "sell Tracked" [ref=e228]:
+                    - generic [ref=e229]:
+                      - generic [ref=e230]: sell
+                      - text: Tracked
+                - row "13 PRD-006 Epson L3210 Epson Gudang Utama Jakarta 5 Unit sell Tracked" [ref=e231] [cursor=pointer]:
+                  - cell "13" [ref=e232]
+                  - cell "PRD-006" [ref=e233]
+                  - cell "Epson L3210" [ref=e234]
+                  - cell "Epson" [ref=e235]
+                  - cell "Gudang Utama Jakarta" [ref=e236]
+                  - cell "5" [ref=e237]
+                  - cell "Unit" [ref=e238]
+                  - cell "sell Tracked" [ref=e239]:
+                    - generic [ref=e240]:
+                      - generic [ref=e241]: sell
+                      - text: Tracked
+                - row "14 PRD-007 Meja Kerja 120x60 Informa Gudang Utama Jakarta 15 Unit sell Tracked" [ref=e242] [cursor=pointer]:
+                  - cell "14" [ref=e243]
+                  - cell "PRD-007" [ref=e244]
+                  - cell "Meja Kerja 120x60" [ref=e245]
+                  - cell "Informa" [ref=e246]
+                  - cell "Gudang Utama Jakarta" [ref=e247]
+                  - cell "15" [ref=e248]
+                  - cell "Unit" [ref=e249]
+                  - cell "sell Tracked" [ref=e250]:
+                    - generic [ref=e251]:
+                      - generic [ref=e252]: sell
+                      - text: Tracked
+                - row "15 PRD-004 Samsung 27\" Monitor Samsung Gudang Utama Jakarta 10 Unit sell Tracked" [ref=e253] [cursor=pointer]:
+                  - cell "15" [ref=e254]
+                  - cell "PRD-004" [ref=e255]
+                  - cell "Samsung 27\" Monitor" [ref=e256]
+                  - cell "Samsung" [ref=e257]
+                  - cell "Gudang Utama Jakarta" [ref=e258]
+                  - cell "10" [ref=e259]
+                  - cell "Unit" [ref=e260]
+                  - cell "sell Tracked" [ref=e261]:
+                    - generic [ref=e262]:
+                      - generic [ref=e263]: sell
+                      - text: Tracked
+            - generic [ref=e264]:
+              - generic [ref=e265]: Total 16 item
+              - generic [ref=e266]:
+                - button "Sebelumnya" [disabled] [ref=e267]
+                - generic [ref=e268]: 1 / 2
+                - button "Berikutnya" [ref=e269] [cursor=pointer]
+  - generic [ref=e272]:
+    - generic [ref=e273]:
+      - generic [ref=e274]:
+        - heading "Detail Asset — Serial Number & Tag" [level=3] [ref=e275]
+        - paragraph [ref=e276]: PRD-009 · Lemari Arsip 4 Laci — Gudang Produksi Bekasi
+      - button [ref=e277] [cursor=pointer]:
+        - img [ref=e278]
+    - generic [ref=e281]:
+      - textbox "Cari serial number atau asset tag..." [ref=e282]
+      - table [ref=e284]:
+        - rowgroup [ref=e285]:
+          - row "No Serial Number Asset Tag Status Digunakan Oleh" [ref=e286]:
+            - columnheader "No" [ref=e287]
+            - columnheader "Serial Number" [ref=e288]
+            - columnheader "Asset Tag" [ref=e289]
+            - columnheader "Status" [ref=e290]
+            - columnheader "Digunakan Oleh" [ref=e291]
+        - rowgroup [ref=e292]:
+          - row "1 — LMR-BKS-0010 Tersedia —" [ref=e293]:
+            - cell "1" [ref=e294]
+            - cell "—" [ref=e295]
+            - cell "LMR-BKS-0010" [ref=e296]
+            - cell "Tersedia" [ref=e297]:
+              - generic [ref=e298]: Tersedia
+            - cell "—" [ref=e299]
+          - row "2 — LMR-BKS-0009 Tersedia —" [ref=e300]:
+            - cell "2" [ref=e301]
+            - cell "—" [ref=e302]
+            - cell "LMR-BKS-0009" [ref=e303]
+            - cell "Tersedia" [ref=e304]:
+              - generic [ref=e305]: Tersedia
+            - cell "—" [ref=e306]
+          - row "3 — LMR-BKS-0008 Tersedia —" [ref=e307]:
+            - cell "3" [ref=e308]
+            - cell "—" [ref=e309]
+            - cell "LMR-BKS-0008" [ref=e310]
+            - cell "Tersedia" [ref=e311]:
+              - generic [ref=e312]: Tersedia
+            - cell "—" [ref=e313]
+          - row "4 — LMR-BKS-0007 Tersedia —" [ref=e314]:
+            - cell "4" [ref=e315]
+            - cell "—" [ref=e316]
+            - cell "LMR-BKS-0007" [ref=e317]
+            - cell "Tersedia" [ref=e318]:
+              - generic [ref=e319]: Tersedia
+            - cell "—" [ref=e320]
+          - row "5 — LMR-BKS-0006 Tersedia —" [ref=e321]:
+            - cell "5" [ref=e322]
+            - cell "—" [ref=e323]
+            - cell "LMR-BKS-0006" [ref=e324]
+            - cell "Tersedia" [ref=e325]:
+              - generic [ref=e326]: Tersedia
+            - cell "—" [ref=e327]
+          - row "6 — LMR-BKS-0005 Tersedia —" [ref=e328]:
+            - cell "6" [ref=e329]
+            - cell "—" [ref=e330]
+            - cell "LMR-BKS-0005" [ref=e331]
+            - cell "Tersedia" [ref=e332]:
+              - generic [ref=e333]: Tersedia
+            - cell "—" [ref=e334]
+          - row "7 — LMR-BKS-0004 Tersedia —" [ref=e335]:
+            - cell "7" [ref=e336]
+            - cell "—" [ref=e337]
+            - cell "LMR-BKS-0004" [ref=e338]
+            - cell "Tersedia" [ref=e339]:
+              - generic [ref=e340]: Tersedia
+            - cell "—" [ref=e341]
+          - row "8 — LMR-BKS-0003 Tersedia —" [ref=e342]:
+            - cell "8" [ref=e343]
+            - cell "—" [ref=e344]
+            - cell "LMR-BKS-0003" [ref=e345]
+            - cell "Tersedia" [ref=e346]:
+              - generic [ref=e347]: Tersedia
+            - cell "—" [ref=e348]
+          - row "9 — LMR-BKS-0002 Tersedia —" [ref=e349]:
+            - cell "9" [ref=e350]
+            - cell "—" [ref=e351]
+            - cell "LMR-BKS-0002" [ref=e352]
+            - cell "Tersedia" [ref=e353]:
+              - generic [ref=e354]: Tersedia
+            - cell "—" [ref=e355]
+          - row "10 — LMR-BKS-0001 Tersedia —" [ref=e356]:
+            - cell "10" [ref=e357]
+            - cell "—" [ref=e358]
+            - cell "LMR-BKS-0001" [ref=e359]
+            - cell "Tersedia" [ref=e360]:
+              - generic [ref=e361]: Tersedia
+            - cell "—" [ref=e362]

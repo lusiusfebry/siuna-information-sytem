@@ -1,0 +1,269 @@
+- generic [ref=e184]:
+  - complementary [ref=e186]:
+    - generic [ref=e187]:
+      - generic [ref=e188]:
+        - generic [ref=e190]: groups
+        - generic [ref=e191]:
+          - heading "Human Resources" [level=1] [ref=e192]
+          - paragraph [ref=e193]: Manajemen SDM
+      - navigation [ref=e194]:
+        - link "home Halaman Utama" [ref=e196] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e197]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e199] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e200]: dashboard
+          - text: Dashboard
+        - generic [ref=e201]:
+          - button "database Master Data" [ref=e202] [cursor=pointer]:
+            - generic [ref=e203]:
+              - generic [ref=e204]: database
+              - text: Master Data
+            - img [ref=e205]
+          - generic [ref=e207]:
+            - link "domain Divisi" [ref=e208] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e209]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e210] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e211]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e212] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e213]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e214] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e215]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e216] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e217]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e218] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e219]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e220] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e221]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e222] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e223]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e224] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e225]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e226] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e227]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e228]:
+          - button "groups Manajemen Karyawan" [ref=e229] [cursor=pointer]:
+            - generic [ref=e230]:
+              - generic [ref=e231]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e232]
+          - link "person Karyawan" [ref=e235] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e236]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e238] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e239]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e241] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e242]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e243]:
+    - banner [ref=e244]:
+      - generic [ref=e245]:
+        - heading "Human Resources" [level=2] [ref=e246]
+        - navigation [ref=e247]:
+          - button "Direktori" [ref=e248] [cursor=pointer]
+          - button "Organisasi" [ref=e249] [cursor=pointer]
+      - generic [ref=e250]:
+        - generic [ref=e251]:
+          - generic [ref=e252]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e253]
+        - generic [ref=e254]:
+          - button "apps" [ref=e255] [cursor=pointer]:
+            - generic [ref=e256]: apps
+          - button "notifications" [ref=e258] [cursor=pointer]:
+            - generic [ref=e259]: notifications
+          - button "settings" [ref=e260] [cursor=pointer]:
+            - generic [ref=e261]: settings
+        - generic [ref=e263]:
+          - generic [ref=e264]:
+            - generic [ref=e265]: "1234567890123456"
+            - generic [ref=e266]: Super Administrator
+          - button "person" [ref=e268] [cursor=pointer]:
+            - generic [ref=e269]: person
+    - main [ref=e7]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]:
+            - heading "Manajemen Karyawan" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Kelola data karyawan, filter, dan export.
+          - generic [ref=e14]:
+            - button "Export" [ref=e17] [cursor=pointer]:
+              - img [ref=e18]
+              - text: Export
+            - button "upload_file Import Excel" [ref=e20] [cursor=pointer]:
+              - generic [ref=e21]: upload_file
+              - text: Import Excel
+            - button "add Tambah Karyawan" [ref=e22] [cursor=pointer]:
+              - generic [ref=e23]: add
+              - text: Tambah Karyawan
+            - button "draft View Drafts" [ref=e24] [cursor=pointer]:
+              - generic [ref=e25]: draft
+              - text: View Drafts
+            - generic [ref=e27]:
+              - button "list" [ref=e28] [cursor=pointer]:
+                - generic [ref=e29]: list
+              - button "view_list" [ref=e30] [cursor=pointer]:
+                - generic [ref=e31]: view_list
+              - button "view_headline" [ref=e32] [cursor=pointer]:
+                - generic [ref=e33]: view_headline
+              - button "grid_view" [ref=e34] [cursor=pointer]:
+                - generic [ref=e35]: grid_view
+              - button "fullscreen" [ref=e36] [cursor=pointer]:
+                - generic [ref=e37]: fullscreen
+              - button "table_rows" [ref=e38] [cursor=pointer]:
+                - generic [ref=e39]: table_rows
+              - button "vertical_split" [ref=e40] [cursor=pointer]:
+                - generic [ref=e41]: vertical_split
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]: Cari Karyawan
+              - generic [ref=e46]:
+                - generic:
+                  - generic: search
+                - textbox "Cari nama atau NIK..." [active] [ref=e47]
+            - button "Advanced Filter 1 Aktif" [ref=e49] [cursor=pointer]:
+              - generic [ref=e50]:
+                - img [ref=e51]
+                - generic [ref=e53]: Advanced Filter
+                - generic [ref=e54]: 1 Aktif
+              - img [ref=e55]
+          - generic [ref=e57]:
+            - generic [ref=e58]: "Filter Aktif:"
+            - generic [ref=e59]:
+              - text: "Status: Aktif"
+              - button "Remove filter" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: Remove filter
+                - img [ref=e62]
+            - button "Clear All" [ref=e64] [cursor=pointer]
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]: "No"
+            - generic [ref=e69]: Nama / NIK
+            - generic [ref=e70]: Posisi
+            - generic [ref=e71]: Department
+            - generic [ref=e72]: Aksi
+          - generic [ref=e75]:
+            - generic [ref=e76] [cursor=pointer]:
+              - generic [ref=e77]: "1"
+              - generic [ref=e78]:
+                - img "Galih Pratama" [ref=e79]
+                - generic [ref=e80]:
+                  - generic [ref=e81]: Galih Pratama
+                  - generic [ref=e82]: EMP-020
+              - generic [ref=e83]: Software Engineer
+              - generic [ref=e84]: Software Development
+              - button "delete" [ref=e86]:
+                - generic [ref=e87]: delete
+            - generic [ref=e88] [cursor=pointer]:
+              - generic [ref=e89]: "2"
+              - generic [ref=e90]:
+                - img "Yulia Rahmawati" [ref=e91]
+                - generic [ref=e92]:
+                  - generic [ref=e93]: Yulia Rahmawati
+                  - generic [ref=e94]: EMP-019
+              - generic [ref=e95]: Operator Produksi
+              - generic [ref=e96]: Produksi
+              - button "delete" [ref=e98]:
+                - generic [ref=e99]: delete
+            - generic [ref=e100] [cursor=pointer]:
+              - generic [ref=e101]: "3"
+              - generic [ref=e102]:
+                - img "Budi Hartono" [ref=e103]
+                - generic [ref=e104]:
+                  - generic [ref=e105]: Budi Hartono
+                  - generic [ref=e106]: EMP-018
+              - generic [ref=e107]: System Administrator
+              - generic [ref=e108]: IT Infrastructure
+              - button "delete" [ref=e110]:
+                - generic [ref=e111]: delete
+            - generic [ref=e112] [cursor=pointer]:
+              - generic [ref=e113]: "4"
+              - generic [ref=e114]:
+                - img "Sari Indah Permatasari" [ref=e115]
+                - generic [ref=e116]:
+                  - generic [ref=e117]: Sari Indah Permatasari
+                  - generic [ref=e118]: EMP-017
+              - generic [ref=e119]: Admin GA
+              - generic [ref=e120]: General Affairs
+              - button "delete" [ref=e122]:
+                - generic [ref=e123]: delete
+            - generic [ref=e124] [cursor=pointer]:
+              - generic [ref=e125]: "5"
+              - generic [ref=e126]:
+                - img "Irfan Hakim" [ref=e127]
+                - generic [ref=e128]:
+                  - generic [ref=e129]: Irfan Hakim
+                  - generic [ref=e130]: EMP-016
+              - generic [ref=e131]: Legal Officer
+              - generic [ref=e132]: Legal
+              - button "delete" [ref=e134]:
+                - generic [ref=e135]: delete
+            - generic [ref=e136] [cursor=pointer]:
+              - generic [ref=e137]: "6"
+              - generic [ref=e138]:
+                - img "Novita Anggraini" [ref=e139]
+                - generic [ref=e140]:
+                  - generic [ref=e141]: Novita Anggraini
+                  - generic [ref=e142]: EMP-015
+              - generic [ref=e143]: Sales Executive
+              - generic [ref=e144]: Sales
+              - button "delete" [ref=e146]:
+                - generic [ref=e147]: delete
+            - generic [ref=e148] [cursor=pointer]:
+              - generic [ref=e149]: "7"
+              - generic [ref=e150]:
+                - img "Taufik Ismail" [ref=e151]
+                - generic [ref=e152]:
+                  - generic [ref=e153]: Taufik Ismail
+                  - generic [ref=e154]: EMP-014
+              - generic [ref=e155]: Accountant
+              - generic [ref=e156]: Accounting
+              - button "delete" [ref=e158]:
+                - generic [ref=e159]: delete
+            - generic [ref=e160] [cursor=pointer]:
+              - generic [ref=e161]: "8"
+              - generic [ref=e162]:
+                - img "Mega Puspita" [ref=e163]
+                - generic [ref=e164]:
+                  - generic [ref=e165]: Mega Puspita
+                  - generic [ref=e166]: EMP-013
+              - generic [ref=e167]: QC Inspector
+              - generic [ref=e168]: Quality Control
+              - button "delete" [ref=e170]:
+                - generic [ref=e171]: delete
+            - generic [ref=e172] [cursor=pointer]:
+              - generic [ref=e173]: "9"
+              - generic [ref=e174]:
+                - img "Wahyu Hidayat" [ref=e175]
+                - generic [ref=e176]:
+                  - generic [ref=e177]: Wahyu Hidayat
+                  - generic [ref=e178]: EMP-012
+              - generic [ref=e179]: Operator Produksi
+              - generic [ref=e180]: Produksi
+              - button "delete" [ref=e182]:
+                - generic [ref=e183]: delete

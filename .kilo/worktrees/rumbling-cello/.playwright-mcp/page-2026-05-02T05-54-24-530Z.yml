@@ -1,0 +1,46 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - img [ref=e8]
+        - heading "Bebang Sistem Informasi" [level=2] [ref=e10]
+      - generic [ref=e11]:
+        - link "Tentang Kami" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+        - link "Bantuan" [ref=e13] [cursor=pointer]:
+          - /url: "#"
+        - button "Hubungi IT" [ref=e14] [cursor=pointer]:
+          - generic [ref=e15]: Hubungi IT
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - img [ref=e22]
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - heading "Selamat Datang di BIS" [level=1] [ref=e26]
+          - paragraph [ref=e27]: Sistem Informasi Terintegrasi PT Prima Sarana Gemilang
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: Nomor Induk Karyawan
+            - generic [ref=e31]:
+              - textbox "Masukkan NIK Anda" [ref=e32]: "1234567890123456"
+              - generic [ref=e34]: badge
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]: Kata Sandi
+              - link "Lupa Sandi?" [ref=e38] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=e39]:
+              - textbox "••••••••" [ref=e40]: password123
+              - generic [ref=e42] [cursor=pointer]: visibility_off
+          - generic [ref=e43]:
+            - checkbox "Ingat saya di perangkat ini" [ref=e44]
+            - generic [ref=e45]: Ingat saya di perangkat ini
+          - button "Masuk ke Akun login" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: Masuk ke Akun
+            - generic [ref=e48]: login
+        - paragraph [ref=e50]:
+          - text: Mengalami kendala saat login?
+          - link "Hubungi Administrator" [ref=e51] [cursor=pointer]:
+            - /url: "#"
+  - contentinfo [ref=e52]:
+    - paragraph [ref=e54]: © 2026 PT Prima Sarana Gemilang • IT Division • v1.0.0

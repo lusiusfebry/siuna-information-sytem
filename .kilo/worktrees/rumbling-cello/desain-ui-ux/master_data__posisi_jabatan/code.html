@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Master Data: Posisi Jabatan - Bebang HR</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-hover": "#1d4ed8",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a202c",
+                        "text-main": "#0d121b",
+                        "text-secondary": "#4c669a",
+                        "border-color": "#cfd7e7",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetic in tables/sidebar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white min-h-screen flex overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-color dark:border-gray-700 flex flex-col shrink-0 transition-all duration-300 hidden md:flex h-screen sticky top-0">
+<!-- Sidebar Header -->
+<div class="p-6 border-b border-border-color dark:border-gray-700">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined text-3xl">verified_user</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-text-main dark:text-white text-lg font-bold leading-tight">Bebang HR</h1>
+<p class="text-text-secondary text-xs font-medium">Sistem Informasi SDM</p>
+</div>
+</div>
+</div>
+<!-- Navigation Menu -->
+<div class="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1">
+<div class="px-3 py-2 text-xs font-bold text-text-secondary uppercase tracking-wider">Master Data</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">domain</span>
+<span class="text-sm font-medium">Divisi</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">apartment</span>
+<span class="text-sm font-medium">Departemen</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 shadow-sm transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] fill-1">work</span>
+<span class="text-sm font-bold">Posisi</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">military_tech</span>
+<span class="text-sm font-medium">Pangkat</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">stars</span>
+<span class="text-sm font-medium">Golongan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">layers</span>
+<span class="text-sm font-medium">Sub Golongan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">handshake</span>
+<span class="text-sm font-medium">Hubungan Kerja</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">label</span>
+<span class="text-sm font-medium">Tag</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">location_on</span>
+<span class="text-sm font-medium">Lokasi</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">person_search</span>
+<span class="text-sm font-medium">Status Karyawan</span>
+</a>
+</div>
+<!-- User Profile (Bottom) -->
+<div class="p-4 border-t border-border-color dark:border-gray-700">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-border-color" data-alt="User profile picture of HR Admin" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDAKbiXg2xacu1VH5nxWVeBcQylXz02TfQor-TrynLWiaeWeVsxrnq7HytW1Rv7eTH1LIkCNtrwx1lmSolE8kTYogy-ElNdJ-Wi5yLja7hPAvccK9rSm2WlzZrmDnNihpKP2PbE5w8BPW14lkkwiI0tGWfwu3cAWWrtfwBsC-zwPPz_J1frL9N0nvG29UOoxQrIZ45yVOZFTfx1Vn3fqZ4OLVas-yXR-c68p4QLKad_HLeyXvpnZ6Pn8Kdhl04XouQfGMejssl60d1F");'>
+</div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-text-main dark:text-white text-sm font-semibold truncate">Admin HR</p>
+<p class="text-text-secondary text-xs truncate">admin@bebang.id</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<!-- Header / Top Bar -->
+<header class="bg-surface-light dark:bg-surface-dark border-b border-border-color dark:border-gray-700 px-6 py-4 flex flex-col gap-4 sticky top-0 z-10">
+<!-- Breadcrumbs -->
+<div class="flex items-center text-sm">
+<a class="text-text-secondary hover:text-primary font-medium transition-colors" href="#">Master Data</a>
+<span class="mx-2 text-text-secondary">/</span>
+<span class="text-text-main dark:text-white font-semibold">Posisi Jabatan</span>
+</div>
+<!-- Page Title & Actions -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="text-2xl md:text-3xl font-black text-text-main dark:text-white tracking-tight">Posisi Jabatan</h2>
+<p class="text-text-secondary mt-1 text-sm md:text-base">Kelola daftar posisi, jabatan, dan tanggung jawab dalam struktur organisasi.</p>
+</div>
+<button class="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm flex items-center gap-2 transition-all active:scale-95 shrink-0 w-fit">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Tambah Posisi</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-auto bg-background-light dark:bg-background-dark p-6">
+<div class="max-w-[1400px] mx-auto flex flex-col gap-6">
+<!-- Filters Section -->
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-border-color dark:border-gray-700 shadow-sm">
+<div class="flex flex-col md:flex-row gap-4 items-end">
+<!-- Search Input -->
+<div class="w-full md:flex-1">
+<label class="block text-xs font-bold text-text-secondary uppercase mb-1.5 ml-1">Cari Posisi</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-background-light dark:bg-gray-800 border border-border-color dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-text-main dark:text-white placeholder:text-text-secondary/70" placeholder="Cari nama posisi jabatan..." type="text"/>
+</div>
+</div>
+<!-- Dropdown Filter: Departemen -->
+<div class="w-full md:w-64">
+<label class="block text-xs font-bold text-text-secondary uppercase mb-1.5 ml-1">Departemen</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">apartment</span>
+<select class="w-full pl-10 pr-8 py-2.5 bg-background-light dark:bg-gray-800 border border-border-color dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all appearance-none text-text-main dark:text-white cursor-pointer">
+<option value="">Semua Departemen</option>
+<option value="marketing">Marketing</option>
+<option value="hr">HR &amp; GA</option>
+<option value="it">IT Engineering</option>
+<option value="finance">Finance</option>
+<option value="ga">General Affair</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none text-lg">arrow_drop_down</span>
+</div>
+</div>
+<!-- Dropdown Filter: Status -->
+<div class="w-full md:w-48">
+<label class="block text-xs font-bold text-text-secondary uppercase mb-1.5 ml-1">Status</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">toggle_on</span>
+<select class="w-full pl-10 pr-8 py-2.5 bg-background-light dark:bg-gray-800 border border-border-color dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all appearance-none text-text-main dark:text-white cursor-pointer">
+<option value="">Semua Status</option>
+<option value="active">Aktif</option>
+<option value="inactive">Non-Aktif</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none text-lg">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-color dark:border-gray-700 shadow-sm overflow-hidden flex flex-col flex-1">
+<div class="overflow-x-auto">
+<table class="w-full min-w-[800px] text-left border-collapse">
+<thead>
+<tr class="bg-gray-50/50 dark:bg-gray-800/50 border-b border-border-color dark:border-gray-700">
+<th class="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-wider w-[25%]">Nama Posisi</th>
+<th class="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-wider w-[20%]">Departemen</th>
+<th class="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-wider w-[30%]">Keterangan</th>
+<th class="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-wider w-[10%] text-center">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-wider w-[15%] text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-color dark:divide-gray-700">
+<!-- Row 1 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-text-main dark:text-white">Manager Marketing</span>
+<span class="text-xs text-text-secondary md:hidden">Marketing</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-text-secondary font-medium">Marketing</td>
+<td class="px-6 py-4 text-sm text-text-secondary">Memimpin strategi pemasaran dan branding perusahaan.</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-text-main dark:text-white">Staff HRGA</span>
+<span class="text-xs text-text-secondary md:hidden">HR &amp; GA</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-text-secondary font-medium">HR &amp; GA</td>
+<td class="px-6 py-4 text-sm text-text-secondary">Administrasi umum, rekrutmen dasar, dan absensi.</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-text-main dark:text-white">Senior Developer</span>
+<span class="text-xs text-text-secondary md:hidden">IT Engineering</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-text-secondary font-medium">IT Engineering</td>
+<td class="px-6 py-4 text-sm text-text-secondary">Pengembangan sistem backend core dan arsitektur database.</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-text-main dark:text-white">Staff Finance</span>
+<span class="text-xs text-text-secondary md:hidden">Finance</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-text-secondary font-medium">Finance</td>
+<td class="px-6 py-4 text-sm text-text-secondary">Pembukuan harian dan rekonsiliasi bank.</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                                            Non-Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-text-main dark:text-white">Satpam</span>
+<span class="text-xs text-text-secondary md:hidden">General Affair</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-text-secondary font-medium">General Affair</td>
+<td class="px-6 py-4 text-sm text-text-secondary">Keamanan kantor, pemeriksaan tamu, dan parkir.</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg text-text-secondary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Hapus">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-surface-light dark:bg-surface-dark px-6 py-4 border-t border-border-color dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-sm text-text-secondary">
+                            Menampilkan <span class="font-bold text-text-main dark:text-white">1-5</span> dari <span class="font-bold text-text-main dark:text-white">24</span> data
+                        </p>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-border-color dark:border-gray-600 text-text-secondary hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 text-sm font-medium transition-colors" disabled="">
+                                Sebelumnya
+                            </button>
+<button class="px-3 py-1.5 rounded-lg border border-border-color dark:border-gray-600 text-text-secondary hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
+                                Selanjutnya
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

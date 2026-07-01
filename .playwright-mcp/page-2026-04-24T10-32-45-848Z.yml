@@ -1,0 +1,101 @@
+- generic [ref=e7]:
+  - complementary [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e13]: groups
+        - generic [ref=e14]:
+          - heading "Human Resources" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Manajemen SDM
+      - navigation [ref=e17]:
+        - link "home Halaman Utama" [ref=e19] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e20]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e22] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e23]: dashboard
+          - text: Dashboard
+        - generic [ref=e24]:
+          - button "database Master Data" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: database
+              - text: Master Data
+            - img [ref=e28]
+          - generic [ref=e30]:
+            - link "domain Divisi" [ref=e31] [cursor=pointer]:
+              - /url: /hr/master-data/divisi
+              - generic [ref=e32]: domain
+              - text: Divisi
+            - link "groups Departemen" [ref=e33] [cursor=pointer]:
+              - /url: /hr/master-data/department
+              - generic [ref=e34]: groups
+              - text: Departemen
+            - link "badge Posisi Jabatan" [ref=e35] [cursor=pointer]:
+              - /url: /hr/master-data/posisi-jabatan
+              - generic [ref=e36]: badge
+              - text: Posisi Jabatan
+            - link "military_tech Kategori Pangkat" [ref=e37] [cursor=pointer]:
+              - /url: /hr/master-data/kategori-pangkat
+              - generic [ref=e38]: military_tech
+              - text: Kategori Pangkat
+            - link "stars Golongan" [ref=e39] [cursor=pointer]:
+              - /url: /hr/master-data/golongan
+              - generic [ref=e40]: stars
+              - text: Golongan
+            - link "hotel_class Sub Golongan" [ref=e41] [cursor=pointer]:
+              - /url: /hr/master-data/sub-golongan
+              - generic [ref=e42]: hotel_class
+              - text: Sub Golongan
+            - link "handshake Jenis Hubungan" [ref=e43] [cursor=pointer]:
+              - /url: /hr/master-data/jenis-hubungan-kerja
+              - generic [ref=e44]: handshake
+              - text: Jenis Hubungan
+            - link "label Tag" [ref=e45] [cursor=pointer]:
+              - /url: /hr/master-data/tag
+              - generic [ref=e46]: label
+              - text: Tag
+            - link "location_on Lokasi Kerja" [ref=e47] [cursor=pointer]:
+              - /url: /hr/master-data/lokasi-kerja
+              - generic [ref=e48]: location_on
+              - text: Lokasi Kerja
+            - link "verified_user Status Karyawan" [ref=e49] [cursor=pointer]:
+              - /url: /hr/master-data/status-karyawan
+              - generic [ref=e50]: verified_user
+              - text: Status Karyawan
+        - generic [ref=e51]:
+          - button "groups Manajemen Karyawan" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: groups
+              - text: Manajemen Karyawan
+            - img [ref=e55]
+          - link "person Karyawan" [ref=e58] [cursor=pointer]:
+            - /url: /hr/employees
+            - generic [ref=e59]: person
+            - text: Karyawan
+        - link "calendar_month Absensi & Cuti" [ref=e61] [cursor=pointer]:
+          - /url: /hr/attendance
+          - generic [ref=e62]: calendar_month
+          - text: Absensi & Cuti
+        - link "history Riwayat Aktivitas" [ref=e64] [cursor=pointer]:
+          - /url: /hr/audit-logs
+          - generic [ref=e65]: history
+          - text: Riwayat Aktivitas
+  - generic [ref=e66]:
+    - banner [ref=e67]:
+      - heading "Human Resources" [level=2] [ref=e69]
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - button "apps" [ref=e72] [cursor=pointer]:
+            - generic [ref=e73]: apps
+          - button "notifications" [ref=e74] [cursor=pointer]:
+            - generic [ref=e75]: notifications
+          - button "settings" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: settings
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: "1234567890123456"
+            - generic [ref=e82]: Super Administrator
+          - button "person" [ref=e84] [cursor=pointer]:
+            - generic [ref=e85]: person
+    - main [ref=e86]:
+      - generic [ref=e88]: Employee not found

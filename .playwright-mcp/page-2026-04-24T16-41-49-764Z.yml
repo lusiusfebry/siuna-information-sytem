@@ -1,0 +1,196 @@
+- generic [ref=e5]:
+  - complementary [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e11]: inventory_2
+        - generic [ref=e12]:
+          - heading "Inventory" [level=1] [ref=e13]
+          - paragraph [ref=e14]: Manajemen Inventaris
+      - navigation [ref=e15]:
+        - link "home Halaman Utama" [ref=e17] [cursor=pointer]:
+          - /url: /welcome
+          - generic [ref=e18]: home
+          - text: Halaman Utama
+        - link "dashboard Dashboard" [ref=e20] [cursor=pointer]:
+          - /url: /inventory/dashboard
+          - generic [ref=e21]: dashboard
+          - text: Dashboard
+        - generic [ref=e22]:
+          - button "database Master Data Inventory" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]:
+              - generic [ref=e25]: database
+              - text: Master Data Inventory
+            - img [ref=e26]
+          - generic [ref=e28]:
+            - link "category Kategori" [ref=e29] [cursor=pointer]:
+              - /url: /inventory/master-data/kategori
+              - generic [ref=e30]: category
+              - text: Kategori
+            - link "account_tree Sub Kategori" [ref=e31] [cursor=pointer]:
+              - /url: /inventory/master-data/sub-kategori
+              - generic [ref=e32]: account_tree
+              - text: Sub Kategori
+            - link "branding_watermark Brand" [ref=e33] [cursor=pointer]:
+              - /url: /inventory/master-data/brand
+              - generic [ref=e34]: branding_watermark
+              - text: Brand
+            - link "straighten UOM" [ref=e35] [cursor=pointer]:
+              - /url: /inventory/master-data/uom
+              - generic [ref=e36]: straighten
+              - text: UOM
+            - link "shopping_bag Produk" [ref=e37] [cursor=pointer]:
+              - /url: /inventory/master-data/produk
+              - generic [ref=e38]: shopping_bag
+              - text: Produk
+            - link "warehouse Gudang" [ref=e39] [cursor=pointer]:
+              - /url: /inventory/master-data/gudang
+              - generic [ref=e40]: warehouse
+              - text: Gudang
+        - generic [ref=e41]:
+          - button "inventory Manajemen Stok" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: inventory
+              - text: Manajemen Stok
+            - img [ref=e45]
+          - generic [ref=e47]:
+            - link "shelves Stok Inventaris" [ref=e48] [cursor=pointer]:
+              - /url: /inventory/stok
+              - generic [ref=e49]: shelves
+              - text: Stok Inventaris
+            - link "swap_horiz Transaksi Stok" [ref=e50] [cursor=pointer]:
+              - /url: /inventory/transaksi
+              - generic [ref=e51]: swap_horiz
+              - text: Transaksi Stok
+            - link "receipt_long Kartu Stok" [ref=e52] [cursor=pointer]:
+              - /url: /inventory/kartu-stok
+              - generic [ref=e53]: receipt_long
+              - text: Kartu Stok
+            - link "qr_code_2 Label & QR Code" [ref=e54] [cursor=pointer]:
+              - /url: /inventory/label
+              - generic [ref=e55]: qr_code_2
+              - text: Label & QR Code
+        - link "upload_file Import Data" [ref=e57] [cursor=pointer]:
+          - /url: /inventory/import
+          - generic [ref=e58]: upload_file
+          - text: Import Data
+  - generic [ref=e59]:
+    - banner [ref=e60]:
+      - generic [ref=e61]:
+        - heading "Inventory Management" [level=2] [ref=e62]
+        - navigation [ref=e63]:
+          - link "Stok" [ref=e64] [cursor=pointer]:
+            - /url: "#"
+          - link "Laporan" [ref=e65] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]: search
+          - textbox "Cari karyawan, departemen, atau NIK..." [ref=e69]
+        - generic [ref=e70]:
+          - button "apps" [ref=e71] [cursor=pointer]:
+            - generic [ref=e72]: apps
+          - generic [ref=e73]:
+            - button "notifications" [active] [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: notifications
+            - generic [ref=e151]:
+              - heading "Notifikasi" [level=3] [ref=e153]
+              - generic [ref=e155]: Tidak ada notifikasi
+          - button "settings" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: settings
+        - generic [ref=e79]:
+          - generic [ref=e80]:
+            - generic [ref=e81]: "1234567890123456"
+            - generic [ref=e82]: Super Administrator
+          - button "person" [ref=e84] [cursor=pointer]:
+            - generic [ref=e85]: person
+    - main [ref=e86]:
+      - generic [ref=e88]:
+        - generic [ref=e89]:
+          - button "arrow_back Kembali" [ref=e90] [cursor=pointer]:
+            - generic [ref=e91]: arrow_back
+            - text: Kembali
+          - heading "Buat Transaksi Baru" [level=1] [ref=e92]
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - heading "Informasi Transaksi" [level=2] [ref=e95]
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]: Tipe Transaksi *
+                - combobox [ref=e99]:
+                  - option "Stok Masuk"
+                  - option "Stok Keluar" [selected]
+                  - option "Adjustment"
+              - generic [ref=e100]:
+                - generic [ref=e101]: Sub Tipe *
+                - combobox [ref=e102]:
+                  - option "Ke Karyawan" [selected]
+                  - option "Ke Gedung/Mess"
+                  - option "Transfer Gudang"
+                  - option "Disposal"
+                  - option "Rusak / Terbuang"
+              - generic [ref=e103]:
+                - generic [ref=e104]: Tanggal *
+                - textbox [ref=e105]: 2026-04-24
+              - generic [ref=e106]:
+                - generic [ref=e107]: Gudang *
+                - combobox [ref=e108]:
+                  - option "-- Pilih Gudang --" [selected]
+                  - option "Gudang Utama Jakarta"
+                  - option "Gudang IT Bandung"
+                  - option "Gudang Operasional"
+              - generic [ref=e148]:
+                - generic [ref=e149]: Karyawan *
+                - spinbutton [ref=e150]
+              - generic [ref=e112]:
+                - generic [ref=e113]: No. Referensi
+                - textbox "Nomor surat jalan / PO" [ref=e114]
+            - generic [ref=e115]:
+              - generic [ref=e116]: Catatan
+              - textbox "Catatan tambahan..." [ref=e117]
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - heading "Detail Item" [level=2] [ref=e120]
+              - button "add Tambah Item" [ref=e121] [cursor=pointer]:
+                - generic [ref=e122]: add
+                - text: Tambah Item
+            - generic [ref=e124]:
+              - generic [ref=e126]: "Item #1"
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - generic [ref=e129]: Produk *
+                  - combobox [ref=e130]:
+                    - option "-- Pilih Produk --" [selected]
+                    - option "IPRD001 - Lenovo ThinkPad T14"
+                    - option "IPRD002 - Dell OptiPlex 3090"
+                    - option "IPRD003 - HP LaserJet Pro M404dn"
+                    - option "IPRD004 - Canon PIXMA G3020"
+                    - option "IPRD005 - Kertas A4 70gsm"
+                    - option "IPRD006 - Pulpen Pilot G-2"
+                    - option "IPRD007 - Meja Kerja 120x60"
+                    - option "IPRD008 - Kursi Ergonomic Mesh"
+                    - option "IPRD009 - Tinta Printer Canon GI-71"
+                    - option "IPRD010 - Amplop Coklat A4"
+                - generic [ref=e131]:
+                  - generic [ref=e132]: UOM *
+                  - combobox [ref=e133]:
+                    - option "-- Pilih UOM --" [selected]
+                    - option "Unit"
+                    - option "Pcs"
+                    - option "Rim"
+                    - option "Box"
+                    - option "Set"
+                - generic [ref=e134]:
+                  - generic [ref=e135]: Jumlah *
+                  - spinbutton [ref=e136]: "1"
+              - generic [ref=e137]:
+                - generic [ref=e138]: Catatan Item
+                - textbox "Catatan untuk item ini" [ref=e139]
+          - generic [ref=e140]:
+            - heading "Dokumen Lampiran" [level=2] [ref=e141]
+            - paragraph [ref=e142]: Upload surat jalan, invoice, atau dokumen pendukung lainnya (maks 5 file, 5MB per file)
+            - button "upload_file Tambah Dokumen" [ref=e143] [cursor=pointer]:
+              - generic [ref=e144]: upload_file
+              - text: Tambah Dokumen
+          - generic [ref=e145]:
+            - button "Batal" [ref=e146] [cursor=pointer]
+            - button "Simpan Transaksi" [ref=e147] [cursor=pointer]

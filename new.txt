@@ -1,0 +1,26 @@
+Caranya sudah tersedia di npm scripts yang ada:
+
+  1. Untuk demo (data lengkap):
+
+  cd backend
+  npm run migrate          # buat tabel dulu
+  npm run seed:complete    # isi semua data demo (HR, Inventory, Facility)
+
+  Login pakai NIK 111111, password password123.
+
+  2. Untuk implementasi (hanya credentials):
+
+  cd backend
+  npm run migrate          # buat tabel dulu
+  npm run seed             # hanya RBAC (permissions, roles) + 2 akun superadmin
+
+  Login pakai NIK 111111 atau 1234567890123456, password password123. Lalu input data real lewat UI.
+
+  ---
+  Kalau nanti sudah jalan dengan data demo dan ingin beralih ke data real, jalankan:
+
+  npm run reset-data       # hapus semua data demo, credentials tetap aman
+
+  Atau kalau mau reset lalu demo ulang:
+
+  npm run reset-and-seed   # hapus + isi ulang data demo dalam satu perintah

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bebang HR - Daftar Karyawan</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kanban-col::-webkit-scrollbar {
+            width: 6px;
+        }
+        .kanban-col::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .kanban-col::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark .kanban-col::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="flex w-72 flex-col border-r border-[#e7ebf3] dark:border-gray-800 bg-white dark:bg-[#1a202c] transition-all duration-300">
+<div class="flex items-center gap-3 px-6 py-5 border-b border-[#e7ebf3] dark:border-gray-800">
+<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">grid_view</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight text-[#0d121b] dark:text-white">Bebang HR</h1>
+<p class="text-xs font-medium text-[#4c669a] dark:text-gray-400">Sistem Informasi</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<div class="flex flex-col gap-1">
+<button class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[22px]">database</span>
+<span class="text-sm font-medium">Master Data</span>
+</div>
+<span class="material-symbols-outlined text-lg text-[#4c669a]">expand_more</span>
+</button>
+</div>
+<div class="flex flex-col gap-1">
+<button class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[#0d121b] dark:text-white bg-gray-50 dark:bg-gray-800/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined fill text-[22px] text-primary">group</span>
+<span class="text-sm font-semibold">Manajemen Karyawan</span>
+</div>
+<span class="material-symbols-outlined text-lg text-[#4c669a]">expand_less</span>
+</button>
+<div class="flex flex-col pl-10 pr-2 gap-1 relative">
+<div class="absolute left-[22px] top-0 bottom-0 w-px bg-[#e7ebf3] dark:bg-gray-700"></div>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-bold text-primary bg-primary/5 dark:bg-primary/20 transition-colors" href="#">
+<div class="absolute left-[-1.15rem] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary"></div>
+                        Daftar Karyawan
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Profil Karyawan
+                    </a>
+</div>
+</div>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">Pengaturan</span>
+</a>
+</nav>
+<div class="border-t border-[#e7ebf3] dark:border-gray-800 p-4">
+<button class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Logout</span>
+</button>
+</div>
+</aside>
+<main class="flex flex-1 flex-col h-full min-w-0 overflow-hidden bg-background-light dark:bg-background-dark">
+<header class="flex h-16 shrink-0 items-center justify-between border-b border-[#e7ebf3] dark:border-gray-800 bg-white dark:bg-[#1a202c] px-6 lg:px-8">
+<nav aria-label="Breadcrumb" class="hidden sm:flex">
+<ol class="flex items-center space-x-2" role="list">
+<li>
+<div class="flex items-center">
+<a class="text-gray-400 hover:text-gray-500" href="#">
+<span class="material-symbols-outlined text-[20px]">home</span>
+<span class="sr-only">Home</span>
+</a>
+</div>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-gray-300 text-[16px] mx-1">chevron_right</span>
+<a class="text-sm font-medium text-[#4c669a] hover:text-gray-700" href="#">Manajemen Karyawan</a>
+</div>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-gray-300 text-[16px] mx-1">chevron_right</span>
+<a aria-current="page" class="text-sm font-medium text-[#0d121b] dark:text-white" href="#">Daftar Karyawan</a>
+</div>
+</li>
+</ol>
+</nav>
+<div class="flex flex-1 items-center justify-end gap-x-4 self-stretch lg:gap-x-6">
+<div class="flex items-center gap-x-4 lg:gap-x-6">
+<button class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500" type="button">
+<span class="sr-only">View notifications</span>
+<div class="relative">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-0.5 right-0.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"></span>
+</div>
+</button>
+<div aria-hidden="true" class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:bg-gray-700"></div>
+<div class="relative flex items-center gap-2 cursor-pointer">
+<div class="flex flex-col items-end hidden md:flex">
+<span class="text-sm font-semibold leading-6 text-[#0d121b] dark:text-white">Admin HR</span>
+<span class="text-xs text-gray-500">Administrator</span>
+</div>
+<div class="h-9 w-9 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:ring-gray-700" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCweB9E4m2QfY75BDxbHszLjzU5P_H8EegjJquDgc4jn_ky9rYPLuejJqDhgYitisHoUHIJ3M_t67Xj-1Zpr1sLFOc5o1dHX-B_DJMsoyjMMYipoPqq7zy8b4aP_8MS0t_xecZgeyiT4RwEOG1Pmyc4dQrSLZdi3xfPPVIWfUBiVplTDhDHxRl6lun9dLNsxdrVpBpcpuqr-3zPuIGy2HOb7tBXLvFZm6Ck8_u-PhOkIhRlXioZlwdveNt6SL3q_RA8M76iNYiCz3tC'); background-size: cover;"></div>
+<span class="material-symbols-outlined text-gray-400 text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-hidden p-4 md:p-8 flex flex-col">
+<div class="mx-auto w-full max-w-7xl h-full flex flex-col">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 shrink-0">
+<div>
+<h2 class="text-2xl font-bold leading-tight tracking-tight text-[#0d121b] dark:text-white">Daftar Karyawan</h2>
+<p class="mt-1 text-sm text-[#4c669a]">Pantau status dan data karyawan melalui papan Kanban.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</span>
+<input class="block w-full sm:w-64 rounded-lg border-0 py-2.5 pl-10 pr-3 text-[#0d121b] ring-1 ring-inset ring-[#cfd7e7] dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-gray-800 dark:text-white sm:text-sm sm:leading-6 shadow-sm" id="search-kanban" name="search" placeholder="Cari karyawan..." type="text"/>
+</div>
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                            Tambah Karyawan
+                        </button>
+</div>
+</div>
+<div class="flex-1 overflow-x-auto overflow-y-hidden pb-4">
+<div class="flex h-full gap-6 min-w-full">
+<div class="flex w-80 min-w-[320px] flex-col rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-[#e7ebf3] dark:border-gray-800">
+<div class="flex items-center justify-between p-4 border-b border-[#e7ebf3] dark:border-gray-700/50 bg-white dark:bg-[#1a202c] rounded-t-xl sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-green-500"></span>
+<h3 class="font-semibold text-[#0d121b] dark:text-white">Aktif</h3>
+<span class="flex h-5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">4</span>
+</div>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-3 kanban-col">
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Budi Santoso" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrCjbv7VI1TfQ9-S1PMTOtUzmG5BkE5kMZIkhWsl3fYCJhOrfJHWTo4xpYEH2UR6T1Ywfsc3qpJJ5oA4X43xFJHjwLE8dDpY3Qv4lrTuAqg1xz-tIkDlIHWtosJmn9TiBBKb0zYCVo5A9yokmkdhEKpkqbkBC11sLhIO3doIe9-rvYBAuGNdk2isf9i81C10gipXCPEIYoqiYYydlHfQ8rQTJL2QlVkkxX9t9Uf5BVh9W0TunCXq7-19muXRwOsQMLbfxuWaeNzLi1"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Budi Santoso</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2023001</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Aktif</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Senior Dev</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">IT</p>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Siti Aminah" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5ixOZNSqTITx8c5sis5tELkBm3lB2gWUPk9eaG7C94OkpywrW5R566qH50lHfWV7leVwpbPM24IA67L_5CjTQywWqJqKnlBrS-erQQzTk1lT30XhrFiCgEHLlazekMUaoLWTtsz7788RUjHHvwnnAAz9X8Ckb0FrV8-PIOx-ne6CMdc1WLWcwh2Li22cHjpXYUAxdXZZEIxygtZHHkJkOUFMMA-uec_IJN_Q-e51rUipwcWLwctoMtZeRdFuRkxoWtNfhd2nt4E_I"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Siti Aminah</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2023004</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Aktif</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">HR Manager</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">HRD</p>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Rina Wati" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfYhw-HOCIkDxOoyCYrcbRCrqZBO7wHz7BN8PA4k6sDToOERpn8fFycRgBc8gvbdEO8ed4pzjqgjXSrUym-_eVpFh9-TUOBI8PM2nFxFc0QNzePavIlmxWHpI4c-sr4vvjStvNXzK8_Mh4nqV22rMZBRNUD_17cnSK52Y4cwymhPlBP2hOfZzhjgfii36Ei1HgnaYG6qOrcrdPT5_8ZG6m4zZYCmc_U2TyfURILDQ1d-wzSl5hH_A-xu1nEV6yVU4EA4Wpdc0ib0Jz"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Rina Wati</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2023012</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Aktif</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Finance Staff</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Keuangan</p>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Andi Wijaya" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZtFRSGTzKienuU9TIzDyY5h00YEeqVrFCllynSSriLU4Wav3McUuLrs3b-CA2W78CSNLhi7ac8onFVNm15D7xM966uKGT5RkCoWYOS-OObIb_s1oA1rXDGnLAyCOj3l0Vl_ioN8K0KEcGRk4GB6j09GGSZckuDYGikSnNWLLXuXHSdcuYvecAZgeIOy4tmWgJO_8-NH98xKTH03zm26piKb4u_YY2zpWuc-vGIxy6NP6llhE-FFHStOH667SXvI5NyKIzuzNOU8X2"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Andi Wijaya</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2023015</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Aktif</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Marketing Lead</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Pemasaran</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex w-80 min-w-[320px] flex-col rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-[#e7ebf3] dark:border-gray-800">
+<div class="flex items-center justify-between p-4 border-b border-[#e7ebf3] dark:border-gray-700/50 bg-white dark:bg-[#1a202c] rounded-t-xl sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-blue-500"></span>
+<h3 class="font-semibold text-[#0d121b] dark:text-white">Training</h3>
+<span class="flex h-5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">2</span>
+</div>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-3 kanban-col">
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Dewi Sartika" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAun32xVGpwoJbHp6Lt_pYcx4_WwtOXUGt6SQR8fGIwV-em26BZBDrHm7CkOUaj4_lKe6h76P6aW56efGhr73wn0OPtZsmHKEhzsmeJFC6gvY06pGEt9za3FvDnUDYkrMQRVCSzAs4CBNpBP1bhjf_GnMjr8HNI31P_Zp9qGYcuTMMFjzOlzRV8AHWvjpxmSAmSaXMUyE0_t6KkpmTMiBAWPoRys2gWb0S-8cY2Avcy2-R_pQRPTusNED0Hnqg8uI1q-hlJEfNDDL_z"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Dewi Sartika</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2024001</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Probation</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Junior Dev</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">IT</p>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Eko Prasetyo" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXVdJ10IUKxvBTV5ihb1IIFCnqZV5ErlSkdpPMtiUCPs9jIPID18a355j1VZTtzAjWtwtgVf5ZZOp0qT5rc6JmDZyHMDZyjE8DBMuJR0R9pPsD3gTr1KvasTbK34eZN5W_TTIThqy-wmoRKDYdhPsXefQw5lOwlXsx25FV-2N6rYbVLKOAwW1FCDeo7WCYL8k8ISTuGvTgsIvANZrXhiVyuuJsSa9FADrC2xVT0mRqWtr0q4qkZcCvTz4rt3oX7Y_PRwu83TsiQrqX"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Eko Prasetyo</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2024005</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">OJT</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Sales Staff</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Penjualan</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex w-80 min-w-[320px] flex-col rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-[#e7ebf3] dark:border-gray-800">
+<div class="flex items-center justify-between p-4 border-b border-[#e7ebf3] dark:border-gray-700/50 bg-white dark:bg-[#1a202c] rounded-t-xl sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-orange-500"></span>
+<h3 class="font-semibold text-[#0d121b] dark:text-white">Cuti / Off</h3>
+<span class="flex h-5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">1</span>
+</div>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-3 kanban-col">
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Hendra Gunawan" class="h-10 w-10 rounded-full object-cover grayscale ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq_qfLGQD_Tm3_dTUhid3LNyYAtBUG_oiZzbwwsDnwWOBoZE6Xyv1YhHQdCYGL1emJ1cww2WG4WrqnIPfTy95LmWhitDQ2-v5ieHONIDXLL_FtsmH0sIxOnP2rwKmc7Gvzj6AEQENriuLkSmqvrVMHdSyFHXd_QtvmZA718oiLIXnUJQgDYiXrITGJ0lGCuPM-04mfFQKp_fhEQQx3XP39j8rsfTDImkeKSFx54pW9bsnpyrTeCi5wHEZp4Isvluh6NeAWT8aReNzY"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Hendra Gunawan</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2022099</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-600/20">Cuti Tahunan</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Driver</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Umum</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex w-80 min-w-[320px] flex-col rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-[#e7ebf3] dark:border-gray-800">
+<div class="flex items-center justify-between p-4 border-b border-[#e7ebf3] dark:border-gray-700/50 bg-white dark:bg-[#1a202c] rounded-t-xl sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="h-2 w-2 rounded-full bg-red-500"></span>
+<h3 class="font-semibold text-[#0d121b] dark:text-white">Keluar</h3>
+<span class="flex h-5 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 px-2 text-xs font-medium text-gray-500 dark:text-gray-400">1</span>
+</div>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-3 kanban-col">
+<div class="group relative flex cursor-pointer flex-col gap-3 rounded-lg bg-white dark:bg-[#1a202c] p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md transition-shadow dark:ring-gray-700 opacity-75">
+<div class="flex items-start justify-between gap-4">
+<div class="flex items-center gap-3">
+<img alt="Bambang" class="h-10 w-10 rounded-full object-cover grayscale ring-2 ring-white dark:ring-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO6-lW0HAjv39n6bOab9_gn730Aia9wMYfETC8iSH8shCDQgnQNcv8AqUsQqZAktp3DMHjtuQPBsavNzhkROatpGmrlX7fZ6B3uPTbHIl9V6V8KJEIqHTOUgWRwiOkqYn-kNXYOVNGH6aWuRenVkKMxOdOTRQVmRjfdCrtLuZ5dn6IfincgLnPrJkhUQoegJTiTHTMVes7p7gNUe9OPqLSAWGxcMZYIf3gLzAQ4VygYvhP2h9Ro1-rjdBzDRi9qFoqBPbFyBW6pTER"/>
+<div>
+<h4 class="font-semibold text-sm text-[#0d121b] dark:text-white">Bambang S.</h4>
+<p class="text-xs text-[#4c669a]">NIK: 2021005</p>
+</div>
+</div>
+<span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Resign</span>
+</div>
+<div class="border-t border-gray-100 dark:border-gray-700 pt-3 mt-1">
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div>
+<p class="text-gray-400 mb-0.5">Jabatan</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">OB</p>
+</div>
+<div>
+<p class="text-gray-400 mb-0.5">Departemen</p>
+<p class="font-medium text-[#0d121b] dark:text-gray-200">Umum</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-8 shrink-0"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

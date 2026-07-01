@@ -1,0 +1,121 @@
+- generic [ref=e55]:
+  - banner [ref=e56]:
+    - generic [ref=e57]:
+      - generic [ref=e58]:
+        - generic [ref=e60]: corporate_fare
+        - generic [ref=e61]:
+          - heading "PT Prima Sarana Gemilang" [level=2] [ref=e62]
+          - generic [ref=e63]: Bebang Sistem Informasi
+      - generic [ref=e66]:
+        - generic [ref=e68]: search
+        - textbox "search" [ref=e69]:
+          - /placeholder: Cari modul atau data...
+    - generic [ref=e70]:
+      - navigation [ref=e71]:
+        - link "Beranda" [ref=e72] [cursor=pointer]:
+          - /url: "#"
+        - link "Laporan" [ref=e73] [cursor=pointer]:
+          - /url: "#"
+        - link "Bantuan" [ref=e74] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e76]:
+        - button "notifications" [ref=e77] [cursor=pointer]:
+          - generic [ref=e78]: notifications
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: "1234567890123456"
+            - generic [ref=e83]: Super Administrator
+          - button "person" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]: person
+  - main [ref=e87]:
+    - generic [ref=e88]:
+      - generic [ref=e89]:
+        - link "dashboard Dashboard" [ref=e90] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e91]: dashboard
+          - text: Dashboard
+        - generic [ref=e92]: /
+        - generic [ref=e93]: Beranda Modul Utama
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - heading "Selamat Datang, User" [level=1] [ref=e96]
+          - paragraph [ref=e97]: Enterprise Resource Planning & Integrated Management System
+        - generic [ref=e98]:
+          - button "history Aktivitas" [ref=e99] [cursor=pointer]:
+            - generic [ref=e100]: history
+            - generic [ref=e101]: Aktivitas
+          - button "bolt Quick Actions" [ref=e102] [cursor=pointer]:
+            - generic [ref=e103]: bolt
+            - generic [ref=e104]: Quick Actions
+      - heading "Daftar Modul Terintegrasi" [level=3] [ref=e107]
+      - generic [ref=e108]:
+        - generic [ref=e109] [cursor=pointer]:
+          - generic [ref=e111]: groups
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: Human Resources
+            - paragraph [ref=e114]: Manajemen Karyawan, Payroll & Presensi
+          - generic [ref=e115]:
+            - generic [ref=e116]: Active
+            - generic [ref=e117]: arrow_forward
+        - generic [ref=e118] [cursor=pointer]:
+          - generic [ref=e120]: inventory_2
+          - generic [ref=e121]:
+            - paragraph [ref=e122]: Inventory
+            - paragraph [ref=e123]: Stok Barang & Logistik Inventaris
+          - generic [ref=e124]:
+            - generic [ref=e125]: Active
+            - generic [ref=e126]: arrow_forward
+        - generic [ref=e127] [cursor=pointer]:
+          - generic [ref=e129]: hotel
+          - generic [ref=e130]:
+            - paragraph [ref=e131]: Mess Management
+            - paragraph [ref=e132]: Manajemen Mess & Akomodasi Site
+          - generic [ref=e133]:
+            - generic [ref=e134]: Coming Soon
+            - generic [ref=e135]: arrow_forward
+        - generic [ref=e136] [cursor=pointer]:
+          - generic [ref=e138]: domain
+          - generic [ref=e139]:
+            - paragraph [ref=e140]: Building Mgmt
+            - paragraph [ref=e141]: Pemeliharaan & Aset Gedung Kantor
+          - generic [ref=e142]:
+            - generic [ref=e143]: Coming Soon
+            - generic [ref=e144]: arrow_forward
+        - generic [ref=e145] [cursor=pointer]:
+          - generic [ref=e147]: admin_panel_settings
+          - generic [ref=e148]:
+            - paragraph [ref=e149]: User Access
+            - paragraph [ref=e150]: Keamanan & Hak Akses Pengguna
+          - generic [ref=e151]:
+            - generic [ref=e152]: Coming Soon
+            - generic [ref=e153]: arrow_forward
+      - generic [ref=e154]:
+        - generic [ref=e155]:
+          - generic [ref=e156]:
+            - heading "Pemberitahuan Sistem" [level=4] [ref=e157]
+            - button "Lihat Semua" [ref=e158] [cursor=pointer]
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - generic [ref=e162]: info
+              - generic [ref=e163]:
+                - paragraph [ref=e164]: Update Sistem v2.4 Berhasil
+                - paragraph [ref=e165]: Integrasi modul Inventory dan HR telah diperbarui.
+            - generic [ref=e166]:
+              - generic [ref=e168]: warning
+              - generic [ref=e169]:
+                - paragraph [ref=e170]: Maintenance Jadwal Mess
+                - paragraph [ref=e171]: Akan dilakukan pembersihan data mess lama pada hari Sabtu.
+        - generic [ref=e172]:
+          - generic [ref=e173]:
+            - paragraph [ref=e174]: Status Kehadiran Hari Ini
+            - paragraph [ref=e175]: 94.2%
+          - generic [ref=e177]:
+            - generic [ref=e178]: Target Efisiensi
+            - generic [ref=e179]: 98%
+          - button "Buka Laporan HR" [ref=e182] [cursor=pointer]
+  - contentinfo [ref=e183]:
+    - generic [ref=e184]:
+      - paragraph [ref=e186]: © 2024 PT Prima Sarana Gemilang. Hak Cipta Dilindungi.
+      - generic [ref=e187]:
+        - generic [ref=e190]: "Server: Production-01 (Online)"
+        - paragraph [ref=e192]: Versi Aplikasi 4.12.0-Stable

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bebang HR - Master Data Divisi</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="flex w-72 flex-col border-r border-[#e7ebf3] dark:border-gray-800 bg-white dark:bg-[#1a202c] transition-all duration-300">
+<div class="flex items-center gap-3 px-6 py-5 border-b border-[#e7ebf3] dark:border-gray-800">
+<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">grid_view</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-lg font-bold leading-tight tracking-tight text-[#0d121b] dark:text-white">Bebang HR</h1>
+<p class="text-xs font-medium text-[#4c669a] dark:text-gray-400">Sistem Informasi</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<div class="flex flex-col gap-1">
+<button class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[#0d121b] dark:text-white bg-gray-50 dark:bg-gray-800/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined fill text-[22px] text-primary">database</span>
+<span class="text-sm font-semibold">Master Data</span>
+</div>
+<span class="material-symbols-outlined text-lg text-[#4c669a]">expand_less</span>
+</button>
+<div class="flex flex-col pl-10 pr-2 gap-1 relative">
+<div class="absolute left-[22px] top-0 bottom-0 w-px bg-[#e7ebf3] dark:bg-gray-700"></div>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-bold text-primary bg-primary/5 dark:bg-primary/20 transition-colors" href="#">
+<div class="absolute left-[-1.15rem] top-1/2 -translate-y-1/2 h-1.5 w-1.5 rounded-full bg-primary"></div>
+                        Divisi
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Department
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Posisi Jabatan
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Kategori Pangkat
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Golongan
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Sub Golongan
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Jenis Hubungan Kerja
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Tag
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Lokasi Kerja
+                    </a>
+<a class="relative flex items-center rounded-lg px-3 py-2 text-sm font-medium text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+                        Status Karyawan
+                    </a>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<button class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-sm font-medium">Manajemen Karyawan</span>
+</div>
+<span class="material-symbols-outlined text-lg opacity-50">expand_more</span>
+</button>
+</div>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d121b] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">Pengaturan</span>
+</a>
+</nav>
+<div class="border-t border-[#e7ebf3] dark:border-gray-800 p-4">
+<button class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[#4c669a] dark:text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors">
+<span class="material-symbols-outlined text-[22px]">logout</span>
+<span class="text-sm font-medium">Logout</span>
+</button>
+</div>
+</aside>
+<main class="flex flex-1 flex-col h-full min-w-0 overflow-hidden bg-background-light dark:bg-background-dark">
+<header class="flex h-16 shrink-0 items-center justify-between border-b border-[#e7ebf3] dark:border-gray-800 bg-white dark:bg-[#1a202c] px-6 lg:px-8">
+<nav aria-label="Breadcrumb" class="hidden sm:flex">
+<ol class="flex items-center space-x-2" role="list">
+<li>
+<div class="flex items-center">
+<a class="text-gray-400 hover:text-gray-500" href="#">
+<span class="material-symbols-outlined text-[20px]">home</span>
+<span class="sr-only">Home</span>
+</a>
+</div>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-gray-300 text-[16px] mx-1">chevron_right</span>
+<a class="text-sm font-medium text-[#4c669a] hover:text-gray-700" href="#">Master Data</a>
+</div>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-gray-300 text-[16px] mx-1">chevron_right</span>
+<a aria-current="page" class="text-sm font-medium text-[#0d121b] dark:text-white" href="#">Divisi</a>
+</div>
+</li>
+</ol>
+</nav>
+<div class="flex flex-1 items-center justify-end gap-x-4 self-stretch lg:gap-x-6">
+<div class="flex items-center gap-x-4 lg:gap-x-6">
+<button class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500" type="button">
+<span class="sr-only">View notifications</span>
+<div class="relative">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+<span class="absolute top-0.5 right-0.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"></span>
+</div>
+</button>
+<div aria-hidden="true" class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:bg-gray-700"></div>
+<div class="relative flex items-center gap-2 cursor-pointer">
+<div class="flex flex-col items-end hidden md:flex">
+<span class="text-sm font-semibold leading-6 text-[#0d121b] dark:text-white">Admin HR</span>
+<span class="text-xs text-gray-500">Administrator</span>
+</div>
+<div class="h-9 w-9 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-200 dark:ring-gray-700" data-alt="Avatar user placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCweB9E4m2QfY75BDxbHszLjzU5P_H8EegjJquDgc4jn_ky9rYPLuejJqDhgYitisHoUHIJ3M_t67Xj-1Zpr1sLFOc5o1dHX-B_DJMsoyjMMYipoPqq7zy8b4aP_8MS0t_xecZgeyiT4RwEOG1Pmyc4dQrSLZdi3xfPPVIWfUBiVplTDhDHxRl6lun9dLNsxdrVpBpcpuqr-3zPuIGy2HOb7tBXLvFZm6Ck8_u-PhOkIhRlXioZlwdveNt6SL3q_RA8M76iNYiCz3tC'); background-size: cover;"></div>
+<span class="material-symbols-outlined text-gray-400 text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+<div class="mx-auto max-w-7xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+<div>
+<h2 class="text-2xl font-bold leading-tight tracking-tight text-[#0d121b] dark:text-white">Data Divisi</h2>
+<p class="mt-1 text-sm text-[#4c669a]">Kelola struktur organisasi dan divisi perusahaan.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-[#0d121b] dark:text-white shadow-sm ring-1 ring-inset ring-[#cfd7e7] dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700" type="button">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                            Export
+                        </button>
+<button class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                            Tambah Divisi
+                        </button>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a202c] rounded-t-xl border border-[#e7ebf3] dark:border-gray-800 p-4 flex flex-col sm:flex-row gap-4 justify-between items-center">
+<div class="relative w-full sm:w-72">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="block w-full rounded-lg border-0 py-2.5 pl-10 pr-3 text-[#0d121b] ring-1 ring-inset ring-[#cfd7e7] dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-gray-800 dark:text-white sm:text-sm sm:leading-6" id="search" name="search" placeholder="Cari nama divisi..." type="text"/>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto">
+<select class="block w-full sm:w-auto rounded-lg border-0 py-2.5 pl-3 pr-10 text-[#0d121b] ring-1 ring-inset ring-[#cfd7e7] dark:ring-gray-700 focus:ring-2 focus:ring-inset focus:ring-primary dark:bg-gray-800 dark:text-white sm:text-sm sm:leading-6">
+<option>Semua Status</option>
+<option>Aktif</option>
+<option>Non-Aktif</option>
+</select>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1a202c] rounded-b-xl border-x border-b border-[#e7ebf3] dark:border-gray-800 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="min-w-full whitespace-nowrap text-left text-sm">
+<thead class="bg-gray-50 dark:bg-gray-800/50 text-[#0d121b] dark:text-white">
+<tr>
+<th class="px-6 py-4 font-semibold w-16" scope="col">No</th>
+<th class="px-6 py-4 font-semibold" scope="col">Nama Divisi</th>
+<th class="px-6 py-4 font-semibold" scope="col">Keterangan</th>
+<th class="px-6 py-4 font-semibold" scope="col">Status</th>
+<th class="px-6 py-4 font-semibold text-right" scope="col">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e7ebf3] dark:divide-gray-700 bg-white dark:bg-[#1a202c]">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+<td class="px-6 py-4 text-[#4c669a]">1</td>
+<td class="px-6 py-4 font-medium text-[#0d121b] dark:text-white">IT &amp; Engineering</td>
+<td class="px-6 py-4 text-[#4c669a]">
+                                    Divisi Teknologi Informasi dan Rekayasa Perangkat Lunak
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+<span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                                                Aktif
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit_square</span>
+</button>
+<button class="text-gray-400 hover:text-red-500 transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+<td class="px-6 py-4 text-[#4c669a]">2</td>
+<td class="px-6 py-4 font-medium text-[#0d121b] dark:text-white">Human Resources</td>
+<td class="px-6 py-4 text-[#4c669a]">
+                                    Divisi Sumber Daya Manusia dan Personalia
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+<span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                                                Aktif
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit_square</span>
+</button>
+<button class="text-gray-400 hover:text-red-500 transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+<td class="px-6 py-4 text-[#4c669a]">3</td>
+<td class="px-6 py-4 font-medium text-[#0d121b] dark:text-white">Finance &amp; Accounting</td>
+<td class="px-6 py-4 text-[#4c669a]">
+                                    Divisi Keuangan dan Akuntansi
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+<span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                                                Aktif
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit_square</span>
+</button>
+<button class="text-gray-400 hover:text-red-500 transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+<td class="px-6 py-4 text-[#4c669a]">4</td>
+<td class="px-6 py-4 font-medium text-[#0d121b] dark:text-white">Marketing</td>
+<td class="px-6 py-4 text-[#4c669a]">
+                                    Divisi Pemasaran dan Promosi
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+<span class="h-1.5 w-1.5 rounded-full bg-gray-500"></span>
+                                                Non-Aktif
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">edit_square</span>
+</button>
+<button class="text-gray-400 hover:text-red-500 transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between border-t border-[#e7ebf3] dark:border-gray-800 px-6 py-4 bg-white dark:bg-[#1a202c]">
+<div class="flex flex-1 justify-between sm:hidden">
+<a class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Previous</a>
+<a class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Next</a>
+</div>
+<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-[#4c669a]">
+                                    Menampilkan <span class="font-medium text-[#0d121b]">1</span> sampai <span class="font-medium text-[#0d121b]">4</span> dari <span class="font-medium text-[#0d121b]">4</span> data
+                                </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</a>
+<a aria-current="page" class="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="#">1</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">2</a>
+<a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+<div class="h-8"></div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
