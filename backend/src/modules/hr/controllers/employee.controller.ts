@@ -7,6 +7,13 @@ const parseDate = (value: any): string | null | undefined => {
     return value;
 };
 
+// Convert empty strings to null so optional fields with format validators
+// (e.g. isEmail) are skipped instead of failing on "".
+const emptyToNull = (value: any): any => {
+    if (value === undefined || value === null || value === '' || value === 'undefined' || value === 'null') return null;
+    return value;
+};
+
 class EmployeeController {
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
@@ -95,13 +102,13 @@ class EmployeeController {
             const employeeData: any = {
                 nama_lengkap: body.nama_lengkap,
                 nomor_induk_karyawan: body.nomor_induk_karyawan,
-                email_perusahaan: body.email_perusahaan,
+                email_perusahaan: emptyToNull(body.email_perusahaan),
                 nomor_handphone: body.nomor_handphone,
 
                 divisi_id: parseOptionalInt(body.divisi_id),
                 department_id: parseOptionalInt(body.department_id),
                 posisi_jabatan_id: parseOptionalInt(body.posisi_jabatan_id),
-                status_karyawan_id: parseOptionalInt(body.status_karyawan_id) || 1, // Default to Aktif (ID 1)
+                status_karyawan_id: parseOptionalInt(body.status_karyawan_id),
                 lokasi_kerja_id: parseOptionalInt(body.lokasi_kerja_id),
                 tag_id: parseOptionalInt(body.tag_id),
                 manager_id: parseOptionalInt(body.manager_id),
@@ -137,7 +144,7 @@ class EmployeeController {
                 nomor_bpjs: body.nomor_bpjs,
                 nomor_ktp: body.nomor_ktp,
                 nomor_kartu_keluarga: body.nomor_kartu_keluarga,
-                email_pribadi: body.email_pribadi,
+                email_pribadi: emptyToNull(body.email_pribadi),
                 nomor_handphone_2: body.nomor_handphone_2,
                 nomor_telepon_rumah_1: body.nomor_telepon_rumah_1,
                 nomor_telepon_rumah_2: body.nomor_telepon_rumah_2,
@@ -266,6 +273,7 @@ class EmployeeController {
 
             const employeeData = {
                 ...body,
+                email_perusahaan: emptyToNull(body.email_perusahaan),
                 divisi_id: parseOptionalInt(body.divisi_id),
                 department_id: parseOptionalInt(body.department_id),
                 posisi_jabatan_id: parseOptionalInt(body.posisi_jabatan_id),
@@ -280,6 +288,7 @@ class EmployeeController {
 
             const personalInfoData = {
                 ...body,
+                email_pribadi: emptyToNull(body.email_pribadi),
                 tanggal_lahir: parseDate(body.tanggal_lahir),
                 tanggal_menikah: parseDate(body.tanggal_menikah),
                 tanggal_cerai: parseDate(body.tanggal_cerai),
