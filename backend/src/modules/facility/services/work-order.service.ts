@@ -35,8 +35,8 @@ class FacilityWorkOrderService {
 
         if (search) {
             where[Op.or] = [
-                { judul: { [Op.like]: `%${search}%` } },
-                { code: { [Op.like]: `%${search}%` } },
+                { judul: { [Op.iLike]: `%${search}%` } },
+                { code: { [Op.iLike]: `%${search}%` } },
             ];
         }
 

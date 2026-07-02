@@ -57,8 +57,8 @@ class InventoryMasterDataService {
 
         if (search) {
             where[Op.or] = [
-                { nama: { [Op.like]: `%${search}%` } },
-                { code: { [Op.like]: `%${search}%` } },
+                { nama: { [Op.iLike]: `%${search}%` } },
+                { code: { [Op.iLike]: `%${search}%` } },
             ];
         }
 

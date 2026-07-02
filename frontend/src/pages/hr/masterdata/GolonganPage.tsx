@@ -15,7 +15,7 @@ import { LayoutView } from '../../../types/layout';
 const GolonganPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('Aktif');
+    const [status, setStatus] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Golongan | null>(null);
