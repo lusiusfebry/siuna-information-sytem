@@ -226,8 +226,24 @@ export const EmployeeStep3Form: React.FC<EmployeeStep3FormProps> = ({ initialDat
                 <div className="mb-6">
                     <h5 className="font-medium text-gray-700 mb-3 bg-gray-50 p-2 rounded">Orang Tua Kandung</h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input label="Nama Ayah Kandung" {...register('nama_ayah_kandung')} autoTitleCase={true} />
-                        <Input label="Nama Ibu Kandung" {...register('nama_ibu_kandung')} autoTitleCase={true} />
+                        {/* Ayah Kandung */}
+                        <div className="col-span-full md:col-span-1 space-y-3 pr-2 border-r-0 md:border-r border-gray-100">
+                            <p className="text-xs font-semibold text-gray-500 uppercase">Bapak Kandung</p>
+                            <Input label="Nama" {...register('nama_ayah_kandung')} autoTitleCase={true} />
+                            <Input type="date" label="Tanggal Lahir" {...register('tanggal_lahir_ayah_kandung')} />
+                            <Input label="Pendidikan Terakhir" {...register('pendidikan_terakhir_ayah_kandung')} />
+                            <Input label="Pekerjaan" {...register('pekerjaan_ayah_kandung')} autoTitleCase={true} />
+                            <Input label="Keterangan" {...register('keterangan_ayah_kandung')} />
+                        </div>
+                        {/* Ibu Kandung */}
+                        <div className="col-span-full md:col-span-1 space-y-3 pl-0 md:pl-2">
+                            <p className="text-xs font-semibold text-gray-500 uppercase">Ibu Kandung</p>
+                            <Input label="Nama" {...register('nama_ibu_kandung')} autoTitleCase={true} />
+                            <Input type="date" label="Tanggal Lahir" {...register('tanggal_lahir_ibu_kandung')} />
+                            <Input label="Pendidikan Terakhir" {...register('pendidikan_terakhir_ibu_kandung')} />
+                            <Input label="Pekerjaan" {...register('pekerjaan_ibu_kandung')} autoTitleCase={true} />
+                            <Input label="Keterangan" {...register('keterangan_ibu_kandung')} />
+                        </div>
                         <div className="col-span-full">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Orang Tua</label>
                             <textarea

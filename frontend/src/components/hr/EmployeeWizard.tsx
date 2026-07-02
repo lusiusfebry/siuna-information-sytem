@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Employee } from '../../types/hr';
 import { EmployeeStep1Form } from './EmployeeStep1Form';
 import { EmployeeStep2Form } from './EmployeeStep2Form';
@@ -14,6 +14,13 @@ interface EmployeeWizardProps {
 
 export const EmployeeWizard: React.FC<EmployeeWizardProps> = ({ initialData, onComplete, onSaveDraft, onCancel }) => {
     const [currentStep, setCurrentStep] = useState(1);
+
+    // Scroll to top whenever the step changes (forward or back).
+    // The scrollable element is the layout's <main>, not the window.
+    useEffect(() => {
+        document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentStep]);
 
     // We store partial data for each step. 
     // Step 1 returns structured values + optional file.

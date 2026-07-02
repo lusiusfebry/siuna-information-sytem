@@ -213,6 +213,14 @@ export const employeeStep3Schema = z.object({
     nama_ayah_kandung: z.string().optional().nullable(),
     nama_ibu_kandung: z.string().optional().nullable(),
     alamat_orang_tua: z.string().optional().nullable(),
+    tanggal_lahir_ayah_kandung: z.string().optional().nullable(),
+    pendidikan_terakhir_ayah_kandung: z.string().optional().nullable(),
+    pekerjaan_ayah_kandung: z.string().optional().nullable(),
+    keterangan_ayah_kandung: z.string().optional().nullable(),
+    tanggal_lahir_ibu_kandung: z.string().optional().nullable(),
+    pendidikan_terakhir_ibu_kandung: z.string().optional().nullable(),
+    pekerjaan_ibu_kandung: z.string().optional().nullable(),
+    keterangan_ibu_kandung: z.string().optional().nullable(),
 
     // Mertua
     nama_ayah_mertua: z.string().optional().nullable(),

@@ -223,6 +223,14 @@ class EmployeeController {
                 nama_ayah_kandung: body.nama_ayah_kandung,
                 nama_ibu_kandung: body.nama_ibu_kandung,
                 alamat_orang_tua: body.alamat_orang_tua,
+                tanggal_lahir_ayah_kandung: parseDate(body.tanggal_lahir_ayah_kandung),
+                pendidikan_terakhir_ayah_kandung: body.pendidikan_terakhir_ayah_kandung,
+                pekerjaan_ayah_kandung: body.pekerjaan_ayah_kandung,
+                keterangan_ayah_kandung: body.keterangan_ayah_kandung,
+                tanggal_lahir_ibu_kandung: parseDate(body.tanggal_lahir_ibu_kandung),
+                pendidikan_terakhir_ibu_kandung: body.pendidikan_terakhir_ibu_kandung,
+                pekerjaan_ibu_kandung: body.pekerjaan_ibu_kandung,
+                keterangan_ibu_kandung: body.keterangan_ibu_kandung,
 
                 data_anak: body.data_anak, // Service handles parsing if it's string
                 data_saudara_kandung: body.data_saudara_kandung,
@@ -319,6 +327,8 @@ class EmployeeController {
                 jumlah_saudara_kandung: parseOptionalInt(body.jumlah_saudara_kandung),
                 tanggal_lahir_ayah_mertua: parseDate(body.tanggal_lahir_ayah_mertua),
                 tanggal_lahir_ibu_mertua: parseDate(body.tanggal_lahir_ibu_mertua),
+                tanggal_lahir_ayah_kandung: parseDate(body.tanggal_lahir_ayah_kandung),
+                tanggal_lahir_ibu_kandung: parseDate(body.tanggal_lahir_ibu_kandung),
             };
 
             if (employeeData.nomor_induk_karyawan) {

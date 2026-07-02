@@ -407,9 +407,15 @@ class EmployeeService {
             }
 
             if (familyInfoData) {
-                // Parse if string (from FormData)
-                if (typeof familyInfoData.data_anak === 'string') familyInfoData.data_anak = JSON.parse(familyInfoData.data_anak);
-                if (typeof familyInfoData.data_saudara_kandung === 'string') familyInfoData.data_saudara_kandung = JSON.parse(familyInfoData.data_saudara_kandung);
+                // Parse if string (from FormData). Guard against empty / 'undefined' /
+                // 'null' strings so a stray value can't throw and roll back the edit.
+                const safeParseArray = (val: any) => {
+                    if (typeof val !== 'string') return val;
+                    if (val === '' || val === 'undefined' || val === 'null') return [];
+                    try { return JSON.parse(val); } catch { return []; }
+                };
+                familyInfoData.data_anak = safeParseArray(familyInfoData.data_anak);
+                familyInfoData.data_saudara_kandung = safeParseArray(familyInfoData.data_saudara_kandung);
 
                 // Upsert family info
                 const existingFamilyInfo = await EmployeeFamilyInfo.findOne({ where: { employee_id: id }, transaction: t });

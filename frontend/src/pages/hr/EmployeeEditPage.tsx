@@ -38,11 +38,16 @@ const EmployeeEditPage: React.FC = () => {
                 // But to satisfy lint, let's use `any` with disable, OR define a type.
                 // Using `any` with disable is safer for now to avoid refactoring types.
 
+                // Flatten nested relations into root form values. Spread nested
+                // objects FIRST, then the employee's own scalar fields, so the
+                // employee's own `id` (used for document uploads & NIK self-check)
+                // is not overwritten by nested primary keys / timestamps.
+                const { personal_info, hr_info, family_info, ...employeeRoot } = data as any;
                 const flatData = {
-                    ...data,
-                    ...data.personal_info,
-                    ...data.hr_info,
-                    ...data.family_info
+                    ...personal_info,
+                    ...hr_info,
+                    ...family_info,
+                    ...employeeRoot,
                 };
 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

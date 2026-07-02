@@ -142,6 +142,14 @@ export interface EmployeeFamilyInfo {
     nama_ayah_kandung?: string;
     nama_ibu_kandung?: string;
     alamat_orang_tua?: string;
+    tanggal_lahir_ayah_kandung?: string;
+    pendidikan_terakhir_ayah_kandung?: string;
+    pekerjaan_ayah_kandung?: string;
+    keterangan_ayah_kandung?: string;
+    tanggal_lahir_ibu_kandung?: string;
+    pendidikan_terakhir_ibu_kandung?: string;
+    pekerjaan_ibu_kandung?: string;
+    keterangan_ibu_kandung?: string;
     nama_ayah_mertua?: string;
     tanggal_lahir_ayah_mertua?: string;
     pendidikan_terakhir_ayah_mertua?: string;

@@ -100,9 +100,29 @@ export const EmployeeFamilyInfoView: React.FC<EmployeeFamilyInfoViewProps> = ({ 
                             <span className="size-1.5 rounded-full bg-primary"></span>
                             Orang Tua Kandung
                         </h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <DetailItem label="Nama Ayah" value={familyInfo.nama_ayah_kandung} />
-                            <DetailItem label="Nama Ibu" value={familyInfo.nama_ibu_kandung} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            {/* Bapak Kandung */}
+                            <div className="space-y-6">
+                                <h5 className="text-[10px] font-extrabold text-[#4c669a] mb-4 uppercase tracking-widest">Bapak Kandung</h5>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <DetailItem label="Nama" value={familyInfo.nama_ayah_kandung} />
+                                    <DetailItem label="Tgl Lahir" value={formatDate(familyInfo.tanggal_lahir_ayah_kandung)} />
+                                    <DetailItem label="Pendidikan" value={familyInfo.pendidikan_terakhir_ayah_kandung} />
+                                    <DetailItem label="Pekerjaan" value={familyInfo.pekerjaan_ayah_kandung} />
+                                    <DetailItem label="Keterangan" value={familyInfo.keterangan_ayah_kandung} />
+                                </div>
+                            </div>
+                            {/* Ibu Kandung */}
+                            <div className="space-y-6 md:border-l md:pl-12 border-[#e7ebf3] dark:border-[#2a3447]">
+                                <h5 className="text-[10px] font-extrabold text-[#4c669a] mb-4 uppercase tracking-widest">Ibu Kandung</h5>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <DetailItem label="Nama" value={familyInfo.nama_ibu_kandung} />
+                                    <DetailItem label="Tgl Lahir" value={formatDate(familyInfo.tanggal_lahir_ibu_kandung)} />
+                                    <DetailItem label="Pendidikan" value={familyInfo.pendidikan_terakhir_ibu_kandung} />
+                                    <DetailItem label="Pekerjaan" value={familyInfo.pekerjaan_ibu_kandung} />
+                                    <DetailItem label="Keterangan" value={familyInfo.keterangan_ibu_kandung} />
+                                </div>
+                            </div>
                             <DetailItem label="Alamat Orang Tua" value={familyInfo.alamat_orang_tua} fullWidth />
                         </div>
                     </div>

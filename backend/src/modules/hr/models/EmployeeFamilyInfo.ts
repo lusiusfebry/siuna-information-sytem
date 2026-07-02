@@ -43,6 +43,14 @@ export interface EmployeeFamilyInfoAttributes {
     nama_ayah_kandung?: string | null;
     nama_ibu_kandung?: string | null;
     alamat_orang_tua?: string | null;
+    tanggal_lahir_ayah_kandung?: string | null;
+    pendidikan_terakhir_ayah_kandung?: string | null;
+    pekerjaan_ayah_kandung?: string | null;
+    keterangan_ayah_kandung?: string | null;
+    tanggal_lahir_ibu_kandung?: string | null;
+    pendidikan_terakhir_ibu_kandung?: string | null;
+    pekerjaan_ibu_kandung?: string | null;
+    keterangan_ibu_kandung?: string | null;
     // Repeatable Fields
     data_anak?: DataAnak[] | null;
     data_saudara_kandung?: DataSaudaraKandung[] | null;
@@ -75,6 +83,14 @@ export class EmployeeFamilyInfo extends Model<EmployeeFamilyInfoAttributes, Empl
     public nama_ayah_kandung?: string | null;
     public nama_ibu_kandung?: string | null;
     public alamat_orang_tua?: string | null;
+    public tanggal_lahir_ayah_kandung?: string | null;
+    public pendidikan_terakhir_ayah_kandung?: string | null;
+    public pekerjaan_ayah_kandung?: string | null;
+    public keterangan_ayah_kandung?: string | null;
+    public tanggal_lahir_ibu_kandung?: string | null;
+    public pendidikan_terakhir_ibu_kandung?: string | null;
+    public pekerjaan_ibu_kandung?: string | null;
+    public keterangan_ibu_kandung?: string | null;
     public data_anak?: DataAnak[] | null;
     public data_saudara_kandung?: DataSaudaraKandung[] | null;
 
@@ -188,6 +204,38 @@ EmployeeFamilyInfo.init({
         allowNull: true,
     },
     alamat_orang_tua: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    tanggal_lahir_ayah_kandung: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    pendidikan_terakhir_ayah_kandung: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    pekerjaan_ayah_kandung: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+    },
+    keterangan_ayah_kandung: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    tanggal_lahir_ibu_kandung: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    pendidikan_terakhir_ibu_kandung: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+    },
+    pekerjaan_ibu_kandung: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+    },
+    keterangan_ibu_kandung: {
         type: DataTypes.TEXT,
         allowNull: true,
     },
