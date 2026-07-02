@@ -12,6 +12,9 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, description, children, size = 'md' }) => {
+    const contentRef = React.useRef<HTMLDivElement>(null);
+    const previouslyFocused = React.useRef<HTMLElement | null>(null);
+
     // Handling ESC
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -20,6 +23,22 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, description, chil
         if (isOpen) window.addEventListener('keydown', handleEsc);
         return () => window.removeEventListener('keydown', handleEsc);
     }, [isOpen, onClose]);
+
+    // Auto-focus the first field when opening; restore focus to trigger on close
+    useEffect(() => {
+        if (isOpen) {
+            previouslyFocused.current = document.activeElement as HTMLElement;
+            const id = setTimeout(() => {
+                const el = contentRef.current?.querySelector<HTMLElement>(
+                    'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), [role="combobox"]'
+                );
+                el?.focus();
+            }, 50);
+            return () => clearTimeout(id);
+        } else {
+            previouslyFocused.current?.focus?.();
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -49,7 +68,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, description, chil
                 </div>
 
                 {/* Body */}
-                <div className="p-6 overflow-y-auto">
+                <div ref={contentRef} className="p-6 overflow-y-auto">
                     {children}
                 </div>
             </div>

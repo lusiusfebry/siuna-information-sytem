@@ -35,7 +35,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [highlightedIndex, setHighlightedIndex] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     // Find selected label
     const selectedOption = options.find(opt => opt.value === value);
@@ -45,10 +49,31 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         opt.label.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const isDisabled = disabled || loading;
+
+    const open = (initialSearch = '') => {
+        if (isDisabled) return;
+        setSearchTerm(initialSearch);
+        setIsOpen(true);
+    };
+
+    const close = (returnFocus = true) => {
+        setIsOpen(false);
+        setSearchTerm('');
+        setHighlightedIndex(0);
+        if (returnFocus) triggerRef.current?.focus();
+    };
+
+    const selectOption = (opt: Option) => {
+        onChange(opt.value);
+        close();
+    };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
+                setSearchTerm('');
             }
         };
 
@@ -56,14 +81,67 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Reset search when opening
+    // Focus the search box and reset highlight when opening
     useEffect(() => {
         if (isOpen) {
-            setSearchTerm('');
+            setHighlightedIndex(0);
+            // Focus after the popup has rendered
+            const id = setTimeout(() => inputRef.current?.focus(), 0);
+            return () => clearTimeout(id);
         }
     }, [isOpen]);
 
-    const isDisabled = disabled || loading;
+    // Keep the highlighted option in view
+    useEffect(() => {
+        if (isOpen) {
+            optionRefs.current[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+    }, [highlightedIndex, isOpen]);
+
+    // Keyboard handling on the (focusable) trigger — opens the dropdown
+    const handleTriggerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (isDisabled) return;
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            open();
+        } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            // Start typing to open + filter
+            e.preventDefault();
+            open(e.key);
+        }
+    };
+
+    // Keyboard handling inside the search box — navigate & select
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setHighlightedIndex(i => Math.min(i + 1, filteredOptions.length - 1));
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setHighlightedIndex(i => Math.max(i - 1, 0));
+                break;
+            case 'Enter':
+                // Prevent the form from submitting; commit the highlighted option instead
+                e.preventDefault();
+                e.stopPropagation();
+                if (filteredOptions[highlightedIndex]) {
+                    selectOption(filteredOptions[highlightedIndex]);
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                e.stopPropagation();
+                close();
+                break;
+            case 'Tab':
+                // Move on without selecting — close and keep focus on the field trigger
+                e.preventDefault();
+                close();
+                break;
+        }
+    };
 
     return (
         <div className={twMerge("w-full relative", className)} ref={containerRef}>
@@ -74,12 +152,18 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             )}
 
             <div
+                ref={triggerRef}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-haspopup="listbox"
+                tabIndex={isDisabled ? -1 : 0}
                 className={clsx(
-                    "relative w-full cursor-default rounded-md border bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm",
+                    "relative w-full cursor-default rounded-md border bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm",
                     error ? "border-red-500" : "border-gray-300",
                     isDisabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"
                 )}
-                onClick={() => !isDisabled && setIsOpen(!isOpen)}
+                onClick={() => !isDisabled && (isOpen ? close(false) : open())}
+                onKeyDown={handleTriggerKeyDown}
             >
                 <span className={clsx("block truncate", !selectedOption && "text-gray-400")}>
                     {loading ? 'Memuat...' : (selectedOption ? selectedOption.label : placeholder)}
@@ -97,16 +181,17 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             </div>
 
             {isOpen && !isDisabled && (
-                <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm" role="listbox">
                     <div className="sticky top-0 z-10 bg-white px-2 py-1.5 border-b border-gray-100">
                         <input
+                            ref={inputRef}
                             type="text"
-                            className="w-full rounded-md border-gray-300 py-1 px-2 text-sm focus:border-primary-500 focus:ring-primary-500"
+                            className="w-full rounded-md border-gray-300 py-1 px-2 text-sm focus:border-primary focus:ring-primary"
                             placeholder="Cari..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); setHighlightedIndex(0); }}
                             onClick={(e) => e.stopPropagation()}
-                            autoFocus
+                            onKeyDown={handleSearchKeyDown}
                         />
                     </div>
 
@@ -115,21 +200,23 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                             Tidak ada hasil.
                         </div>
                     ) : (
-                        filteredOptions.map((option) => (
+                        filteredOptions.map((option, index) => (
                             <div
                                 key={option.value}
+                                ref={(el) => { optionRefs.current[index] = el; }}
+                                role="option"
+                                aria-selected={option.value === value}
                                 className={clsx(
-                                    "relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-primary-50 hover:text-primary-900",
-                                    option.value === value ? "bg-primary-50 text-primary-900 font-semibold" : "text-gray-900"
+                                    "relative cursor-default select-none py-2 pl-3 pr-9",
+                                    index === highlightedIndex ? "bg-primary/10 text-primary-900" : "text-gray-900",
+                                    option.value === value && "font-semibold"
                                 )}
-                                onClick={() => {
-                                    onChange(option.value);
-                                    setIsOpen(false);
-                                }}
+                                onClick={() => selectOption(option)}
+                                onMouseEnter={() => setHighlightedIndex(index)}
                             >
                                 <span className="block truncate">{option.label}</span>
                                 {option.value === value && (
-                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
                                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                                     </span>
                                 )}

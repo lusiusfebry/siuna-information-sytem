@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
+import { SearchableSelect } from '../../components/common/SearchableSelect';
 import permissionService from '../../services/permission.service';
 import { User } from '../../types/auth'; // Ensure this type is updated
 import { Role } from '../../types/permission';
@@ -157,62 +159,42 @@ const UserManagementPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Simple Modal Implementation */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        {/* Background overlay */}
-                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setIsModalOpen(false)}></div>
-
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div className="sm:flex sm:items-start">
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
-                                            Ubah Role User: {selectedUser?.nik}
-                                        </h3>
-                                        <div className="mt-4">
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                Pilih Role Baru
-                                            </label>
-                                            <select
-                                                className="block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                value={selectedRole || ''}
-                                                onChange={(e) => setSelectedRole(Number(e.target.value))}
-                                            >
-                                                <option value="" disabled>Pilih Role</option>
-                                                {roles.map(r => (
-                                                    <option key={r.id} value={r.id}>
-                                                        {r.display_name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <Button
-                                    variant="primary"
-                                    onClick={handleRoleUpdate}
-                                    className="w-full sm:w-auto sm:ml-3"
-                                >
-                                    Simpan Perubahan
-                                </Button>
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="mt-3 w-full sm:mt-0 sm:w-auto"
-                                >
-                                    Batal
-                                </Button>
-                            </div>
-                        </div>
+            {/* Edit Role Modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={`Ubah Role User: ${selectedUser?.nik || ''}`}
+            >
+                <form
+                    onSubmit={(e) => { e.preventDefault(); handleRoleUpdate(); }}
+                    className="space-y-5"
+                >
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Pilih Role Baru
+                        </label>
+                        <SearchableSelect
+                            options={roles.map(r => ({ value: r.id, label: r.display_name }))}
+                            value={selectedRole}
+                            onChange={(val) => setSelectedRole(Number(val))}
+                            placeholder="Pilih Role"
+                        />
                     </div>
-                </div>
-            )}
+                    <div className="flex gap-3 pt-4 border-t border-gray-100 mt-6">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="flex-1"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Batal
+                        </Button>
+                        <Button type="submit" variant="primary" className="flex-1">
+                            Simpan Perubahan
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

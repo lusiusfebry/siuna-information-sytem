@@ -267,23 +267,23 @@ const TransaksiFormPage = () => {
 
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Gudang *</label>
-                            <select value={gudangId} onChange={(e) => setGudangId(Number(e.target.value))} className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100" required>
-                                <option value={0}>-- Pilih Gudang --</option>
-                                {gudangData?.data?.map((g) => (
-                                    <option key={g.id} value={g.id}>{g.nama}</option>
-                                ))}
-                            </select>
+                            <SearchableSelect
+                                options={(gudangData?.data || []).map((g) => ({ value: g.id, label: g.nama }))}
+                                value={gudangId || null}
+                                onChange={(val) => setGudangId(Number(val) || 0)}
+                                placeholder="-- Pilih Gudang --"
+                            />
                         </div>
 
                         {showGudangTujuan && (
                             <div className="flex flex-col gap-1.5">
                                 <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Gudang Tujuan *</label>
-                                <select value={gudangTujuanId} onChange={(e) => setGudangTujuanId(Number(e.target.value))} className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
-                                    <option value={0}>-- Pilih Gudang Tujuan --</option>
-                                    {gudangData?.data?.filter(g => g.id !== gudangId).map((g) => (
-                                        <option key={g.id} value={g.id}>{g.nama}</option>
-                                    ))}
-                                </select>
+                                <SearchableSelect
+                                    options={(gudangData?.data || []).filter(g => g.id !== gudangId).map((g) => ({ value: g.id, label: g.nama }))}
+                                    value={gudangTujuanId || null}
+                                    onChange={(val) => setGudangTujuanId(Number(val) || 0)}
+                                    placeholder="-- Pilih Gudang Tujuan --"
+                                />
                             </div>
                         )}
 
@@ -291,22 +291,22 @@ const TransaksiFormPage = () => {
                             <>
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Gedung/Mess Tujuan *</label>
-                                    <select value={buildingId} onChange={(e) => { setBuildingId(Number(e.target.value)); setRoomId(0); }} className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
-                                        <option value={0}>-- Pilih Gedung/Mess --</option>
-                                        {buildingData?.data?.map((b) => (
-                                            <option key={b.id} value={b.id}>{b.code} - {b.nama} ({b.tipe})</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        options={(buildingData?.data || []).map((b) => ({ value: b.id, label: `${b.code} - ${b.nama} (${b.tipe})` }))}
+                                        value={buildingId || null}
+                                        onChange={(val) => { setBuildingId(Number(val) || 0); setRoomId(0); }}
+                                        placeholder="-- Pilih Gedung/Mess --"
+                                    />
                                 </div>
                                 {buildingId > 0 && filteredRooms.length > 0 && (
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Ruangan (opsional)</label>
-                                        <select value={roomId} onChange={(e) => setRoomId(Number(e.target.value))} className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
-                                            <option value={0}>-- Semua / Tidak Spesifik --</option>
-                                            {filteredRooms.map((r) => (
-                                                <option key={r.id} value={r.id}>{r.code} - {r.nama}{r.lantai ? ` (Lt. ${r.lantai})` : ''}</option>
-                                            ))}
-                                        </select>
+                                        <SearchableSelect
+                                            options={[{ value: 0, label: '-- Semua / Tidak Spesifik --' }, ...filteredRooms.map((r) => ({ value: r.id, label: `${r.code} - ${r.nama}${r.lantai ? ` (Lt. ${r.lantai})` : ''}` }))]}
+                                            value={roomId || null}
+                                            onChange={(val) => setRoomId(Number(val) || 0)}
+                                            placeholder="-- Semua / Tidak Spesifik --"
+                                        />
                                     </div>
                                 )}
                             </>
@@ -419,12 +419,12 @@ const TransaksiFormPage = () => {
                                                     {uomData?.data?.find(u => u.id === selectedProduk.uom_id)?.nama || '-'}
                                                 </div>
                                             ) : (
-                                                <select value={detail.uom_id} onChange={(e) => updateDetail(detail._key, 'uom_id', Number(e.target.value))} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
-                                                    <option value={0}>-- Pilih UOM --</option>
-                                                    {uomData?.data?.map((u) => (
-                                                        <option key={u.id} value={u.id}>{u.nama}</option>
-                                                    ))}
-                                                </select>
+                                                <SearchableSelect
+                                                    options={(uomData?.data || []).map((u) => ({ value: u.id, label: u.nama }))}
+                                                    value={detail.uom_id || null}
+                                                    onChange={(val) => updateDetail(detail._key, 'uom_id', Number(val) || 0)}
+                                                    placeholder="-- Pilih UOM --"
+                                                />
                                             )}
                                         </div>
 
