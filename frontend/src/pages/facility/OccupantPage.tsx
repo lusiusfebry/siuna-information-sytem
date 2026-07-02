@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useOccupantList, useCreateOccupant, useCheckoutOccupant } from '../../hooks/useFacilityOccupant';
 import { useFacRoomList, useFacBuildingList } from '../../hooks/useFacilityMasterData';
@@ -7,6 +7,7 @@ import { useEmployeeList } from '../../hooks/useEmployee';
 import MasterDataTable, { Column } from '../../components/hr/MasterDataTable';
 import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
+import { SearchableSelect } from '../../components/common/SearchableSelect';
 import { FacOccupant, OccupantPayload } from '../../types/facility';
 
 interface OccFormData { room_id: string; employee_id: string; tanggal_masuk: string; keterangan: string; }
@@ -20,7 +21,7 @@ const selectCls = 'px-3 py-2 border rounded-lg text-sm border-gray-300 dark:bord
 const OccupantForm = ({ onSubmit, onCancel, isLoading }: {
     onSubmit: (d: OccupantPayload) => void; onCancel: () => void; isLoading?: boolean;
 }) => {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<OccFormData>({
+    const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm<OccFormData>({
         defaultValues: { room_id: '', employee_id: '', tanggal_masuk: new Date().toISOString().split('T')[0], keterangan: '' },
     });
     const { data: roomData } = useFacRoomList({ limit: 200 });
@@ -40,14 +41,20 @@ const OccupantForm = ({ onSubmit, onCancel, isLoading }: {
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Ruangan <span className="text-red-500">*</span></label>
-                <select {...register('room_id', { required: 'Wajib dipilih' })} className={`${cls} ${errors.room_id ? 'border-red-500' : ''}`}>
-                    <option value="">Pilih Ruangan</option>
-                    {rooms.map((r: any) => (
-                        <option key={r.id} value={r.id}>
-                            {r.nama}{r.building ? ` — ${r.building.nama}` : ''} (Kap: {r.kapasitas ?? '-'})
-                        </option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="room_id"
+                    rules={{ required: 'Wajib dipilih' }}
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={rooms.map((r: any) => ({ label: `${r.nama}${r.building ? ` — ${r.building.nama}` : ''} (Kap: ${r.kapasitas ?? '-'})`, value: r.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('room_id', val ? String(val) : '')}
+                            placeholder="Pilih Ruangan"
+                            error={errors.room_id?.message}
+                        />
+                    )}
+                />
                 {selectedRoom && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Kapasitas: {selectedRoom.kapasitas ?? '-'} orang
@@ -59,10 +66,20 @@ const OccupantForm = ({ onSubmit, onCancel, isLoading }: {
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Karyawan <span className="text-red-500">*</span></label>
-                <select {...register('employee_id', { required: 'Wajib dipilih' })} className={`${cls} ${errors.employee_id ? 'border-red-500' : ''}`}>
-                    <option value="">Pilih Karyawan</option>
-                    {employees.map((e: any) => <option key={e.id} value={e.id}>{e.nama_lengkap}</option>)}
-                </select>
+                <Controller
+                    control={control}
+                    name="employee_id"
+                    rules={{ required: 'Wajib dipilih' }}
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={employees.map((e: any) => ({ label: e.nama_lengkap, value: e.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('employee_id', val ? String(val) : '')}
+                            placeholder="Pilih Karyawan"
+                            error={errors.employee_id?.message}
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Tanggal Masuk <span className="text-red-500">*</span></label>
@@ -190,11 +207,14 @@ const OccupantPage = () => {
                 <input type="text" placeholder="Cari nama / NIK / ruangan..." value={search}
                     className="flex-1 min-w-[200px] px-3 py-2 border rounded-lg text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-                <select className={selectCls} value={buildingFilter}
-                    onChange={(e) => { setBuildingFilter(e.target.value); setPage(1); }}>
-                    <option value="">Semua Gedung</option>
-                    {buildings.map((b: any) => <option key={b.id} value={b.id}>{b.nama}</option>)}
-                </select>
+                <div className="min-w-[180px]">
+                    <SearchableSelect
+                        options={[{ label: 'Semua Gedung', value: '' }, ...buildings.map((b: any) => ({ label: b.nama, value: b.id }))]}
+                        value={buildingFilter}
+                        onChange={(val) => { setBuildingFilter(val ? String(val) : ''); setPage(1); }}
+                        placeholder="Semua Gedung"
+                    />
+                </div>
                 <select className={selectCls} value={statusFilter}
                     onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
                     <option value="Aktif">Aktif</option>

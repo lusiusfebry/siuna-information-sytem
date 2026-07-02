@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import Button from '../common/Button';
 import Input from '../common/Input';
+import { SearchableSelect } from '../common/SearchableSelect';
 // Removed Switch import as we use custom implementation
 
 // Plan assumed no headlessui install check, but I can use custom simple toggle or check styles.
@@ -111,19 +112,25 @@ const MasterDataForm: React.FC<MasterDataFormProps> = ({
                     )}
 
                     {field.type === 'select' && (
-                        <select
-                            {...register(field.name, { required: field.required ? `${field.label} harus dipilih` : false })}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors text-sm ${errors[field.name] ? 'border-red-500' : 'border-gray-300'
-                                }`}
-                            disabled={field.disabled}
-                        >
-                            <option value="">Pilih {field.label}</option>
-                            {field.options?.map(opt => (
-                                <option key={String(opt.value)} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
+                        <Controller
+                            control={control}
+                            name={field.name}
+                            rules={{ required: field.required ? `${field.label} harus dipilih` : false }}
+                            render={({ field: { onChange, value } }) => (
+                                <SearchableSelect
+                                    options={field.options || []}
+                                    value={value as string | number | null}
+                                    onChange={(val) => {
+                                        // Preserve numeric type when the option values are numbers
+                                        const isNumeric = field.options?.some(o => typeof o.value === 'number');
+                                        onChange(isNumeric && val !== '' ? Number(val) : val);
+                                    }}
+                                    placeholder={field.placeholder || `Pilih ${field.label}`}
+                                    disabled={field.disabled}
+                                    error={errors[field.name]?.message as string}
+                                />
+                            )}
+                        />
                     )}
 
                     {field.type === 'color' && (
@@ -174,7 +181,7 @@ const MasterDataForm: React.FC<MasterDataFormProps> = ({
                         />
                     )}
 
-                    {errors[field.name] && field.type !== 'text' && (
+                    {errors[field.name] && field.type !== 'text' && field.type !== 'select' && (
                         <span className="text-xs text-red-500 mt-0.5">{errors[field.name]?.message as string}</span>
                     )}
                 </div>

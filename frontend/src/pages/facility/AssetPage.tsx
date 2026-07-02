@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useAssetList, useCreateAsset, useWithdrawAsset } from '../../hooks/useFacilityAsset';
 import { useFacRoomList } from '../../hooks/useFacilityMasterData';
@@ -7,6 +7,7 @@ import MasterDataTable, { Column } from '../../components/hr/MasterDataTable';
 import Modal from '../../components/common/Modal';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import Button from '../../components/common/Button';
+import { SearchableSelect } from '../../components/common/SearchableSelect';
 import { FacAsset, AssetPayload } from '../../types/facility';
 
 interface AssetFormData { room_id: string; serial_number_id: string; tanggal_penempatan: string; keterangan: string; }
@@ -17,7 +18,7 @@ const lbl = 'text-sm font-medium text-gray-700 dark:text-gray-300';
 const AssetForm = ({ onSubmit, onCancel, isLoading }: {
     onSubmit: (d: AssetPayload) => void; onCancel: () => void; isLoading?: boolean;
 }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm<AssetFormData>({
+    const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<AssetFormData>({
         defaultValues: { room_id: '', serial_number_id: '', tanggal_penempatan: new Date().toISOString().split('T')[0], keterangan: '' },
     });
     const { data: roomData } = useFacRoomList({ limit: 100 });
@@ -33,10 +34,20 @@ const AssetForm = ({ onSubmit, onCancel, isLoading }: {
         <form onSubmit={handleSubmit(submit)} className="space-y-5">
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Ruangan <span className="text-red-500">*</span></label>
-                <select {...register('room_id', { required: 'Wajib dipilih' })} className={`${cls} ${errors.room_id ? 'border-red-500' : ''}`}>
-                    <option value="">Pilih Ruangan</option>
-                    {rooms.map((r: any) => <option key={r.id} value={r.id}>{r.nama}{r.building ? ` (${r.building.nama})` : ''}</option>)}
-                </select>
+                <Controller
+                    control={control}
+                    name="room_id"
+                    rules={{ required: 'Wajib dipilih' }}
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={rooms.map((r: any) => ({ label: `${r.nama}${r.building ? ` (${r.building.nama})` : ''}`, value: r.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('room_id', val ? String(val) : '')}
+                            placeholder="Pilih Ruangan"
+                            error={errors.room_id?.message}
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Serial Number ID <span className="text-red-500">*</span></label>

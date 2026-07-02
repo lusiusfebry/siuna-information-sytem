@@ -16,6 +16,7 @@ import MasterDataLayout from '../../../components/layout/MasterDataLayout';
 import Modal from '../../../components/common/Modal';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import SearchFilter from '../../../components/common/SearchFilter';
+import { SearchableSelect } from '../../../components/common/SearchableSelect';
 import Button from '../../../components/common/Button';
 import { FacRoom, RoomStatus } from '../../../types/facility';
 import { LayoutView } from '../../../types/layout';
@@ -48,7 +49,7 @@ const RoomForm = ({
     onCancel: () => void;
     isLoading?: boolean;
 }) => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm<RoomFormData>({
+    const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<RoomFormData>({
         defaultValues: { nama: '', building_id: '', room_type_id: '', lantai: '', kapasitas: '', keterangan: '', status: 'Tersedia' },
     });
 
@@ -97,22 +98,35 @@ const RoomForm = ({
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Gedung <span className="text-red-500">*</span></label>
-                <select {...register('building_id', { required: 'Gedung harus dipilih' })} className={`${cls} ${errors.building_id ? 'border-red-500' : ''}`}>
-                    <option value="">Pilih Gedung</option>
-                    {buildingList.map((b: any) => (
-                        <option key={b.id} value={b.id}>{b.nama}</option>
-                    ))}
-                </select>
-                {errors.building_id && <span className="text-xs text-red-500">{errors.building_id.message}</span>}
+                <Controller
+                    control={control}
+                    name="building_id"
+                    rules={{ required: 'Gedung harus dipilih' }}
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={buildingList.map((b: any) => ({ label: b.nama, value: b.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('building_id', val ? String(val) : '')}
+                            placeholder="Pilih Gedung"
+                            error={errors.building_id?.message}
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Tipe Ruangan</label>
-                <select {...register('room_type_id')} className={cls}>
-                    <option value="">Pilih Tipe Ruangan</option>
-                    {roomTypeList.map((rt: any) => (
-                        <option key={rt.id} value={rt.id}>{rt.nama}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="room_type_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={roomTypeList.map((rt: any) => ({ label: rt.nama, value: rt.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('room_type_id', val ? String(val) : '')}
+                            placeholder="Pilih Tipe Ruangan"
+                        />
+                    )}
+                />
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Lantai</label>
@@ -150,7 +164,7 @@ const RoomForm = ({
 const RoomPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('Tersedia');
+    const [status, setStatus] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<FacRoom | null>(null);

@@ -16,6 +16,7 @@ import MasterDataLayout from '../../../components/layout/MasterDataLayout';
 import Modal from '../../../components/common/Modal';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import SearchFilter from '../../../components/common/SearchFilter';
+import { SearchableSelect } from '../../../components/common/SearchableSelect';
 import Button from '../../../components/common/Button';
 import { FacBuilding, BuildingTipe } from '../../../types/facility';
 import { LayoutView } from '../../../types/layout';
@@ -49,7 +50,7 @@ const BuildingForm = ({
     onCancel: () => void;
     isLoading?: boolean;
 }) => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm<BuildingFormData>({
+    const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<BuildingFormData>({
         defaultValues: { nama: '', tipe: '', lokasi_kerja_id: '', penanggung_jawab_id: '', alamat: '', kapasitas_total: '', keterangan: '', status: true },
     });
 
@@ -108,12 +109,18 @@ const BuildingForm = ({
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Lokasi Kerja</label>
-                <select {...register('lokasi_kerja_id')} className={cls}>
-                    <option value="">Pilih Lokasi Kerja</option>
-                    {lokasiList.map((l: any) => (
-                        <option key={l.id} value={l.id}>{l.nama}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="lokasi_kerja_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={lokasiList.map((l: any) => ({ label: l.nama, value: l.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('lokasi_kerja_id', val ? String(val) : '')}
+                            placeholder="Pilih Lokasi Kerja"
+                        />
+                    )}
+                />
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -123,12 +130,18 @@ const BuildingForm = ({
 
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Penanggung Jawab</label>
-                <select {...register('penanggung_jawab_id')} className={cls}>
-                    <option value="">Pilih Penanggung Jawab</option>
-                    {employees.map((e: any) => (
-                        <option key={e.id} value={e.id}>{e.nama_lengkap}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="penanggung_jawab_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={employees.map((e: any) => ({ label: e.nama_lengkap, value: e.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('penanggung_jawab_id', val ? String(val) : '')}
+                            placeholder="Pilih Penanggung Jawab"
+                        />
+                    )}
+                />
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -172,7 +185,7 @@ const BuildingForm = ({
 const BuildingPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('Aktif');
+    const [status, setStatus] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<FacBuilding | null>(null);

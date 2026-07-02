@@ -11,6 +11,7 @@ import MasterDataLayout from '../../../components/layout/MasterDataLayout';
 import Modal from '../../../components/common/Modal';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import SearchFilter from '../../../components/common/SearchFilter';
+import { SearchableSelect } from '../../../components/common/SearchableSelect';
 import Button from '../../../components/common/Button';
 import { InvGudang } from '../../../types/inventory';
 import { LayoutView } from '../../../types/layout';
@@ -111,15 +112,6 @@ const GudangForm = ({
         }
     }, [watchPjId, employees, setValue]);
 
-    const deptRegister = register('department_id');
-
-    const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        deptRegister.onChange(e);
-        userChangedDept.current = true;
-        setValue('penanggung_jawab_id', '');
-        setValue('lokasi_kerja_id', '');
-    };
-
     const onFormSubmit = (data: GudangFormData) => {
         onSubmit({
             nama: data.nama,
@@ -149,33 +141,57 @@ const GudangForm = ({
 
             <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Department</label>
-                <select {...deptRegister} onChange={handleDeptChange} className={selectClass}>
-                    <option value="">Pilih Department</option>
-                    {departments.map((d: any) => (
-                        <option key={d.id} value={d.id}>{d.nama}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="department_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={departments.map((d: any) => ({ label: d.nama, value: d.id }))}
+                            value={value || null}
+                            onChange={(val) => {
+                                setValue('department_id', val ? String(val) : '');
+                                userChangedDept.current = true;
+                                setValue('penanggung_jawab_id', '');
+                                setValue('lokasi_kerja_id', '');
+                            }}
+                            placeholder="Pilih Department"
+                        />
+                    )}
+                />
             </div>
 
             <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Penanggung Jawab</label>
-                <select {...register('penanggung_jawab_id')} className={selectClass} disabled={!watchDeptId}>
-                    <option value="">{watchDeptId ? 'Pilih Penanggung Jawab' : 'Pilih Department terlebih dahulu'}</option>
-                    {employees.map((e: any) => (
-                        <option key={e.id} value={e.id}>{e.nama_lengkap}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="penanggung_jawab_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={employees.map((e: any) => ({ label: e.nama_lengkap, value: e.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('penanggung_jawab_id', val ? String(val) : '')}
+                            placeholder={watchDeptId ? 'Pilih Penanggung Jawab' : 'Pilih Department terlebih dahulu'}
+                            disabled={!watchDeptId}
+                        />
+                    )}
+                />
                 {!watchDeptId && <span className="text-xs text-gray-400">Pilih department untuk menampilkan daftar karyawan</span>}
             </div>
 
             <div className="flex flex-col gap-1.5">
                 <label className={labelClass}>Lokasi Kerja</label>
-                <select {...register('lokasi_kerja_id')} className={selectClass}>
-                    <option value="">Pilih Lokasi Kerja</option>
-                    {lokasiList.map((l: any) => (
-                        <option key={l.id} value={l.id}>{l.nama}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="lokasi_kerja_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={lokasiList.map((l: any) => ({ label: l.nama, value: l.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('lokasi_kerja_id', val ? String(val) : '')}
+                            placeholder="Pilih Lokasi Kerja"
+                        />
+                    )}
+                />
                 {watchPjId && <span className="text-xs text-gray-400">Otomatis terisi berdasarkan lokasi karyawan</span>}
             </div>
 
@@ -220,7 +236,7 @@ const GudangForm = ({
 const GudangPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('Aktif');
+    const [status, setStatus] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<InvGudang | null>(null);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import {
     useWorkOrderList,
@@ -14,6 +14,7 @@ import MasterDataLayout from '../../components/layout/MasterDataLayout';
 import Modal from '../../components/common/Modal';
 import SearchFilter from '../../components/common/SearchFilter';
 import Button from '../../components/common/Button';
+import { SearchableSelect } from '../../components/common/SearchableSelect';
 import {
     FacWorkOrder,
     WorkOrderPayload,
@@ -110,7 +111,7 @@ const WorkOrderForm = ({
 }) => {
     const isEditMode = !!(initialValues && Object.keys(initialValues).length > 0);
 
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<WorkOrderFormData>({
+    const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<WorkOrderFormData>({
         defaultValues: {
             judul: '',
             deskripsi: '',
@@ -200,28 +201,36 @@ const WorkOrderForm = ({
 
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Ruangan <span className="text-red-500">*</span></label>
-                <select
-                    {...register('room_id', { required: 'Ruangan harus dipilih' })}
-                    className={`${cls} ${errors.room_id ? 'border-red-500' : ''}`}
-                >
-                    <option value="">Pilih Ruangan</option>
-                    {roomList.map((r: any) => (
-                        <option key={r.id} value={r.id}>
-                            {r.nama}{r.building ? ` - ${r.building.nama}` : ''}
-                        </option>
-                    ))}
-                </select>
-                {errors.room_id && <span className="text-xs text-red-500">{errors.room_id.message}</span>}
+                <Controller
+                    control={control}
+                    name="room_id"
+                    rules={{ required: 'Ruangan harus dipilih' }}
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={roomList.map((r: any) => ({ label: `${r.nama}${r.building ? ` - ${r.building.nama}` : ''}`, value: r.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('room_id', val ? String(val) : '')}
+                            placeholder="Pilih Ruangan"
+                            error={errors.room_id?.message}
+                        />
+                    )}
+                />
             </div>
 
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Kategori</label>
-                <select {...register('kategori_id')} className={cls}>
-                    <option value="">Pilih Kategori</option>
-                    {categoryList.map((c: any) => (
-                        <option key={c.id} value={c.id}>{c.nama}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="kategori_id"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={categoryList.map((c: any) => ({ label: c.nama, value: c.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('kategori_id', val ? String(val) : '')}
+                            placeholder="Pilih Kategori"
+                        />
+                    )}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,12 +254,18 @@ const WorkOrderForm = ({
 
             <div className="flex flex-col gap-1.5">
                 <label className={lbl}>Assigned To</label>
-                <select {...register('assigned_to')} className={cls}>
-                    <option value="">Pilih Karyawan</option>
-                    {employees.map((e: any) => (
-                        <option key={e.id} value={e.id}>{e.nama_lengkap}</option>
-                    ))}
-                </select>
+                <Controller
+                    control={control}
+                    name="assigned_to"
+                    render={({ field: { value } }) => (
+                        <SearchableSelect
+                            options={employees.map((e: any) => ({ label: e.nama_lengkap, value: e.id }))}
+                            value={value || null}
+                            onChange={(val) => setValue('assigned_to', val ? String(val) : '')}
+                            placeholder="Pilih Karyawan"
+                        />
+                    )}
+                />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
