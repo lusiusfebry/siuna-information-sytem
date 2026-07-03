@@ -1,0 +1,155 @@
+/**
+ * Canonical column headers for the Employee (Karyawan) Excel import template.
+ *
+ * This is the SINGLE SOURCE OF TRUTH for the template layout. The generator
+ * script (`backend/scripts/generate-employee-template.ts`) writes these headers
+ * into `frontend/public/template-karyawan.xlsx`, and the importer
+ * (`excel-import.service.ts`) reads values by these exact header strings.
+ *
+ * Repeatable blocks (ANAK 1..4, SAUDARA KANDUNG 1..5) are generated so their
+ * labels are always sequential — fixing the historical duplicate
+ * "SAUDARA KANDUNG 3" defect in the old template.
+ */
+
+export const EMPLOYEE_TEMPLATE_SHEET = 'Data Karyawan';
+
+const HEAD_A: string[] = [
+    'NOMOR INDUK KARYAWAN',
+    'NAMA LENGKAP',
+    'POSISI JABATAN',
+    'LOKASI COSTING',
+    'ACTUAL',
+    'ASSIGN',
+    'PANGKAT KATEGORI',
+    'GOLONGAN',
+    'SUB GOLONGAN',
+    'TEMPAT LAHIR',
+    'TANGGAL LAHIR',
+    'TANGGAL JOIN GROUP',
+    'TANGGAL MASUK',
+    'JENIS HUBUNGAN KERJA',
+    'TANGGAL AWAL KONTRAK',
+    'TANGGAL AKHIR KONTRAK',
+    'TANGGAL TETAP',
+    'TANGGAL KELUAR',
+    'JENIS KELAMIN',
+    'AGAMA',
+    'ALAMAT DOMISILI',
+    'KOTA DOMISILI',
+    'PROPINSI DOMISILI',
+    'NOMOR TELEPON RUMAH 1',
+    'NOMOR TELEPON RUMAH 2',
+    'NOMOR HP 1',
+    'NOMOR HP 2',
+    'GOLONGAN DARAH',
+    'NOMOR KTP',
+    'ALAMAT KTP',
+    'NOMOR NPWP',
+    'NOMOR BPJS-TK',
+    'NOMOR DANA PENSIUN',
+    'NOMOR REKENING',
+    'NAMA PEMILIK REKENING',
+    'STATUS PERKAWINAN (PAJAK)',
+    'JUMLAH ANAK',
+    'STATUS PAJAK',
+    'PENDIDIKAN TERAKHIR',
+    'JURUSAN PENDIDIKAN',
+    'NAMA SEKOLAH',
+    'KOTA SEKOLAH',
+    'STATUS PENDIDIKAN',
+    'KETERANGAN PENDIDIKAN',
+    'KODE PENDIDIKAN',
+    'STATUS PERNIKAHAN',
+    'TANGGAL MENIKAH',
+    'TANGGAL CERAI',
+    'TANGGAL WAFAT PASANGAN',
+    'NAMA PASANGAN NIKAH',
+    'TANGGAL LAHIR PASANGAN',
+    'PENDIDIKAN TERAKHIR PASANGAN',
+    'PEKERJAAN PASANGAN',
+    'KETERANGAN PASANGAN',
+];
+
+const ANAK_BLOCK = (i: number): string[] => [
+    `NAMA ANAK ${i}`,
+    `JENIS KELAMIN ANAK ${i}`,
+    `TANGGAL LAHIR ANAK ${i}`,
+    `KETERANGAN ANAK ${i}`,
+];
+
+const PARENTS: string[] = [
+    'NAMA BAPAK KANDUNG',
+    'TANGGAL LAHIR BAPAK KANDUNG',
+    'PENDIDIKAN TERAKHIR BAPAK KANDUNG',
+    'PEKERJAAN BAPAK KANDUNG',
+    'KETERANGAN BAPAK KANDUNG',
+    'NAMA IBU KANDUNG',
+    'TANGGAL LAHIR IBU KANDUNG',
+    'PENDIDIKAN TERAKHIR IBU KANDUNG',
+    'PEKERJAAN IBU KANDUNG',
+    'KETERANGAN IBU KANDUNG',
+];
+
+const SAUDARA_BLOCK = (i: number): string[] => [
+    `NAMA SAUDARA KANDUNG ${i}`,
+    `JENIS KELAMIN SAUDARA KANDUNG ${i}`,
+    `TANGGAL LAHIR SAUDARA KANDUNG ${i}`,
+    `PENDIDIKAN TERAKHIR SAUDARA KANDUNG ${i}`,
+    `PEKERJAAN SAUDARA KANDUNG ${i}`,
+    `KETERANGAN SAUDARA KANDUNG ${i}`,
+];
+
+const HEAD_B: string[] = [
+    'SIKLUS PEMBAYARAN',
+    'NAMA BANK',
+    'CABANG BANK',
+    'NAMA BAPAK MERTUA',
+    'TANGGAL LAHIR BAPAK MERTUA',
+    'PENDIDIKAN TERAKHIR BAPAK MERTUA',
+    'PEKERJAAN BAPAK MERTUA',
+    'KETERANGAN BAPAK MERTUA',
+    'NAMA IBU MERTUA',
+    'TANGGAL LAHIR IBU MERTUA',
+    'PENDIDIKAN TERAKHIR IBU MERTUA',
+    'PEKERJAAN IBU MERTUA',
+    'KETERANGAN IBU MERTUA',
+    'ORGANISASI SUB DEPARTMENT',
+    'DEPARTMENT',
+    'DIVISI',
+    'NAMA KONTAK DARURAT 1',
+    'HUBUNGAN KONTAK DARURAT 1',
+    'ALAMAT KONTAK DARURAT 1',
+    'NOMOR HP1 KONTAK DARURAT 1',
+    'NOMOR HP2 KONTAK DARURAT 1',
+    'UKURAN SEPATU',
+    'UKURAN BAJU',
+    'LOKASI SEBELUMNYA',
+    'TANGGAL MUTASI',
+    'UNIT YANG DI BAWAH',
+    'POINT OF ORIGINAL',
+    'POINT OF HIRE',
+    'NOMOR KARTU KELUARGA',
+    'NOMOR NIK KK',
+    'LOKASI KERJA',
+    'STATUS KARYAWAN',
+    'TAG',
+    'MANAGER',
+    'ATASAN LANGSUNG',
+    'EMAIL PERUSAHAAN',
+    'EMAIL PRIBADI',
+];
+
+export const EMPLOYEE_TEMPLATE_HEADERS: string[] = [
+    ...HEAD_A,
+    ...ANAK_BLOCK(1),
+    ...ANAK_BLOCK(2),
+    ...ANAK_BLOCK(3),
+    ...ANAK_BLOCK(4),
+    ...PARENTS,
+    ...SAUDARA_BLOCK(1),
+    ...SAUDARA_BLOCK(2),
+    ...SAUDARA_BLOCK(3),
+    ...SAUDARA_BLOCK(4),
+    ...SAUDARA_BLOCK(5),
+    ...HEAD_B,
+];

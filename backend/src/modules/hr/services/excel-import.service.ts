@@ -250,6 +250,23 @@ class ExcelImportService {
             return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
         };
 
+        // Convert empty strings to null so optional fields with format validators
+        // (e.g. isEmail on email_perusahaan/email_pribadi) are skipped instead of
+        // failing on "" and rolling back the whole import transaction.
+        const emptyToNull = (val: any) => {
+            if (val === undefined || val === null) return null;
+            const s = String(val).trim();
+            return s === '' ? null : val;
+        };
+
+        // Normalize gender codes (L/P) to full labels used across the app.
+        const normalizeGender = (val: any) => {
+            const s = val ? String(val).trim() : '';
+            if (s === 'L' || s.toLowerCase() === 'laki-laki') return 'Laki-laki';
+            if (s === 'P' || s.toLowerCase() === 'perempuan') return 'Perempuan';
+            return s || null;
+        };
+
         const checkLookup = async (type: string, dbField: string, excelKey: string) => {
             const val = getValue(dbField, excelKey);
             if (val) {
@@ -262,7 +279,7 @@ class ExcelImportService {
         // --- EMPLOYEE DATA (Core) ---
         employeeData.nama_lengkap = getValue('nama_lengkap', 'NAMA LENGKAP');
         employeeData.nomor_induk_karyawan = getValue('nomor_induk_karyawan', 'NOMOR INDUK KARYAWAN');
-        employeeData.email_perusahaan = getValue('email_perusahaan', 'EMAIL PERUSAHAAN');
+        employeeData.email_perusahaan = emptyToNull(getValue('email_perusahaan', 'EMAIL PERUSAHAAN'));
         employeeData.nomor_handphone = getValue('nomor_handphone', 'NOMOR HP 1');
         employeeData.is_draft = false;
 
@@ -270,7 +287,7 @@ class ExcelImportService {
         employeeData.divisi_id = await checkLookup('Divisi', 'divisi_id', 'DIVISI');
         employeeData.department_id = await checkLookup('Department', 'department_id', 'DEPARTMENT');
         employeeData.posisi_jabatan_id = await checkLookup('PosisiJabatan', 'posisi_jabatan_id', 'POSISI JABATAN');
-        employeeData.status_karyawan_id = (await checkLookup('StatusKaryawan', 'status_karyawan_id', 'STATUS KARYAWAN')) || 1; // Default to Aktif (ID 1)
+        employeeData.status_karyawan_id = await checkLookup('StatusKaryawan', 'status_karyawan_id', 'STATUS KARYAWAN');
         employeeData.lokasi_kerja_id = await checkLookup('LokasiKerja', 'lokasi_kerja_id', 'LOKASI KERJA');
         employeeData.tag_id = await checkLookup('Tag', 'tag_id', 'TAG'); // New Tag Mapping
 
@@ -301,9 +318,9 @@ class ExcelImportService {
         // --- PERSONAL INFO ---
         personalInfoData.tempat_lahir = getValue('tempat_lahir', 'TEMPAT LAHIR');
         personalInfoData.tanggal_lahir = parseDate(getValue('tanggal_lahir', 'TANGGAL LAHIR'));
-        personalInfoData.jenis_kelamin = getValue('jenis_kelamin', 'JENIS KELAMIN') === 'L' ? 'Laki-laki' : (getValue('jenis_kelamin', 'JENIS KELAMIN') === 'P' ? 'Perempuan' : getValue('jenis_kelamin', 'JENIS KELAMIN'));
+        personalInfoData.jenis_kelamin = normalizeGender(getValue('jenis_kelamin', 'JENIS KELAMIN'));
         personalInfoData.agama = getValue('agama', 'AGAMA');
-        personalInfoData.email_pribadi = getValue('email_pribadi', 'EMAIL PRIBADI');
+        personalInfoData.email_pribadi = emptyToNull(getValue('email_pribadi', 'EMAIL PRIBADI'));
 
         personalInfoData.alamat_domisili = getValue('alamat_domisili', 'ALAMAT DOMISILI');
         personalInfoData.kota_domisili = getValue('kota_domisili', 'KOTA DOMISILI');
@@ -398,6 +415,57 @@ class ExcelImportService {
         // Parent Data
         familyInfoData.nama_ayah_kandung = getValue('nama_ayah_kandung', 'NAMA BAPAK KANDUNG');
         familyInfoData.nama_ibu_kandung = getValue('nama_ibu_kandung', 'NAMA IBU KANDUNG');
+        // Parent details (Bapak/Ibu Kandung)
+        familyInfoData.tanggal_lahir_ayah_kandung = parseDate(getValue('tanggal_lahir_ayah_kandung', 'TANGGAL LAHIR BAPAK KANDUNG'));
+        familyInfoData.pendidikan_terakhir_ayah_kandung = getValue('pendidikan_terakhir_ayah_kandung', 'PENDIDIKAN TERAKHIR BAPAK KANDUNG');
+        familyInfoData.pekerjaan_ayah_kandung = getValue('pekerjaan_ayah_kandung', 'PEKERJAAN BAPAK KANDUNG');
+        familyInfoData.keterangan_ayah_kandung = getValue('keterangan_ayah_kandung', 'KETERANGAN BAPAK KANDUNG');
+        familyInfoData.tanggal_lahir_ibu_kandung = parseDate(getValue('tanggal_lahir_ibu_kandung', 'TANGGAL LAHIR IBU KANDUNG'));
+        familyInfoData.pendidikan_terakhir_ibu_kandung = getValue('pendidikan_terakhir_ibu_kandung', 'PENDIDIKAN TERAKHIR IBU KANDUNG');
+        familyInfoData.pekerjaan_ibu_kandung = getValue('pekerjaan_ibu_kandung', 'PEKERJAAN IBU KANDUNG');
+        familyInfoData.keterangan_ibu_kandung = getValue('keterangan_ibu_kandung', 'KETERANGAN IBU KANDUNG');
+
+        // Mertua (parents-in-law)
+        familyInfoData.nama_ayah_mertua = getValue('nama_ayah_mertua', 'NAMA BAPAK MERTUA');
+        familyInfoData.tanggal_lahir_ayah_mertua = parseDate(getValue('tanggal_lahir_ayah_mertua', 'TANGGAL LAHIR BAPAK MERTUA'));
+        familyInfoData.pendidikan_terakhir_ayah_mertua = getValue('pendidikan_terakhir_ayah_mertua', 'PENDIDIKAN TERAKHIR BAPAK MERTUA');
+        familyInfoData.keterangan_ayah_mertua = getValue('keterangan_ayah_mertua', 'KETERANGAN BAPAK MERTUA');
+        familyInfoData.nama_ibu_mertua = getValue('nama_ibu_mertua', 'NAMA IBU MERTUA');
+        familyInfoData.tanggal_lahir_ibu_mertua = parseDate(getValue('tanggal_lahir_ibu_mertua', 'TANGGAL LAHIR IBU MERTUA'));
+        familyInfoData.pendidikan_terakhir_ibu_mertua = getValue('pendidikan_terakhir_ibu_mertua', 'PENDIDIKAN TERAKHIR IBU MERTUA');
+        familyInfoData.keterangan_ibu_mertua = getValue('keterangan_ibu_mertua', 'KETERANGAN IBU MERTUA');
+
+        // Repeatable: data anak (ANAK 1..4)
+        const dataAnak: any[] = [];
+        for (let i = 1; i <= 4; i++) {
+            const nama = row[`NAMA ANAK ${i}`];
+            if (nama && String(nama).trim()) {
+                dataAnak.push({
+                    nama: String(nama).trim(),
+                    jenis_kelamin: normalizeGender(row[`JENIS KELAMIN ANAK ${i}`]),
+                    tanggal_lahir: parseDate(row[`TANGGAL LAHIR ANAK ${i}`]),
+                    keterangan: row[`KETERANGAN ANAK ${i}`] ? String(row[`KETERANGAN ANAK ${i}`]).trim() : null,
+                });
+            }
+        }
+        if (dataAnak.length > 0) familyInfoData.data_anak = dataAnak;
+
+        // Repeatable: data saudara kandung (SAUDARA KANDUNG 1..5)
+        const dataSaudara: any[] = [];
+        for (let i = 1; i <= 5; i++) {
+            const nama = row[`NAMA SAUDARA KANDUNG ${i}`];
+            if (nama && String(nama).trim()) {
+                dataSaudara.push({
+                    nama: String(nama).trim(),
+                    jenis_kelamin: normalizeGender(row[`JENIS KELAMIN SAUDARA KANDUNG ${i}`]),
+                    tanggal_lahir: parseDate(row[`TANGGAL LAHIR SAUDARA KANDUNG ${i}`]),
+                    pendidikan_terakhir: row[`PENDIDIKAN TERAKHIR SAUDARA KANDUNG ${i}`] ? String(row[`PENDIDIKAN TERAKHIR SAUDARA KANDUNG ${i}`]).trim() : null,
+                    pekerjaan: row[`PEKERJAAN SAUDARA KANDUNG ${i}`] ? String(row[`PEKERJAAN SAUDARA KANDUNG ${i}`]).trim() : null,
+                    keterangan: row[`KETERANGAN SAUDARA KANDUNG ${i}`] ? String(row[`KETERANGAN SAUDARA KANDUNG ${i}`]).trim() : null,
+                });
+            }
+        }
+        if (dataSaudara.length > 0) familyInfoData.data_saudara_kandung = dataSaudara;
 
         return { employeeData, personalInfoData, hrInfoData, familyInfoData, rawValues };
     }
