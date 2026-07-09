@@ -48,6 +48,12 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
             return res.status(401).json({ message: 'User not found' });
         }
 
+        // Reject tokens for deactivated accounts so disabling a user takes effect
+        // immediately (before token expiry).
+        if ((user as any).is_active === false) {
+            return res.status(401).json({ message: 'Akun dinonaktifkan' });
+        }
+
         // Attach user model instance to request
         req.user = user;
 

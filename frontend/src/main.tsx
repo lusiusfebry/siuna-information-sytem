@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './styles/index.css'
 import { useAuthStore } from './stores/authStore'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 import { Toaster } from 'react-hot-toast'
 
@@ -20,12 +21,14 @@ const Root = () => {
 
     return (
         <React.StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
-                    <Toaster position="top-right" />
-                    <App />
-                </BrowserRouter>
-            </QueryClientProvider>
+            <ErrorBoundary>
+                <QueryClientProvider client={queryClient}>
+                    <BrowserRouter>
+                        <Toaster position="top-right" />
+                        <App />
+                    </BrowserRouter>
+                </QueryClientProvider>
+            </ErrorBoundary>
         </React.StrictMode>
     );
 };

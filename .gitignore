@@ -24,3 +24,13 @@ template-karyawan .xlsx
 .kilocode/skills/
 
 .tmp-antigravity-skills
+
+# Duplicated git worktrees & scratch artifacts (should never be committed)
+.kilo/worktrees/
+.playwright-mcp/
+
+# Committed credential files — secrets must not live in the repo
+credential_aplikasi.md
+credential_login_aplikasi.md
+tutorial/04-credential-login.md
+

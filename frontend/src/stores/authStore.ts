@@ -55,9 +55,16 @@ export const useAuthStore = create<AuthStore>()(
                     // Verify token with backend
                     const response = await authService.getCurrentUser();
                     set({ user: response.data.user, isAuthenticated: true, token }); // ensure token is in state
-                } catch (error) {
-                    console.error('Auth check failed:', error);
-                    get().logout();
+                } catch (error: unknown) {
+                    // Only log out when the token is genuinely rejected (401/403).
+                    // A network error / 5xx / timeout must NOT destroy a valid session,
+                    // otherwise a transient blip bounces the user to /login.
+                    const status = (error as { response?: { status?: number } })?.response?.status;
+                    if (status === 401 || status === 403) {
+                        get().logout();
+                    } else {
+                        console.error('Auth check failed (keeping session):', error);
+                    }
                 } finally {
                     set({ isLoading: false });
                 }

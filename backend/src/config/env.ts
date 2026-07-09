@@ -7,6 +7,26 @@ const envPath = process.env.NODE_ENV === 'test'
 
 dotenv.config({ path: envPath });
 
+const isProd = process.env.NODE_ENV === 'production';
+
+// Fail fast in production if critical secrets are missing or left at their
+// insecure development defaults — a weak/guessable JWT secret allows token
+// forgery (full auth bypass).
+const WEAK_JWT_SECRETS = ['secret', 'your-secret-key-change-in-production'];
+if (isProd) {
+    const jwt = process.env.JWT_SECRET;
+    if (!jwt || WEAK_JWT_SECRETS.includes(jwt) || jwt.length < 32) {
+        throw new Error(
+            'FATAL: JWT_SECRET must be set to a strong (>=32 char) value in production.'
+        );
+    }
+    if (!process.env.DB_PASSWORD || process.env.DB_PASSWORD === '123456789') {
+        throw new Error(
+            'FATAL: DB_PASSWORD must be set to a non-default value in production.'
+        );
+    }
+}
+
 export const env = {
     nodeEnv: process.env.NODE_ENV || 'development',
     port: parseInt(process.env.PORT || '3000', 10),

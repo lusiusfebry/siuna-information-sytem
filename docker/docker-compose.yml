@@ -9,7 +9,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-123456789}
       POSTGRES_DB: bebang_db
     ports:
-      - "5433:5432"
+      # Publish on the same port the app/.env expects (DB_PORT, default 5432)
+      # so host-run processes and the container agree. Override with DB_PORT.
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
