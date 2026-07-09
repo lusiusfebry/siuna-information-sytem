@@ -24,8 +24,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Apply rate limiting to API routes
 app.use('/api/', apiLimiter);
 
-// Static files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Static files — serve ONLY public image directories (referenced by <img> tags,
+// which cannot send auth headers): company logo, employee photos, product photos.
+// Sensitive files (employee documents, imported spreadsheets, inventory documents)
+// are intentionally NOT served here — they are delivered via authenticated,
+// permission-checked controller routes (e.g. /hr/employees/:id/documents/:docId/download).
+const uploadsRoot = path.join(__dirname, '../uploads');
+app.use('/uploads/company', express.static(path.join(uploadsRoot, 'company')));
+app.use('/uploads/employees/photos', express.static(path.join(uploadsRoot, 'employees/photos')));
+app.use('/uploads/inventory/photos', express.static(path.join(uploadsRoot, 'inventory/photos')));
 
 // Routes
 import hrRoutes from './modules/hr/routes/hr.routes';

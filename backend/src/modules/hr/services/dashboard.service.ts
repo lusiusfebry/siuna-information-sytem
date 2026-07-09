@@ -8,31 +8,32 @@ import { Sequelize, Op } from 'sequelize';
 
 class DashboardService {
     async getDashboardStats() {
-        // Total Active Employees
+        // Total (non-draft) employees. NOTE: StatusKaryawan.status is the master
+        // row's own soft-delete flag, NOT the employment status — filtering on it
+        // was a bug. Headcount = committed (non-draft) employee records.
         const totalEmployees = await Employee.count({
-            include: [{
-                model: StatusKaryawan,
-                as: 'status_karyawan',
-                where: { status: 'Aktif' }
-            }]
+            where: { is_draft: false }
         });
 
         // Total Active Departments
         const totalDepartments = await Department.count();
 
         // Employees on Leave (Active Approved Leave today)
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
         const employeesOnLeave = await Leave.count({
             where: {
                 status: 'Approved',
-                tanggal_mulai: { [Op.lte]: new Date() },
-                tanggal_selesai: { [Op.gte]: new Date() }
+                tanggal_mulai: { [Op.lte]: today },
+                tanggal_selesai: { [Op.gte]: today }
             }
         });
 
-        // Attendance Rate (Present today / Total Active Employees)
+        // Attendance Rate (Present today / Total Employees). Attendance.tanggal is
+        // a DATEONLY column, so compare against a YYYY-MM-DD string, not a JS Date
+        // (a full Date with time never matches a DATEONLY value).
         const presentCount = await Attendance.count({
             where: {
-                tanggal: new Date(),
+                tanggal: today,
                 status: 'Hadir'
             }
         });

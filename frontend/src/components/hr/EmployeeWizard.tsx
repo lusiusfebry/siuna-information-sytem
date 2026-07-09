@@ -12,6 +12,35 @@ interface EmployeeWizardProps {
     onCancel: () => void;
 }
 
+// Builds the multipart FormData sent to the API from the merged wizard values.
+// Critically, it SKIPS plain relation objects (e.g. `divisi`, `department`,
+// `manager` that leak in when editing an existing employee) — those would
+// otherwise be serialized as the literal string "[object Object]". The real
+// foreign keys travel as separate scalar fields (`divisi_id`, etc.).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const buildEmployeeFormData = (data: Record<string, any>, opts: { isDraft: boolean }): FormData => {
+    const payload = new FormData();
+    Object.keys(data).forEach((key) => {
+        const value = data[key];
+        if (key === 'foto_karyawan') {
+            if (value instanceof File) payload.append('foto_karyawan', value);
+            return;
+        }
+        if (key === 'data_anak' || key === 'data_saudara_kandung') {
+            if (value) payload.append(key, JSON.stringify(value));
+            return;
+        }
+        if (value === undefined || value === null) return;
+        // Draft additionally drops empty strings to keep the payload minimal.
+        if (opts.isDraft && value === '') return;
+        // Skip relation objects / arrays / nested structures — only scalars go through.
+        if (typeof value === 'object') return;
+        payload.append(key, String(value));
+    });
+    payload.set('is_draft', opts.isDraft ? 'true' : 'false');
+    return payload;
+};
+
 export const EmployeeWizard: React.FC<EmployeeWizardProps> = ({ initialData, onComplete, onSaveDraft, onCancel }) => {
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -31,27 +60,8 @@ export const EmployeeWizard: React.FC<EmployeeWizardProps> = ({ initialData, onC
     // Save as Draft handler - receives data from step form
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSaveDraftFromStep = (stepData: any) => {
-        const payload = new FormData();
-
-        // Merge existing formData with step data
         const mergedData = { ...formData, ...stepData };
-
-        Object.keys(mergedData).forEach(key => {
-            if (key === 'foto_karyawan' && mergedData[key] instanceof File) {
-                payload.append('foto_karyawan', mergedData[key]);
-            } else if (key === 'data_anak' || key === 'data_saudara_kandung') {
-                // Serialize JSON arrays only if they exist
-                if (mergedData[key]) {
-                    payload.append(key, JSON.stringify(mergedData[key]));
-                }
-            } else if (mergedData[key] !== undefined && mergedData[key] !== null && mergedData[key] !== '') {
-                payload.append(key, String(mergedData[key]));
-            }
-        });
-
-        // Set as draft
-        payload.append('is_draft', 'true');
-
+        const payload = buildEmployeeFormData(mergedData, { isDraft: true });
         if (onSaveDraft) {
             onSaveDraft(payload);
         }
@@ -98,25 +108,7 @@ export const EmployeeWizard: React.FC<EmployeeWizardProps> = ({ initialData, onC
     const handleStep3Next = (data: any) => {
         const finalData = { ...formData, ...data };
         setFormData(finalData);
-
-        // Construct FormData for submission
-        const payload = new FormData();
-        Object.keys(finalData).forEach(key => {
-            if (key === 'foto_karyawan' && finalData[key] instanceof File) {
-                payload.append('foto_karyawan', finalData[key]);
-            } else if (key === 'data_anak' || key === 'data_saudara_kandung') {
-                // Serialize JSON arrays only if they exist
-                if (finalData[key]) {
-                    payload.append(key, JSON.stringify(finalData[key]));
-                }
-            } else if (finalData[key] !== undefined && finalData[key] !== null) {
-                payload.append(key, String(finalData[key]));
-            }
-        });
-
-        // Explicitly set is_draft to false for final save
-        payload.set('is_draft', 'false');
-
+        const payload = buildEmployeeFormData(finalData, { isDraft: false });
         onComplete(payload);
     };
 

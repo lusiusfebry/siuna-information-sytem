@@ -1,34 +1,14 @@
 import cacheService from './cache.service';
-import Divisi from '../../modules/hr/models/Divisi';
-import Department from '../../modules/hr/models/Department';
-import PosisiJabatan from '../../modules/hr/models/PosisiJabatan';
-import StatusKaryawan from '../../modules/hr/models/StatusKaryawan';
-import LokasiKerja from '../../modules/hr/models/LokasiKerja';
-import Tag from '../../modules/hr/models/Tag';
 
+// NOTE: Redis is intentionally disabled (see src/config/redis.ts — the client is
+// a no-op stub). Cache warming previously loaded every master-data table on boot
+// and wrote it into the void, wasting startup queries and printing a misleading
+// "cache warming completed". Until a real Redis client is wired up, this is a
+// deliberate no-op so operational logs reflect reality.
 class CacheWarmingService {
     async warmMasterDataCache() {
-        console.log('🔥 Warming cache for master data...');
-
-        const models = [
-            { name: 'Divisi', model: Divisi },
-            { name: 'Department', model: Department },
-            { name: 'PosisiJabatan', model: PosisiJabatan },
-            { name: 'StatusKaryawan', model: StatusKaryawan },
-            { name: 'LokasiKerja', model: LokasiKerja },
-            { name: 'Tag', model: Tag },
-        ];
-
-        for (const { name, model } of models) {
-            try {
-                const data = await model.findAll();
-                await cacheService.set(`master_data:${name}:all`, data, 3600);
-            } catch (error) {
-                console.error(`Failed to warm cache for ${name}:`, error);
-            }
-        }
-
-        console.log('✅ Cache warming completed');
+        void cacheService; // referenced so the module contract stays stable
+        console.log('ℹ️  Cache is disabled (Redis not configured) — skipping cache warming.');
     }
 }
 

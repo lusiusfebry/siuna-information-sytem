@@ -24,7 +24,8 @@ class UserController {
             });
             res.json({ data: users });
         } catch (error) {
-            res.status(500).json({ message: 'Failed to fetch users', error });
+            console.error('Failed to fetch users:', error);
+            res.status(500).json({ message: 'Failed to fetch users' });
         }
     }
 
@@ -39,16 +40,25 @@ class UserController {
             const role = await Role.findByPk(role_id);
             if (!role) return res.status(400).json({ message: 'Role invalid' });
 
-            // Prevent changing own role if not safely handled? Or strictly superadmin.
             const currentUser = req.user;
-            if (currentUser && currentUser.id === user.id && currentUser.roleDetails?.name !== 'superadmin') {
-                // Self-demotion check? Allow for now if authorized.
+            const isSuperadmin = currentUser?.roleDetails?.name === 'superadmin';
+
+            // Prevent changing your OWN role (no self-escalation / accidental self-demotion).
+            if (currentUser && currentUser.id === user.id) {
+                return res.status(403).json({ message: 'Anda tidak dapat mengubah role akun Anda sendiri' });
+            }
+
+            // Only a superadmin may grant privileged roles (superadmin/admin).
+            const privilegedRoles = ['superadmin', 'admin'];
+            if (privilegedRoles.includes(role.name) && !isSuperadmin) {
+                return res.status(403).json({ message: 'Hanya superadmin yang dapat memberikan role ini' });
             }
 
             await user.update({ role_id });
             res.json({ message: 'User role updated' });
         } catch (error) {
-            res.status(500).json({ message: 'Failed to update user role', error });
+            console.error('Failed to update user role:', error);
+            res.status(500).json({ message: 'Failed to update user role' });
         }
     }
 
@@ -67,7 +77,8 @@ class UserController {
             await user.update({ is_active });
             res.json({ message: `User ${is_active ? 'activated' : 'deactivated'}` });
         } catch (error) {
-            res.status(500).json({ message: 'Failed to update user status', error });
+            console.error('Failed to update user status:', error);
+            res.status(500).json({ message: 'Failed to update user status' });
         }
     }
 }
