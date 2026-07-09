@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   postgres:
@@ -40,11 +39,11 @@ services:
     command: redis-server --appendonly yes
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:8.14
     container_name: bebang-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-root}
     ports:
       - "5050:80"
     depends_on:
@@ -53,9 +52,12 @@ services:
       - bebang-network
 
   backend:
-    build: 
+    build:
       context: ../backend
       dockerfile: Dockerfile
+      # Dev uses the "build" stage (full toolchain + devDeps) so `npm run dev`
+      # works; the production stage in the same Dockerfile is used for deploys.
+      target: build
     container_name: bebang-backend-dev
     command: npm run dev
     volumes:
@@ -73,9 +75,10 @@ services:
       - bebang-network
 
   frontend:
-    build: 
+    build:
       context: ../frontend
       dockerfile: Dockerfile
+      target: build
     container_name: bebang-frontend-dev
     command: npm run dev -- --host
     volumes:

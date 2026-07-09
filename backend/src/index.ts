@@ -41,6 +41,16 @@ app.get('/', (req, res) => {
     res.send('Bebang Sistem Informasi API Running');
 });
 
+// Health check — verifies the DB connection (used by container HEALTHCHECK).
+app.get('/api/health', async (_req, res) => {
+    try {
+        await sequelize.authenticate();
+        res.json({ status: 'ok', db: 'up', timestamp: new Date().toISOString() });
+    } catch {
+        res.status(503).json({ status: 'error', db: 'down' });
+    }
+});
+
 app.use('/api/hr', hrRoutes);
 import inventoryRoutes from './modules/inventory/routes/inventory.routes';
 app.use('/api/inventory', inventoryRoutes);

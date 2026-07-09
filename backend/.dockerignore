@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.env.*
+uploads
+uploads_test
+*.log
+coverage
+.git
+__tests__
+*.test.ts
+test-run*.log
+uji-import-karyawan.xlsx

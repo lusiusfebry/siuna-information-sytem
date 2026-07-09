@@ -52,9 +52,9 @@ const EmployeeListPage = () => {
     // Master Data for Chips Label Lookup
     const { data: divisiList } = useMasterDataList('divisi');
     const { data: deptList } = useMasterDataList('department');
-    const { data: posisiList } = useMasterDataList('posisi_jabatan');
-    const { data: statusList } = useMasterDataList('status_karyawan');
-    const { data: lokasiList } = useMasterDataList('lokasi_kerja');
+    const { data: posisiList } = useMasterDataList('posisi-jabatan');
+    const { data: statusList } = useMasterDataList('status-karyawan');
+    const { data: lokasiList } = useMasterDataList('lokasi-kerja');
     const { data: tagList } = useMasterDataList('tag');
 
     const fetchEmployees = useCallback(async (pageNum: number) => {
