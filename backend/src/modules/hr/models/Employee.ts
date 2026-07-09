@@ -206,6 +206,9 @@ Employee.init({
 }, {
     sequelize,
     tableName: 'employees',
+    // DB columns are snake_case (migration 55); keep JS attribute names.
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
 });
 
 export default Employee;

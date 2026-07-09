@@ -56,7 +56,7 @@ class ExportService {
                 },
                 { model: EmployeeFamilyInfo, as: 'family_info' }
             ],
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
 
         const workbook = new ExcelJS.Workbook();

@@ -49,7 +49,7 @@ class DocumentService {
         }
         return await EmployeeDocument.findAll({
             where,
-            order: [['createdAt', 'DESC']]
+            order: [['created_at', 'DESC']]
         });
     }
 

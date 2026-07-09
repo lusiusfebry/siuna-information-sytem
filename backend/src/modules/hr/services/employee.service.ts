@@ -144,7 +144,7 @@ class EmployeeService {
             ],
             offset,
             limit: parseInt(limit),
-            order: [['createdAt', 'DESC']],
+            order: [['created_at', 'DESC']],
             subQuery: false // Optimize for large datasets with includes
         });
 

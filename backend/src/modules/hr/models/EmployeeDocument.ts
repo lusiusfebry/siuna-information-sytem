@@ -76,19 +76,11 @@ EmployeeDocument.init({
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-    },
 }, {
     sequelize,
     tableName: 'employee_documents',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
 });
 
 export default EmployeeDocument;
