@@ -1,5 +1,5 @@
 import ExportService from '../export.service';
-import { Employee } from '../../models';
+import Employee from '../../models/Employee';
 import puppeteer from 'puppeteer';
 import employeeService from '../employee.service';
 
@@ -29,15 +29,21 @@ jest.mock('puppeteer', () => ({
     })
 }));
 
-jest.mock('../../models', () => ({
-    Employee: {
-        findAll: jest.fn(),
-        findByPk: jest.fn()
-    },
-    // Mock other models for includes
-    Divisi: {}, Department: {}, PosisiJabatan: {}, StatusKaryawan: {}, LokasiKerja: {}, Tag: {},
-    EmployeePersonalInfo: {}, EmployeeHRInfo: {}, EmployeeFamilyInfo: {}
+// The service imports models from their individual files (../models/Employee),
+// NOT the barrel (../models), so mock the concrete modules it actually loads.
+jest.mock('../../models/Employee', () => ({
+    __esModule: true,
+    default: { findAll: jest.fn(), findByPk: jest.fn() },
 }));
+jest.mock('../../models/EmployeePersonalInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/EmployeeHRInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/EmployeeFamilyInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Divisi', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Department', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/PosisiJabatan', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/StatusKaryawan', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/LokasiKerja', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Tag', () => ({ __esModule: true, default: {} }));
 
 jest.mock('../employee.service', () => ({
     getEmployeeById: jest.fn()

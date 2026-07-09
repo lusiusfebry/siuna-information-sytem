@@ -27,7 +27,6 @@ describe('MasterDataTable', () => {
     ];
 
     const defaultProps = {
-        title: 'Test Table',
         columns: mockColumns,
         data: mockData,
         onEdit: vi.fn(),
@@ -37,7 +36,7 @@ describe('MasterDataTable', () => {
 
     it('renders table with data', () => {
         render(<MasterDataTable {...defaultProps} />);
-        expect(screen.getByText('Test Table')).toBeInTheDocument();
+        // MasterDataTable renders each row's data (card layout); it has no title prop.
         expect(screen.getByText('Item 1')).toBeInTheDocument();
         expect(screen.getByText('Item 2')).toBeInTheDocument();
     });

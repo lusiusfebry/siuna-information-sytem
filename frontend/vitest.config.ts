@@ -15,6 +15,10 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: ['./src/test/setup.ts'],
         css: true,
+        // Only run Vitest unit/component tests under src/. Playwright e2e specs
+        // live in e2e/ and must NOT be picked up here (they use @playwright/test).
+        include: ['src/**/*.{test,spec}.{ts,tsx}'],
+        exclude: ['node_modules', 'dist', 'e2e', '**/*.e2e.*'],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '../../../test/utils';
 import VirtualEmployeeTable from '../VirtualEmployeeTable';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock react-window and related libraries
 vi.mock('react-virtualized-auto-sizer', () => ({
@@ -14,11 +14,11 @@ vi.mock('react-window-infinite-loader', () => ({
 }));
 
 vi.mock('react-window', () => ({
-    FixedSizeList: ({ children, itemCount }: { children: (props: { index: number, style: React.CSSProperties }) => React.ReactNode, itemCount: number }) => (
+    FixedSizeList: ({ children, itemCount, itemData }: { children: (props: { index: number, style: React.CSSProperties, data: unknown }) => React.ReactNode, itemCount: number, itemData: unknown }) => (
         <div>
             {Array.from({ length: itemCount }).map((_, index) => (
                 <div key={index}>
-                    {children({ index, style: {} })}
+                    {children({ index, style: {}, data: itemData })}
                 </div>
             ))}
         </div>
@@ -39,6 +39,12 @@ describe('VirtualEmployeeTable', () => {
         onRowClick: vi.fn(),
         onDelete: vi.fn()
     };
+
+    beforeEach(() => {
+        // Reset shared spies so cross-test calls don't leak (the delete test
+        // asserts onRowClick was NOT called).
+        vi.clearAllMocks();
+    });
 
     it('renders list of employees', () => {
         render(<VirtualEmployeeTable {...defaultProps} />);

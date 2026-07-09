@@ -22,7 +22,11 @@ module.exports = {
             statements: 80,
         },
     },
+    globalSetup: '<rootDir>/src/test/globalSetup.ts',
     setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+    // Integration suites share one Postgres DB, so run serially to avoid
+    // cross-suite races and seed-data collisions.
+    maxWorkers: 1,
     testTimeout: 30000,
     verbose: true,
 };

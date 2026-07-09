@@ -40,8 +40,8 @@ describe('Export API Integration (Real DB)', () => {
             adminToken = authService.generateToken(userWithRole!);
 
             // Create a test employee
-            const divisi = await Divisi.create({ nama: 'Export Div' });
-            const status = await StatusKaryawan.create({ nama: 'Aktif Export' });
+            const divisi = await Divisi.create({ nama: 'Export Div', code: 'DIV-EXP' });
+            const status = await StatusKaryawan.create({ nama: 'Aktif Export', code: 'STK-EXP' });
 
             const employee = await Employee.create({
                 nama_lengkap: 'Export Test Employee',

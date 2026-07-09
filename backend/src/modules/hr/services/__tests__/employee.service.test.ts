@@ -1,10 +1,13 @@
 import EmployeeService from '../employee.service';
-import { Employee } from '../../models';
+import Employee from '../../models/Employee';
 import { Op } from 'sequelize';
 
-// Mock models and dependencies
-jest.mock('../../models', () => ({
-    Employee: {
+// The service imports each model from its own file (../models/Employee, etc.),
+// not the barrel, so mock the concrete modules it loads. Empty models are given
+// a default export object; Employee gets the query methods the tests assert on.
+jest.mock('../../models/Employee', () => ({
+    __esModule: true,
+    default: {
         findByPk: jest.fn(),
         create: jest.fn(),
         findAll: jest.fn(),
@@ -13,23 +16,22 @@ jest.mock('../../models', () => ({
         update: jest.fn(),
         destroy: jest.fn(),
     },
-    // Mock other models as objects
-    Divisi: {},
-    Department: {},
-    PosisiJabatan: {},
-    StatusKaryawan: {},
-    LokasiKerja: {},
-    Tag: {},
-    EmployeePersonalInfo: {},
-    EmployeeHRInfo: {},
-    EmployeeFamilyInfo: {},
-    JenisHubunganKerja: {},
-    KategoriPangkat: {},
-    Golongan: {},
-    SubGolongan: {}
 }));
+jest.mock('../../models/EmployeePersonalInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/EmployeeHRInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/EmployeeFamilyInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Divisi', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Department', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/PosisiJabatan', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/StatusKaryawan', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/LokasiKerja', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Tag', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/JenisHubunganKerja', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/KategoriPangkat', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Golongan', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/SubGolongan', () => ({ __esModule: true, default: {} }));
 
-jest.mock('../validators/business-rules.validator', () => ({
+jest.mock('../../validators/business-rules.validator', () => ({
     validateManagerPosition: jest.fn().mockResolvedValue({ valid: true }),
     validateAtasanLangsungActive: jest.fn().mockResolvedValue({ valid: true }),
     validateDepartmentBelongsToDivisi: jest.fn().mockResolvedValue({ valid: true }),
@@ -37,11 +39,14 @@ jest.mock('../validators/business-rules.validator', () => ({
     validateContractDates: jest.fn().mockResolvedValue({ valid: true }),
 }));
 
-jest.mock('../../../config/database', () => ({
-    transaction: jest.fn().mockResolvedValue({
-        commit: jest.fn(),
-        rollback: jest.fn(),
-    }),
+jest.mock('../../../../config/database', () => ({
+    __esModule: true,
+    default: {
+        transaction: jest.fn().mockResolvedValue({
+            commit: jest.fn(),
+            rollback: jest.fn(),
+        }),
+    },
 }));
 
 describe('EmployeeService', () => {

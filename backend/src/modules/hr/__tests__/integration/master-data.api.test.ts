@@ -46,11 +46,13 @@ describe('Master Data API Integration', () => {
             token = authService.generateToken(userWithRole!);
             console.log('Token generated');
 
-            // Seed some data
-            testDivisi = await Divisi.create({ nama: 'Test Divisi' });
+            // Seed some data (direct model.create bypasses the controller's
+            // auto-generated code, so provide an explicit unique code here).
+            testDivisi = await Divisi.create({ nama: 'Test Divisi', code: 'DIV-TEST' });
             console.log('Test divisi created');
             testDept = await Department.create({
                 nama: 'Test Dept',
+                code: 'DEP-TEST',
                 divisi_id: testDivisi.id
             });
             console.log('Test dept created');
@@ -117,7 +119,7 @@ describe('Master Data API Integration', () => {
 
     describe('DELETE /api/hr/master/:model/:id', () => {
         it('should delete master data', async () => {
-            const newDiv = await Divisi.create({ nama: 'To Be Deleted' });
+            const newDiv = await Divisi.create({ nama: 'To Be Deleted', code: 'DIV-DEL' });
             const res = await request(app)
                 .delete(`/api/hr/master/divisi/${newDiv.id}`)
                 .set('Authorization', `Bearer ${token}`);

@@ -28,10 +28,11 @@ describe('Import API Integration (Real DB)', () => {
                 }
             });
 
-            // Create admin user
+            // Create admin user (distinct NIK to avoid clashing with other
+            // integration suites that seed a test user)
             testUser = await User.create({
                 nama: 'Admin Import Test',
-                nik: '888888',
+                nik: '888887',
                 password: 'password123',
                 role_id: role.id,
                 is_active: true
@@ -42,14 +43,15 @@ describe('Import API Integration (Real DB)', () => {
             });
             adminToken = authService.generateToken(userWithRole!);
 
-            // Seed Master Data needed for lookup
-            await Divisi.create({ nama: 'Integrated IT' });
-            await StatusKaryawan.create({ nama: 'Aktif' });
+            // Seed Master Data needed for lookup (explicit code required)
+            await Divisi.create({ nama: 'Integrated IT', code: 'DIV-IMP' });
+            await StatusKaryawan.create({ nama: 'Aktif', code: 'STK-IMP' });
 
             // Create a real Excel file for testing
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet('Data Karyawan');
-            sheet.addRow(['No Induk Karyawan', 'Nama Lengkap', 'Email Perusahaan', 'No Handphone', 'Divisi', 'Status Karyawan']);
+            // Headers must match the importer's exact canonical (UPPERCASE) names.
+            sheet.addRow(['NOMOR INDUK KARYAWAN', 'NAMA LENGKAP', 'EMAIL PERUSAHAAN', 'NOMOR HP 1', 'DIVISI', 'STATUS KARYAWAN']);
             sheet.addRow(['IMP-2024-001', 'Imported Test 1', 'imp1@test.com', '08111111', 'Integrated IT', 'Aktif']);
             sheet.addRow(['IMP-2024-002', 'Imported Test 2', 'imp2@test.com', '08222222', 'Integrated IT', 'Aktif']);
 
@@ -65,7 +67,7 @@ describe('Import API Integration (Real DB)', () => {
         try {
             console.log('Import test cleanup starting...');
             await Employee.destroy({ where: { nomor_induk_karyawan: ['IMP-2024-001', 'IMP-2024-002'] }, force: true });
-            await User.destroy({ where: { nik: '888888' } });
+            await User.destroy({ where: { nik: '888887' } });
             await Divisi.destroy({ where: { nama: 'Integrated IT' } });
             await StatusKaryawan.destroy({ where: { nama: 'Aktif' } });
             if (fs.existsSync(testFilePath)) fs.unlinkSync(testFilePath);

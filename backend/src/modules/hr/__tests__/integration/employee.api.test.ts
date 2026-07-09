@@ -44,24 +44,27 @@ describe('Employee API Integration (Real DB)', () => {
             });
             adminToken = authService.generateToken(userWithRole!);
 
-            // Seed Master Data
-            const divisi = await Divisi.create({ nama: 'Integrated IT' });
+            // Seed Master Data (explicit code — direct create bypasses auto-gen)
+            const divisi = await Divisi.create({ nama: 'Integrated IT', code: 'DIV-EMP' });
             divisiId = divisi.id;
 
             const dept = await Department.create({
                 nama: 'Integrated Dev',
+                code: 'DEP-EMP',
                 divisi_id: divisiId
             });
             departmentId = dept.id;
 
             const pos = await PosisiJabatan.create({
                 nama: 'Integrated Engineer',
+                code: 'POS-EMP',
                 department_id: departmentId
             });
             posisiId = pos.id;
 
             const status = await StatusKaryawan.create({
-                nama: 'Aktif'
+                nama: 'Aktif',
+                code: 'STK-EMP'
             });
             statusId = status.id;
             console.log('Employee test setup completed');

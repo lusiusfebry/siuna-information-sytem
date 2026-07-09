@@ -1,6 +1,6 @@
 import ExcelImportService from '../excel-import.service';
 import ExcelJS from 'exceljs';
-import { Divisi } from '../../models';
+import Divisi from '../../models/Divisi';
 
 // Mock ExcelJS
 jest.mock('exceljs', () => {
@@ -21,30 +21,36 @@ jest.mock('exceljs', () => {
     };
 });
 
-jest.mock('../../models', () => ({
-    Divisi: { findAll: jest.fn() },
-    Department: { findAll: jest.fn() },
-    PosisiJabatan: { findAll: jest.fn() },
-    StatusKaryawan: { findAll: jest.fn() },
-    LokasiKerja: { findAll: jest.fn() },
-    Tag: { findAll: jest.fn() },
-    JenisHubunganKerja: { findAll: jest.fn() },
-    KategoriPangkat: { findAll: jest.fn() },
-    Golongan: { findAll: jest.fn() },
-    SubGolongan: { findAll: jest.fn() },
-    Employee: { findOne: jest.fn(), create: jest.fn() }
-}));
+// The service imports each model from its own file — mock the concrete modules.
+// Every findAll defaults to [] so loadMasterDataCache can iterate all 10 models.
+jest.mock('../../models/Divisi', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/Department', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/PosisiJabatan', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/StatusKaryawan', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/LokasiKerja', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/Tag', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/JenisHubunganKerja', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/KategoriPangkat', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/Golongan', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/SubGolongan', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
+jest.mock('../../models/Employee', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn() } }));
 
 jest.mock('../employee.service', () => ({
-    validateNIKUnique: jest.fn(),
-    createEmployeeComplete: jest.fn()
+    __esModule: true,
+    default: {
+        validateNIKUnique: jest.fn(),
+        createEmployeeComplete: jest.fn(),
+    },
 }));
 
-jest.mock('../../../config/database', () => ({
-    transaction: jest.fn().mockResolvedValue({
-        commit: jest.fn(),
-        rollback: jest.fn()
-    })
+jest.mock('../../../../config/database', () => ({
+    __esModule: true,
+    default: {
+        transaction: jest.fn().mockResolvedValue({
+            commit: jest.fn(),
+            rollback: jest.fn()
+        }),
+    },
 }));
 
 describe('ExcelImportService', () => {
@@ -87,17 +93,18 @@ describe('ExcelImportService', () => {
     describe('validateEmployeeData', () => {
         it('should return error if name missing', async () => {
             const data: any = { employeeData: {}, rawValues: {} };
-            const error = await ExcelImportService.validateEmployeeData(data);
-            expect(error).toBe('Nama Lengkap wajib diisi');
+            // validateEmployeeData returns a string[] of errors.
+            const errors = await ExcelImportService.validateEmployeeData(data);
+            expect(errors).toContain('Nama Lengkap wajib diisi');
         });
 
-        it('should return null if valid', async () => {
+        it('should return no errors if valid', async () => {
             const data: any = {
                 employeeData: { nama_lengkap: 'John', nomor_induk_karyawan: '123' },
                 rawValues: {}
             };
-            const error = await ExcelImportService.validateEmployeeData(data);
-            expect(error).toBeNull();
+            const errors = await ExcelImportService.validateEmployeeData(data);
+            expect(errors).toEqual([]);
         });
     });
 });

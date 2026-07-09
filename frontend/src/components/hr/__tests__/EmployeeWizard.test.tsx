@@ -2,9 +2,10 @@ import { render, screen, fireEvent } from '../../../test/utils';
 import { EmployeeWizard } from '../EmployeeWizard';
 import { describe, it, expect, vi } from 'vitest';
 
-// Mock child components to simplify integration test
+// Mock child components to simplify integration test. The step forms are NAMED
+// exports (export const EmployeeStepXForm), so mock the named keys — not default.
 vi.mock('../EmployeeStep1Form', () => ({
-    default: ({ onNext }: { onNext: (data: Record<string, unknown>) => void }) => (
+    EmployeeStep1Form: ({ onNext }: { onNext: (data: Record<string, unknown>) => void }) => (
         <div>
             Step 1 Form
             <button onClick={() => onNext({ nama_lengkap: 'John' })}>Next Step</button>
@@ -13,7 +14,7 @@ vi.mock('../EmployeeStep1Form', () => ({
 }));
 
 vi.mock('../EmployeeStep2Form', () => ({
-    default: ({ onNext, onBack }: { onNext: (data: Record<string, unknown>) => void, onBack: () => void }) => (
+    EmployeeStep2Form: ({ onNext, onBack }: { onNext: (data: Record<string, unknown>) => void, onBack: () => void }) => (
         <div>
             Step 2 Form
             <button onClick={onBack}>Back</button>
@@ -23,11 +24,11 @@ vi.mock('../EmployeeStep2Form', () => ({
 }));
 
 vi.mock('../EmployeeStep3Form', () => ({
-    default: ({ onSubmit, onBack }: { onSubmit: (data: Record<string, unknown>) => void, onBack: () => void }) => (
+    EmployeeStep3Form: ({ onNext, onBack }: { onNext: (data: Record<string, unknown>) => void, onBack: () => void }) => (
         <div>
             Step 3 Form
             <button onClick={onBack}>Back</button>
-            <button onClick={() => onSubmit({ family: 'data' })}>Submit</button>
+            <button onClick={() => onNext({ family: 'data' })}>Submit</button>
         </div>
     )
 }));
