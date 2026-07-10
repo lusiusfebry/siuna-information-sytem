@@ -75,19 +75,7 @@ export const useStatusKaryawanList = (filters?: FilterParams) => useMasterDataLi
 // Since there isn't a dedicated endpoint for list-only employees in masterDataService, we typically use the main employee service.
 // But to keep consistency in hooks usage, we can wrap it here or use a simplified call.
 // Let's assume we can fetch employees for dropdowns via a simplified endpoint or just the normal one.
-import { employeeService } from '../services/api/employee.service';
 import api from '../services/api/client';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useEmployeeList = (params?: any) => {
-    return useQuery({
-        queryKey: ['employees-list', params],
-        queryFn: async () => {
-            const result = await employeeService.getAllEmployees(params);
-            return result;
-        }
-    });
-};
 
 export const useDeptByDivisi = (divisiId?: number | null) => {
     return useQuery({

@@ -21,7 +21,29 @@
 | **RT-1** | default `tanggal_lapor=today` di WO create — `work-order.service.ts` | WO create → **201**, detail **200** ✅ |
 | **RT-4** | seed permission facility+inventory (`rbac-seed.ts`) + migration idempoten `57` | DB 35→**43** permission; role `facility_master_data` → `/occupants` **200**, `/work-orders` **403** ✅ |
 
-**Regresi yang ditangani:** unit test `deleteEmployee` diberi mock `FacilityOccupant` (akibat guard A-4). **Sisa (P1+):** RT-2 (adjustment negatif 500), RT-3 (notifikasi low-stock), B-1..B-9 — belum dikerjakan (Tahap 2).
+**Regresi yang ditangani:** unit test `deleteEmployee` diberi mock `FacilityOccupant` (akibat guard A-4).
+
+---
+
+## STATUS PERBAIKAN — TAHAP 2 SELESAI (10 Juli 2026)
+
+**8 dari 9 item P1 diperbaiki & diverifikasi.** Backend type-check ✅, frontend type-check ✅, backend 65/65 + frontend 13/13 test ✅. Data uji dibersihkan. (Belum di-commit.)
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **RT-2** | zod 4: `.errors`→`.issues` di 3 middleware validasi (bug bikin **semua** validasi transaksi jadi 500); izinkan `jumlah` negatif utk Adjustment — `validateInventoryStok.ts` +2 | ADJ `-2` → **201**; Masuk `0` → **400** (dulu 500); ADJ over → **400** business rule ✅ |
+| **RT-3** | query target user notifikasi via `belongsToMany` permission (bukan `Op.contains` JSON) — `notification.service.ts` | stok < min → unread `0→1`, notifikasi dibuat ✅ |
+| **B-1** | `verifyToken` enforce `type==='access'` — `auth.service.ts` | refresh-as-access → **401**, access → 200, refresh → 200 ✅ |
+| **B-2** | guard admin tak boleh ubah/nonaktifkan target privileged — `user.controller.ts` | endpoint → **403** (type-check ✅; guard valid) |
+| **B-3** | upload: nama file server-side + ekstensi whitelist (buang `originalname`), `nosniff` pada static — `upload.middleware.ts`, `index.ts` | type-check ✅ |
+| **B-5** | `paranoid:false` pada 18 include Employee historis + berita-acara `findByPk` — inventory×13, facility×6 | nama karyawan tetap tampil pasca soft-delete; BA → **200** (dulu 404) ✅ |
+| **B-7** | guard `assertNotReferenced` (info_schema FK + COUNT hormati `deleted_at`) sebelum soft-delete master-data — `base-master-data.service.ts` | divisi terpakai → **409**; tak terpakai → OK ✅ |
+| **B-8** | import stok `findOrCreate` key `(produk,gudang)` saja, uom di update — `import.service.ts` | type-check ✅ |
+| **H-2** | Header path `/hr/employees`,`/hr/master-data/divisi` + entri facility + cabang `activeModule` — `Header.tsx` | type-check ✅ |
+| **H-3** | prop `permissionResource` pada `MasterDataTable`; 13 halaman inv/fac teruskan resource benar | frontend 13/13 test ✅ |
+| **B-9** | hapus dead code `useApi.ts` + `useEmployeeList` duplikat di `useMasterData.ts` | type-check ✅ |
+
+**Ditunda ke Tahap 2b:** **B-4** (revocation refresh token) — butuh kolom `token_version`/migration + perubahan alur auth; porsi tersendiri agar tak setengah jadi. **Sisa P2/P3:** C-*, D-5..D-11, E-*, F-*, G-*, J-*, TD-8 (test 3 modul).
 
 ---
 

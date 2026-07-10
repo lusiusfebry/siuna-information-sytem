@@ -77,7 +77,7 @@ export const validateInventoryMasterData = (req: Request, res: Response, next: N
     } catch (error: any) {
         if (error instanceof z.ZodError) {
             const zodError = error as any;
-            const formattedErrors = zodError.errors.map((err: any) => ({
+            const formattedErrors = (zodError.issues ?? zodError.errors).map((err: any) => ({
                 field: err.path.join('.'),
                 message: err.message
             }));

@@ -9,14 +9,24 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+const IMAGE_EXT: Record<string, string> = {
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png': '.png',
+};
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const nik = req.body.nomor_induk_karyawan || 'unknown';
-        cb(null, `${uniqueSuffix}-${nik}-${file.originalname}`);
+        // Never trust client originalname (stored-XSS via .html + spoofed mime,
+        // path traversal via separators). Build a server-side name with a
+        // whitelisted extension derived from the validated mimetype.
+        const nik = String(req.body.nomor_induk_karyawan || 'unknown').replace(/[^a-zA-Z0-9]/g, '');
+        const ext = IMAGE_EXT[file.mimetype] || '.bin';
+        cb(null, `emp-${uniqueSuffix}-${nik}${ext}`);
     }
 });
 
@@ -49,7 +59,10 @@ const excelStorage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, `${uniqueSuffix}-${file.originalname}`);
+        // Force a safe extension based on the real file extension (fileFilter
+        // already restricts to .xlsx/.xls); never embed the raw originalname.
+        const ext = path.extname(file.originalname).toLowerCase() === '.xls' ? '.xls' : '.xlsx';
+        cb(null, `import-${uniqueSuffix}${ext}`);
     }
 });
 

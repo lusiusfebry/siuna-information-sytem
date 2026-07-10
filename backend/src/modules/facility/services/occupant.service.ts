@@ -22,7 +22,7 @@ class FacilityOccupantService {
                 ...(Object.keys(roomWhere).length > 0 ? { where: roomWhere } : {}),
                 include: [{ association: 'building' }],
             },
-            { association: 'employee' },
+            { association: 'employee', paranoid: false },
         ];
 
         // Search across employee name, NIK, and room name
@@ -56,7 +56,7 @@ class FacilityOccupantService {
         return await FacilityOccupant.findByPk(id, {
             include: [
                 { association: 'room', include: [{ association: 'building' }] },
-                { association: 'employee' },
+                { association: 'employee', paranoid: false },
                 { association: 'creator' },
             ],
         });

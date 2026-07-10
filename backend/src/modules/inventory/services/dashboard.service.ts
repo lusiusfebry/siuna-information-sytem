@@ -110,7 +110,7 @@ class InventoryDashboardService {
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
             ],
             order: [['created_at', 'DESC']],

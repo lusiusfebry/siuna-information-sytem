@@ -32,9 +32,16 @@ app.use('/api/', apiLimiter);
 // are intentionally NOT served here — they are delivered via authenticated,
 // permission-checked controller routes (e.g. /hr/employees/:id/documents/:docId/download).
 const uploadsRoot = path.join(__dirname, '../uploads');
-app.use('/uploads/company', express.static(path.join(uploadsRoot, 'company')));
-app.use('/uploads/employees/photos', express.static(path.join(uploadsRoot, 'employees/photos')));
-app.use('/uploads/inventory/photos', express.static(path.join(uploadsRoot, 'inventory/photos')));
+// Defense-in-depth: force nosniff on served uploads so a file that somehow ends
+// up with an HTML/SVG body is never interpreted as active content in our origin.
+const staticOpts = {
+    setHeaders: (res: express.Response) => {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+    },
+};
+app.use('/uploads/company', express.static(path.join(uploadsRoot, 'company'), staticOpts));
+app.use('/uploads/employees/photos', express.static(path.join(uploadsRoot, 'employees/photos'), staticOpts));
+app.use('/uploads/inventory/photos', express.static(path.join(uploadsRoot, 'inventory/photos'), staticOpts));
 
 // Routes
 import hrRoutes from './modules/hr/routes/hr.routes';

@@ -7,8 +7,9 @@ import { useUnreadCount, useNotifications, useMarkAsRead, useMarkAllAsRead } fro
 import type { NotificationItem } from '../../services/api/notification.service';
 
 const MODULE_HEADERS: Record<string, { title: string; links: { label: string; href: string }[] }> = {
-    hr: { title: 'Human Resources', links: [{ label: 'Direktori', href: '/hr/employee' }, { label: 'Organisasi', href: '/hr/masterdata' }] },
+    hr: { title: 'Human Resources', links: [{ label: 'Direktori', href: '/hr/employees' }, { label: 'Organisasi', href: '/hr/master-data/divisi' }] },
     inventory: { title: 'Inventory Management', links: [{ label: 'Stok', href: '/inventory/stok' }, { label: 'Laporan', href: '/inventory/laporan' }] },
+    facility: { title: 'Facility Management', links: [{ label: 'Dashboard', href: '/facility/dashboard' }, { label: 'Work Order', href: '/facility/work-orders' }] },
     settings: { title: 'Pengaturan Sistem', links: [{ label: 'Konfigurasi', href: '/settings/roles' }] },
 };
 
@@ -38,6 +39,7 @@ const Header = () => {
     }, []);
 
     const activeModule = location.pathname.startsWith('/inventory') ? 'inventory'
+        : location.pathname.startsWith('/facility') ? 'facility'
         : location.pathname.startsWith('/settings') ? 'settings' : 'hr';
     const config = MODULE_HEADERS[activeModule];
 

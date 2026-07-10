@@ -115,6 +115,12 @@ export class BaseMasterDataService {
     async delete(model: ModelStatic<Model>, id: number) {
         const item = await model.findByPk(id);
         if (!item) return null;
+
+        // Because master-data tables are paranoid, destroy() only sets deleted_at
+        // and never triggers the DB-level FK RESTRICT — so the catch below is dead
+        // for soft-delete. Enforce "still in use" at the app layer first.
+        await this.assertNotReferenced(model, id);
+
         try {
             await item.destroy();
         } catch (err: any) {
@@ -134,6 +140,51 @@ export class BaseMasterDataService {
         }
         await this.invalidateCache(model.name);
         return true;
+    }
+
+    /**
+     * Reject deletion when any live row in another table still references this
+     * master-data row. FK metadata is read from information_schema (trusted), the
+     * id is parameterized, and child tables with a `deleted_at` column only count
+     * their non-soft-deleted rows.
+     */
+    private async assertNotReferenced(model: ModelStatic<Model>, id: number) {
+        const sequelize = (model as any).sequelize;
+        if (!sequelize) return;
+        const parentTable = model.getTableName() as string;
+
+        const [refs] = await sequelize.query(
+            `SELECT tc.table_name AS child_table, kcu.column_name AS child_col
+             FROM information_schema.table_constraints tc
+             JOIN information_schema.key_column_usage kcu
+               ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+             JOIN information_schema.constraint_column_usage ccu
+               ON tc.constraint_name = ccu.constraint_name AND tc.table_schema = ccu.table_schema
+             WHERE tc.constraint_type = 'FOREIGN KEY' AND ccu.table_name = :parentTable`,
+            { replacements: { parentTable } }
+        );
+
+        for (const ref of refs as Array<{ child_table: string; child_col: string }>) {
+            const [cols] = await sequelize.query(
+                `SELECT 1 FROM information_schema.columns
+                 WHERE table_name = :t AND column_name = 'deleted_at' LIMIT 1`,
+                { replacements: { t: ref.child_table } }
+            );
+            const softDeleteClause = (cols as any[]).length > 0 ? ' AND deleted_at IS NULL' : '';
+            const [countRows] = await sequelize.query(
+                `SELECT COUNT(*)::int AS n FROM "${ref.child_table}"
+                 WHERE "${ref.child_col}" = :id${softDeleteClause}`,
+                { replacements: { id } }
+            );
+            const n = (countRows as any[])[0]?.n ?? 0;
+            if (n > 0) {
+                const error: any = new Error(
+                    `Tidak dapat menghapus data ${model.name} karena masih digunakan oleh data lain.`
+                );
+                error.statusCode = 409;
+                throw error;
+            }
+        }
     }
 
     async restore(model: ModelStatic<Model>, id: number) {

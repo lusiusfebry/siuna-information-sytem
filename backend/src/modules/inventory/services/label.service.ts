@@ -52,7 +52,7 @@ class LabelService {
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
             ],
         });
         if (!tag || !tag.tag_number) throw new AppError('Asset tag tidak ditemukan', 404);
@@ -258,7 +258,7 @@ ${pages}
                 include: [
                     { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
                     { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
-                    { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                    { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 ],
             });
             if (!tag) throw new AppError('Asset tag tidak ditemukan', 404);

@@ -164,7 +164,7 @@ class StokService {
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] , paranoid: false },
             ],
             limit: Number(limit),
             offset,
@@ -540,7 +540,7 @@ class StokService {
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityBuilding, as: 'facility_building', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
             ],
             limit: Number(limit),
@@ -565,7 +565,7 @@ class StokService {
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityBuilding, as: 'facility_building', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
                 {
                     model: InvTransaksiDetail,
@@ -611,7 +611,7 @@ class StokService {
                     include: [
                         { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
                         { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
-                        { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                        { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                     ],
                 },
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },

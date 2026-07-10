@@ -45,8 +45,8 @@ class FacilityWorkOrderService {
             include: [
                 { association: 'room', include: [{ association: 'building' }] },
                 { association: 'kategori' },
-                { association: 'reporter' },
-                { association: 'assignee' },
+                { association: 'reporter', paranoid: false },
+                { association: 'assignee', paranoid: false },
             ],
             limit: Number(limit),
             offset: Number(offset),
@@ -67,8 +67,8 @@ class FacilityWorkOrderService {
             include: [
                 { association: 'room', include: [{ association: 'building' }] },
                 { association: 'kategori' },
-                { association: 'reporter' },
-                { association: 'assignee' },
+                { association: 'reporter', paranoid: false },
+                { association: 'assignee', paranoid: false },
                 { association: 'creator' },
             ],
         });

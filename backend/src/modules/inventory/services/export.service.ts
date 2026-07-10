@@ -47,7 +47,7 @@ class InventoryExportService {
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
                 {
                     model: InvTransaksiDetail, as: 'details',
@@ -236,7 +236,7 @@ tr:nth-child(even) { background: #f9f9f9; }
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
                 {
                     model: InvTransaksiDetail, as: 'details',
@@ -320,7 +320,7 @@ tr:nth-child(even) { background: #f9f9f9; }
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
                 {
                     model: InvTransaksiDetail, as: 'details',
@@ -374,7 +374,7 @@ tr:nth-child(even) { background: #f9f9f9; }
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'], include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }] },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
             ],
             order: [['created_at', 'DESC']],
         });
@@ -430,7 +430,7 @@ tr:nth-child(even) { background: #f9f9f9; }
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
-                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
             ],
             order: [['created_at', 'DESC']],
         });

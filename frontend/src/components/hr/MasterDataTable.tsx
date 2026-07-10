@@ -25,6 +25,9 @@ interface MasterDataTableProps<T> {
     onDelete: (item: T) => void;
     view?: LayoutView;
     transparent?: boolean;
+    /** RBAC resource gating the Edit/Delete buttons. Defaults to HR master_data;
+     *  inventory/facility pages must pass their own resource. */
+    permissionResource?: string;
 }
 
 const MasterDataTable = <T extends { id: number | string; code?: string; status?: string; nama?: string; name?: string }>({
@@ -35,7 +38,8 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
     onEdit,
     onDelete,
     view = LayoutView.VIEW_1,
-    transparent = false
+    transparent = false,
+    permissionResource = RESOURCES.MASTER_DATA
 }: MasterDataTableProps<T>) => {
 
     const config = LAYOUT_CONFIGS[view];
@@ -135,7 +139,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
 
                                 {/* Quick Actions */}
                                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                    <PermissionGuard resource={RESOURCES.MASTER_DATA} action={ACTIONS.DELETE}>
+                                    <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -191,7 +195,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                     ))}
                                     <td className={`px-6 ${isCompact ? 'py-2' : 'py-4'} text-right`}>
                                         <div className="flex items-center justify-end gap-2">
-                                            <PermissionGuard resource={RESOURCES.MASTER_DATA} action={ACTIONS.UPDATE}>
+                                            <PermissionGuard resource={permissionResource} action={ACTIONS.UPDATE}>
                                                 <Button
                                                     variant="secondary"
                                                     size="sm"
@@ -201,7 +205,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                                     <PencilSquareIcon className="w-4 h-4" />
                                                 </Button>
                                             </PermissionGuard>
-                                            <PermissionGuard resource={RESOURCES.MASTER_DATA} action={ACTIONS.DELETE}>
+                                            <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
                                                 <Button
                                                     variant="secondary"
                                                     size="sm"

@@ -101,7 +101,13 @@ class AuthService {
     }
 
     verifyToken(token: string) {
-        return jwt.verify(token, env.jwtSecret);
+        const decoded = jwt.verify(token, env.jwtSecret) as any;
+        // Reject refresh tokens presented as access tokens: they share the same
+        // secret but must not authenticate normal API requests (7d vs 15m).
+        if (decoded.type && decoded.type !== 'access') {
+            throw new Error('Invalid access token');
+        }
+        return decoded;
     }
 
     verifyRefreshToken(token: string) {

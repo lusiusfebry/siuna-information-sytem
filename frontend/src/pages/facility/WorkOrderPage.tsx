@@ -442,7 +442,7 @@ const WorkOrderPage = () => {
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
-                <MasterDataTable
+                <MasterDataTable permissionResource="facility_master_data"
                     view={layout}
                     columns={columns}
                     data={data?.data || []}

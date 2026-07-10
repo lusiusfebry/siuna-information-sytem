@@ -2,14 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { AppError } from '../utils/errorHandler';
 
-const transaksiDetailSchema = z.object({
-    produk_id: z.number().int().positive('Produk harus dipilih'),
-    uom_id: z.number().int().positive('UOM harus dipilih'),
-    jumlah: z.number().int().min(1, 'Jumlah harus lebih dari 0'),
-    catatan: z.string().optional(),
-    serial_numbers: z.array(z.string().min(1)).optional(),
-});
-
 const transaksiDetailAdjustmentSchema = z.object({
     produk_id: z.number().int().positive('Produk harus dipilih'),
     uom_id: z.number().int().positive('UOM harus dipilih'),
@@ -30,7 +22,10 @@ const transaksiSchema = z.object({
     supplier_nama: z.string().optional().nullable(),
     no_referensi: z.string().optional().nullable(),
     catatan: z.string().optional().nullable(),
-    details: z.array(transaksiDetailSchema).min(1, 'Minimal satu item detail harus diisi'),
+    // Base uses the permissive detail schema (int, any sign). Sign is enforced
+    // per-tipe in superRefine: Masuk/Keluar require jumlah >= 1, Adjustment
+    // allows negative (stok opname pengurangan).
+    details: z.array(transaksiDetailAdjustmentSchema).min(1, 'Minimal satu item detail harus diisi'),
 }).superRefine((data, ctx) => {
     if (data.sub_tipe === 'Supplier' && !data.supplier_nama) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Nama supplier harus diisi', path: ['supplier_nama'] });
@@ -44,11 +39,13 @@ const transaksiSchema = z.object({
     if ((data.sub_tipe === 'Ke Karyawan' || data.sub_tipe === 'Retur Karyawan') && !data.karyawan_id) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Karyawan harus dipilih', path: ['karyawan_id'] });
     }
-    if (data.tipe === 'Adjustment') {
-        const adjustmentResult = z.array(transaksiDetailAdjustmentSchema).safeParse(data.details);
-        if (!adjustmentResult.success) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Detail adjustment tidak valid', path: ['details'] });
-        }
+    // Masuk/Keluar must use positive quantities; only Adjustment may be negative.
+    if (data.tipe === 'Masuk' || data.tipe === 'Keluar') {
+        data.details.forEach((d, i) => {
+            if (d.jumlah < 1) {
+                ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Jumlah harus lebih dari 0', path: ['details', i, 'jumlah'] });
+            }
+        });
     }
 });
 
@@ -60,7 +57,7 @@ export const validateInventoryStok = (req: Request, _res: Response, next: NextFu
     } catch (error: any) {
         if (error instanceof z.ZodError) {
             const zodError = error as any;
-            const formattedErrors = zodError.errors.map((err: any) => ({
+            const formattedErrors = (zodError.issues ?? zodError.errors).map((err: any) => ({
                 field: err.path.join('.'),
                 message: err.message,
             }));

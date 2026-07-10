@@ -4,6 +4,7 @@ import InvStok from '../../modules/inventory/models/Stok';
 import InvProduk from '../../modules/inventory/models/Produk';
 import { User } from '../../modules/auth/models/User';
 import { Role } from '../../modules/auth/models/Role';
+import { Permission } from '../../modules/auth/models/Permission';
 import { Sequelize } from 'sequelize';
 
 class NotificationService {
@@ -52,28 +53,37 @@ class NotificationService {
 
             if (lowStockItems.length === 0) return;
 
+            // Target users whose role grants inventory_stock read/create. RBAC
+            // permissions live in a join table (belongsToMany), NOT a JSON column,
+            // so we join roleDetails->permissions. Superadmin is included via role
+            // name (it bypasses explicit permission grants elsewhere).
             const users = await User.findAll({
+                where: { is_active: true },
                 include: [{
                     model: Role,
                     as: 'roleDetails',
-                    where: {
-                        permissions: {
-                            [Op.or]: [
-                                { [Op.contains]: { inventory_stock: ['read'] } },
-                                { [Op.contains]: { inventory_stock: ['create'] } },
-                            ]
-                        } as any,
-                    },
+                    required: true,
+                    include: [{
+                        model: Permission,
+                        as: 'permissions',
+                        required: false,
+                        where: { resource: 'inventory_stock', action: { [Op.in]: ['read', 'create'] } },
+                    }],
                 }],
-                where: { is_active: true },
             });
+
+            // Keep users who either are superadmin or actually got a matching permission.
+            const targetUsers = users.filter((u: any) =>
+                u.roleDetails?.name === 'superadmin' ||
+                (u.roleDetails?.permissions && u.roleDetails.permissions.length > 0)
+            );
 
             const notifications: any[] = [];
             for (const item of lowStockItems) {
                 const produk = (item as any).produk;
                 const stokMin = produk?.stok_minimum ?? 5;
 
-                for (const user of users) {
+                for (const user of targetUsers) {
                     notifications.push({
                         user_id: user.id,
                         title: 'Stok Rendah',

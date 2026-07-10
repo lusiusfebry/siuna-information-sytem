@@ -137,7 +137,7 @@ const AssetPage = () => {
                 </select>
             </div>
 
-            <MasterDataTable columns={columns} data={data?.data || []} isLoading={isLoading}
+            <MasterDataTable permissionResource="facility_master_data" columns={columns} data={data?.data || []} isLoading={isLoading}
                 pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
                 onEdit={(item) => { if (item.status === 'Aktif') handleWithdraw(item); }}
                 onDelete={() => {}}

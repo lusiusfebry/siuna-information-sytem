@@ -34,7 +34,9 @@ class UserController {
             const { id } = req.params;
             const { role_id } = req.body;
 
-            const user = await User.findByPk(id);
+            const user = await User.findByPk(id, {
+                include: [{ model: Role, as: 'roleDetails' }],
+            });
             if (!user) return res.status(404).json({ message: 'User not found' });
 
             const role = await Role.findByPk(role_id);
@@ -48,8 +50,16 @@ class UserController {
                 return res.status(403).json({ message: 'Anda tidak dapat mengubah role akun Anda sendiri' });
             }
 
-            // Only a superadmin may grant privileged roles (superadmin/admin).
             const privilegedRoles = ['superadmin', 'admin'];
+
+            // Prevent modifying an account whose CURRENT role is privileged unless
+            // the actor is a superadmin (blocks admin -> demote/lock superadmin).
+            const targetRoleName = (user as any).roleDetails?.name;
+            if (privilegedRoles.includes(targetRoleName) && !isSuperadmin) {
+                return res.status(403).json({ message: 'Tidak dapat mengubah akun dengan hak akses lebih tinggi' });
+            }
+
+            // Only a superadmin may grant privileged roles (superadmin/admin).
             if (privilegedRoles.includes(role.name) && !isSuperadmin) {
                 return res.status(403).json({ message: 'Hanya superadmin yang dapat memberikan role ini' });
             }
@@ -67,11 +77,20 @@ class UserController {
             const { id } = req.params;
             const { is_active } = req.body;
 
-            const user = await User.findByPk(id);
+            const user = await User.findByPk(id, {
+                include: [{ model: Role, as: 'roleDetails' }],
+            });
             if (!user) return res.status(404).json({ message: 'User not found' });
 
             if (user.id === req.user?.id) {
                 return res.status(400).json({ message: 'Cannot deactivate yourself' });
+            }
+
+            // Prevent deactivating a privileged account unless actor is superadmin.
+            const isSuperadmin = req.user?.roleDetails?.name === 'superadmin';
+            const targetRoleName = (user as any).roleDetails?.name;
+            if (['superadmin', 'admin'].includes(targetRoleName) && !isSuperadmin) {
+                return res.status(403).json({ message: 'Tidak dapat mengubah status akun dengan hak akses lebih tinggi' });
             }
 
             await user.update({ is_active });

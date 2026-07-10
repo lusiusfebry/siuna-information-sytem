@@ -205,12 +205,16 @@ class InventoryImportService {
                         jumlah: item.jumlah,
                     } as any, { transaction: t });
 
+                    // Stock is unique per (produk_id, gudang_id) — uom_id must NOT
+                    // be part of the lookup key, otherwise a differing UOM misses the
+                    // existing row and the create() collides with the unique index,
+                    // rolling back the whole import.
                     const [stok] = await InvStok.findOrCreate({
-                        where: { produk_id: item.produk.id, gudang_id: item.gudang_id, uom_id: item.uom_id },
+                        where: { produk_id: item.produk.id, gudang_id: item.gudang_id },
                         defaults: { produk_id: item.produk.id, gudang_id: item.gudang_id, uom_id: item.uom_id, jumlah: 0 } as any,
                         transaction: t,
                     });
-                    await stok.update({ jumlah: (stok as any).jumlah + item.jumlah }, { transaction: t });
+                    await stok.update({ jumlah: (stok as any).jumlah + item.jumlah, uom_id: item.uom_id }, { transaction: t });
 
                     if (item.produk.has_serial_number && item.serial_numbers.length > 0) {
                         for (const sn of item.serial_numbers) {

@@ -47,7 +47,9 @@ class EmployeeAssetService {
     }
 
     async generateBeritaAcara(employeeId: number, transaksiId?: number): Promise<Buffer> {
-        const employee = await Employee.findByPk(employeeId);
+        // paranoid:false — a berita acara is a historical handover document and
+        // must still be printable after the employee is soft-deleted.
+        const employee = await Employee.findByPk(employeeId, { paranoid: false });
         if (!employee) throw new AppError('Karyawan tidak ditemukan', 404);
 
         let items: any[] = [];

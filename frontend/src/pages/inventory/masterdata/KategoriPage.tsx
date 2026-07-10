@@ -116,7 +116,7 @@ const KategoriPage = () => {
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
-                <MasterDataTable
+                <MasterDataTable permissionResource="inventory_master_data"
                     view={layout}
                     columns={columns}
                     data={data?.data || []}
