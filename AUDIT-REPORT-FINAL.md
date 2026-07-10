@@ -76,7 +76,23 @@
 **Ditunda (didokumentasikan, bukan dilewatkan):**
 - **TD-4 besar — 205 `console.log`→logger terstruktur & pengurangan 160 `as any`**: churn diff besar, nilai-bug rendah, risiko regresi tak sepadan untuk sesi ini. Layak dikerjakan sebagai satu PR khusus dengan logger util (mis. pino) + sweep bertahap.
 - **TD-6 — import per-baris savepoint, export streaming, race code transaksi (E-2/E-3)**: perubahan struktural pada jalur data-massal; porsi tersendiri.
-- **C-2, C-4, C-5..C-12, D-5..D-11, E-1/E-4/E-6..E-8, G-3..G-5, H-4..H-8, J-*, TD-8 (test 3 modul)**: sisa P2/P3 non-blocking.
+- **C-2, C-4, C-5..C-12, D-5..D-11, E-1/E-4/E-6..E-8, G-3..G-5, H-4..H-8, J-***: sisa P2/P3 non-blocking.
+
+---
+
+## STATUS PERBAIKAN — TAHAP 4 (Test 3 modul) SEBAGIAN SELESAI (10 Juli 2026)
+
+**Menutup utang test terbesar: Inventory/Facility/Notifications yang tadinya 0 test.** Backend test **65 → 90** (15 suite, semua hijau). 25 test baru **mengunci perbaikan Tahap 1–3 sebagai regression test**.
+
+| Test file baru | Mengunci | Jml |
+|---|---|---|
+| `shared/middleware/__tests__/validateInventoryStok.test.ts` | **RT-2** (adjustment negatif diizinkan; Masuk/Keluar ≥1; zod→400 bukan 500) | 7 |
+| `facility/services/__tests__/occupant.service.test.ts` | **C-3** (update cek kapasitas/FK) + create capacity | 6 |
+| `shared/services/__tests__/notification.service.test.ts` | **RT-3** (low-stock dibuat, target user via permission) + scoping read per-user | 6 |
+| `facility/services/__tests__/work-order.service.test.ts` | **RT-1** (default `tanggal_lapor` + generate code) | 2 |
+| `shared/services/__tests__/base-master-data.service.test.ts` | **B-7** (`assertNotReferenced` → 409 saat masih dipakai) | 4 |
+
+**Ditunda:** integration/E2E test HTTP untuk ketiga modul (unit test service+validator sudah menutup logika inti; integration bisa menyusul), dan test frontend komponen inventory/facility.
 
 ---
 
