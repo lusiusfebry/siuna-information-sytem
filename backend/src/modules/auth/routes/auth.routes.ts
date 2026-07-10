@@ -50,6 +50,9 @@ const router = Router();
  */
 router.post('/login', authLimiter, (req, res, next) => authController.login(req, res, next));
 
+// Refresh access token from the refresh-token cookie (no access token needed).
+router.post('/refresh', (req, res, next) => authController.refresh(req, res, next));
+
 /**
  * @swagger
  * /auth/me:

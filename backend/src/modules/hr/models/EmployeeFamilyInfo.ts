@@ -272,6 +272,8 @@ EmployeeFamilyInfo.init({
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    paranoid: true,
+    deletedAt: 'deleted_at',
 });
 
 export default EmployeeFamilyInfo;

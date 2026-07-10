@@ -17,12 +17,19 @@ declare global {
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // Primary: httpOnly access-token cookie. Fallback: Authorization header
+        // (kept for curl/tests and backward compatibility during migration).
+        const cookieToken = (req as any).cookies?.access_token;
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const headerToken = authHeader && authHeader.startsWith('Bearer ')
+            ? authHeader.split(' ')[1]
+            : undefined;
+        const token = cookieToken || headerToken;
+
+        if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        const token = authHeader.split(' ')[1];
         const decoded = authService.verifyToken(token) as any;
 
         // Fetch full user details including Role and Permissions (via Role)

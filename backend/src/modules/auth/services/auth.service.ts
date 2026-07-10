@@ -56,8 +56,9 @@ class AuthService {
         await user.save();
 
         const token = this.generateToken(user);
+        const refreshToken = this.generateRefreshToken(user);
 
-        return { user, token };
+        return { user, token, refreshToken };
     }
 
     private registerFailedAttempt(nik: string) {
@@ -75,20 +76,40 @@ class AuthService {
     }
 
     generateToken(user: User) {
+        // Short-lived access token (limits the window if it is ever stolen).
         return jwt.sign(
             {
                 id: user.id,
                 nik: user.nik,
                 role: user.roleDetails?.name,
-                employee_id: user.employee_id
+                employee_id: user.employee_id,
+                type: 'access',
             },
             env.jwtSecret,
-            { expiresIn: '24h' }
+            { expiresIn: '15m' }
+        );
+    }
+
+    // Long-lived refresh token — used only at /auth/refresh to mint new access
+    // tokens. Carries minimal claims (just the user id).
+    generateRefreshToken(user: User) {
+        return jwt.sign(
+            { id: user.id, type: 'refresh' },
+            env.jwtSecret,
+            { expiresIn: '7d' }
         );
     }
 
     verifyToken(token: string) {
         return jwt.verify(token, env.jwtSecret);
+    }
+
+    verifyRefreshToken(token: string) {
+        const decoded = jwt.verify(token, env.jwtSecret) as any;
+        if (decoded.type !== 'refresh') {
+            throw new Error('Invalid refresh token');
+        }
+        return decoded;
     }
 }
 

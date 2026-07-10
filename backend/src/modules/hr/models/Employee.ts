@@ -209,6 +209,9 @@ Employee.init({
     // DB columns are snake_case (migration 55); keep JS attribute names.
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    // Soft-delete (migration 56) — destroy() sets deleted_at instead of removing.
+    paranoid: true,
+    deletedAt: 'deleted_at',
 });
 
 export default Employee;

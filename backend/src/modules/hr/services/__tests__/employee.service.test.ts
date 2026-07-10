@@ -17,9 +17,10 @@ jest.mock('../../models/Employee', () => ({
         destroy: jest.fn(),
     },
 }));
-jest.mock('../../models/EmployeePersonalInfo', () => ({ __esModule: true, default: {} }));
-jest.mock('../../models/EmployeeHRInfo', () => ({ __esModule: true, default: {} }));
-jest.mock('../../models/EmployeeFamilyInfo', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/EmployeePersonalInfo', () => ({ __esModule: true, default: { destroy: jest.fn(), restore: jest.fn() } }));
+jest.mock('../../models/EmployeeHRInfo', () => ({ __esModule: true, default: { destroy: jest.fn(), restore: jest.fn() } }));
+jest.mock('../../models/EmployeeFamilyInfo', () => ({ __esModule: true, default: { destroy: jest.fn(), restore: jest.fn() } }));
+jest.mock('../../models/EmployeeDocument', () => ({ __esModule: true, default: { destroy: jest.fn(), restore: jest.fn() } }));
 jest.mock('../../models/Divisi', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Department', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/PosisiJabatan', () => ({ __esModule: true, default: {} }));

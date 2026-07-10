@@ -622,6 +622,14 @@ router.delete(
     (req, res, next) => employeeController.delete(req, res, next)
 );
 
+// Restore a soft-deleted employee (undelete). Requires update permission.
+router.post(
+    '/employees/:id/restore',
+    checkPermission(RESOURCES.EMPLOYEES, ACTIONS.UPDATE),
+    auditLogger('employees'),
+    (req, res, next) => employeeController.restore(req, res, next)
+);
+
 
 // Master Data Generic Routes
 const dynamicAuditLogger = (req: any, res: any, next: any) => {

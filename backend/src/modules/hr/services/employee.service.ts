@@ -10,6 +10,7 @@ import { Op } from 'sequelize';
 import sequelize from '../../../config/database'; // Import sequelize instance
 import EmployeeFamilyInfo from '../models/EmployeeFamilyInfo'; // Assuming we need this for full details
 import EmployeeHRInfo from '../models/EmployeeHRInfo';
+import EmployeeDocument from '../models/EmployeeDocument';
 import JenisHubunganKerja from '../models/JenisHubunganKerja';
 import KategoriPangkat from '../models/KategoriPangkat';
 import Golongan from '../models/Golongan';
@@ -53,10 +54,16 @@ class EmployeeService {
     }
 
     async getAllEmployees(params: any = {}, userId?: number) {
-        const { search, divisi_id, department_id, status_id, posisi_jabatan_id, lokasi_kerja_id, tag_id, is_draft, page = 1, limit = 10 } = params;
+        const { search, divisi_id, department_id, status_id, posisi_jabatan_id, lokasi_kerja_id, tag_id, is_draft, only_deleted, page = 1, limit = 10 } = params;
         const offset = (page - 1) * limit;
 
         const where: any = {};
+
+        // Recycle-bin view: show only soft-deleted employees.
+        const showDeleted = only_deleted === 'true' || only_deleted === true;
+        if (showDeleted) {
+            where.deleted_at = { [Op.ne]: null };
+        }
 
         // By default, exclude drafts unless specifically requested
         if (is_draft !== undefined) {
@@ -102,10 +109,11 @@ class EmployeeService {
         if (tag_id) where.tag_id = tag_id;
 
         // Optimization: Use separate count and findAll (faster for large datasets)
-        const count = await Employee.count({ where });
+        const count = await Employee.count({ where, paranoid: !showDeleted });
 
         const rows = await Employee.findAll({
             where,
+            paranoid: !showDeleted,
             attributes: [
                 'id', 'nama_lengkap', 'nomor_induk_karyawan',
                 'foto_karyawan', 'email_perusahaan', 'nomor_handphone'
@@ -460,16 +468,46 @@ class EmployeeService {
     async deleteEmployee(id: number) {
         const t = await sequelize.transaction();
         try {
-            const employee = await Employee.findByPk(id);
+            const employee = await Employee.findByPk(id, { transaction: t });
             if (!employee) throw new Error('Employee not found');
 
-            // Personal info should cascade delete if configured in DB, but safe to delete here if needed.
-            // Assuming DB constraints handle cascade or we let Sequelize handle it via hooks if set up.
-            // For now, consistent with existing method.
+            // Soft-delete is now paranoid, so destroy() only UPDATEs deleted_at on
+            // the parent — the DB FK CASCADE does NOT fire. Soft-delete children
+            // explicitly so they follow the parent and can be restored together.
+            await EmployeePersonalInfo.destroy({ where: { employee_id: id }, transaction: t });
+            await EmployeeHRInfo.destroy({ where: { employee_id: id }, transaction: t });
+            await EmployeeFamilyInfo.destroy({ where: { employee_id: id }, transaction: t });
+            await EmployeeDocument.destroy({ where: { employee_id: id }, transaction: t });
+
             await employee.destroy({ transaction: t });
 
             await t.commit();
             return true;
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
+    async restoreEmployee(id: number) {
+        const t = await sequelize.transaction();
+        try {
+            // Find the soft-deleted parent (paranoid:false to see it).
+            const employee = await Employee.findByPk(id, { paranoid: false, transaction: t });
+            if (!employee) throw new Error('Employee not found');
+            if (!(employee as any).deleted_at) {
+                await t.rollback();
+                return employee; // already active
+            }
+
+            await employee.restore({ transaction: t });
+            await EmployeePersonalInfo.restore({ where: { employee_id: id }, transaction: t });
+            await EmployeeHRInfo.restore({ where: { employee_id: id }, transaction: t });
+            await EmployeeFamilyInfo.restore({ where: { employee_id: id }, transaction: t });
+            await EmployeeDocument.restore({ where: { employee_id: id }, transaction: t });
+
+            await t.commit();
+            return employee;
         } catch (error) {
             await t.rollback();
             throw error;
@@ -481,7 +519,9 @@ class EmployeeService {
         if (excludeId) {
             where.id = { [Op.ne]: excludeId };
         }
-        const existing = await Employee.findOne({ where });
+        // paranoid:false so a soft-deleted employee's NIK is still treated as taken
+        // (the DB unique index includes soft-deleted rows — NIK stays locked).
+        const existing = await Employee.findOne({ where, paranoid: false });
         return existing === null;
     }
 }

@@ -81,6 +81,8 @@ EmployeeDocument.init({
     tableName: 'employee_documents',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    paranoid: true,
+    deletedAt: 'deleted_at',
 });
 
 export default EmployeeDocument;

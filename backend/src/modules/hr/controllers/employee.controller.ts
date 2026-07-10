@@ -373,6 +373,16 @@ class EmployeeController {
         }
     }
 
+    async restore(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = parseInt(req.params.id);
+            const employee = await employeeService.restoreEmployee(id);
+            res.json({ status: 'success', message: 'Karyawan berhasil dipulihkan', data: employee });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getQRCode(req: Request, res: Response, next: NextFunction) {
         try {
             const id = parseInt(req.params.id);

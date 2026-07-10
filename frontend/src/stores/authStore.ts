@@ -17,15 +17,18 @@ export const useAuthStore = create<AuthStore>()(
             isLoadingPermissions: false,
 
             login: (token: string, user: User) => {
+                // Auth now lives in an httpOnly cookie set by the server. We keep
+                // the token in memory only (not localStorage) so it isn't exposed
+                // to XSS; the cookie is what actually authenticates requests.
                 set({ token, user, isAuthenticated: true });
-                localStorage.setItem('token', token);
+                localStorage.removeItem('token');
             },
 
             logout: () => {
                 set({ token: null, user: null, isAuthenticated: false });
                 localStorage.removeItem('token');
-                // Optional: call API logout
-                // authService.logout().catch(console.error);
+                // Clear the server-side auth cookies too.
+                authService.logout().catch(() => { /* ignore */ });
             },
 
             setLoading: (isLoading: boolean) => set({ isLoading }),
@@ -45,24 +48,20 @@ export const useAuthStore = create<AuthStore>()(
             },
 
             checkAuth: async () => {
-                const token = localStorage.getItem('token'); // or get().token if persisted
-                if (!token) {
-                    set({ isLoading: false, isAuthenticated: false });
-                    return;
-                }
-
+                // The httpOnly cookie is sent automatically; just ask the server
+                // who we are. A 401 triggers the axios interceptor's silent
+                // refresh+retry, so a merely-expired access token self-heals.
                 try {
-                    // Verify token with backend
                     const response = await authService.getCurrentUser();
-                    set({ user: response.data.user, isAuthenticated: true, token }); // ensure token is in state
+                    set({ user: response.data.user, isAuthenticated: true });
                 } catch (error: unknown) {
-                    // Only log out when the token is genuinely rejected (401/403).
-                    // A network error / 5xx / timeout must NOT destroy a valid session,
-                    // otherwise a transient blip bounces the user to /login.
                     const status = (error as { response?: { status?: number } })?.response?.status;
                     if (status === 401 || status === 403) {
-                        get().logout();
+                        // Genuinely unauthenticated (refresh also failed).
+                        set({ user: null, isAuthenticated: false });
+                        localStorage.removeItem('token');
                     } else {
+                        // Network blip / 5xx — keep any existing session.
                         console.error('Auth check failed (keeping session):', error);
                     }
                 } finally {
@@ -72,7 +71,9 @@ export const useAuthStore = create<AuthStore>()(
         }),
         {
             name: 'auth-storage',
-            partialize: (state) => ({ token: state.token, user: state.user, isAuthenticated: state.isAuthenticated }),
+            // Persist only the user for UX; auth is proven by the cookie via
+            // checkAuth on load (never persist the token).
+            partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
         }
     )
 );
