@@ -16,7 +16,7 @@ export interface EmployeeOption {
 }
 
 export const useEmployeeList = () => {
-    const { token } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
 
     return useQuery({
         queryKey: ['employees', 'list'],
@@ -26,12 +26,12 @@ export const useEmployeeList = () => {
             });
             return response.data;
         },
-        enabled: !!token
+        enabled: isAuthenticated
     });
 };
 
 export const useEmployeesByDepartment = (departmentId?: number) => {
-    const { token } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
 
     return useQuery({
         queryKey: ['employees', 'by-department', departmentId],
@@ -41,6 +41,6 @@ export const useEmployeesByDepartment = (departmentId?: number) => {
             });
             return response.data;
         },
-        enabled: !!token && !!departmentId,
+        enabled: isAuthenticated && !!departmentId,
     });
 };

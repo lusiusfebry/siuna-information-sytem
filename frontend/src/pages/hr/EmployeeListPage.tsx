@@ -1,6 +1,5 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../services/api/client';
 import Button from '../../components/common/Button';
 import VirtualEmployeeTable from '../../components/hr/VirtualEmployeeTable';
 import EmployeeGrid from '../../components/hr/EmployeeGrid';
@@ -8,6 +7,7 @@ import LayoutSwitcher from '../../components/layout/LayoutSwitcher';
 import { LayoutView } from '../../types/layout';
 import { toast } from 'react-hot-toast';
 import { useMasterDataList } from '../../hooks/useMasterData';
+import { useEmployeesInfinite, useDeleteEmployee, useRestoreEmployee } from '../../hooks/useEmployeeList';
 import { AdvancedEmployeeFilter } from '../../components/hr/AdvancedEmployeeFilter';
 import { FilterChipsContainer } from '../../components/common/FilterChipsContainer';
 import { ExportButton } from '../../components/hr/ExportButton';
@@ -20,11 +20,7 @@ import { usePermission } from '../../hooks/usePermission';
 
 const EmployeeListPage = () => {
     const navigate = useNavigate();
-    const [employees, setEmployees] = useState<import('../../types/hr').Employee[]>([]);
-    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [hasNextPage, setHasNextPage] = useState(true);
-    const [page, setPage] = useState(1);
     const [layout, setLayout] = useState<LayoutView>(() => {
         const saved = localStorage.getItem('employeeListLayout');
         return (saved as LayoutView) || LayoutView.VIEW_1; // VIEW_1 is List, VIEW_4 is Grid
@@ -33,20 +29,18 @@ const EmployeeListPage = () => {
     // Advanced Filters State
     const [filters, setFilters] = useState<EmployeeFilterParams>({});
     const [showDrafts, setShowDrafts] = useState(false);
+    const [showDeleted, setShowDeleted] = useState(false); // recycle-bin view
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState<import('../../types/hr').Employee | null>(null);
-    const [deleting, setDeleting] = useState(false);
 
     const { can } = usePermission();
     const canDelete = can(RESOURCES.EMPLOYEES, ACTIONS.DELETE);
+    const canRestore = can(RESOURCES.EMPLOYEES, ACTIONS.UPDATE);
 
     const debouncedSearch = useDebounce(search, 500);
 
     const handleFilterChange = (newFilters: EmployeeFilterParams) => {
         setFilters(newFilters);
-        setPage(1);
-        setEmployees([]);
-        setHasNextPage(true);
     };
 
     // Master Data for Chips Label Lookup
@@ -57,33 +51,28 @@ const EmployeeListPage = () => {
     const { data: lokasiList } = useMasterDataList('lokasi-kerja');
     const { data: tagList } = useMasterDataList('tag');
 
-    const fetchEmployees = useCallback(async (pageNum: number) => {
-        setLoading(true);
-        try {
-            const params = {
-                search: debouncedSearch,
-                ...filters,
-                is_draft: showDrafts ? true : undefined,
-                page: pageNum,
-                limit: 20 // Increase limit for virtual scrolling
-            };
-            const response = await api.get('/hr/employees', { params });
-            const newEmployees = response.data.data;
+    // --- Employee list via React Query (infinite / virtual scroll) ---
+    const {
+        data,
+        isLoading,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+    } = useEmployeesInfinite({
+        search: debouncedSearch,
+        ...filters,
+        is_draft: showDrafts,
+        only_deleted: showDeleted,
+    });
 
-            if (pageNum === 1) {
-                setEmployees(newEmployees);
-            } else {
-                setEmployees(prev => [...prev, ...newEmployees]);
-            }
+    const employees = useMemo(
+        () => (data?.pages ?? []).flatMap((p) => p.data),
+        [data]
+    );
+    const loading = isLoading || isFetchingNextPage;
 
-            setHasNextPage(pageNum < response.data.totalPages);
-        } catch (error) {
-            console.error('Failed to fetch employees:', error);
-            toast.error('Gagal memuat data karyawan');
-        } finally {
-            setLoading(false);
-        }
-    }, [debouncedSearch, filters, showDrafts]);
+    const deleteMutation = useDeleteEmployee();
+    const restoreMutation = useRestoreEmployee();
 
     // Track if this is the initial load to set default status filter only once
     const isInitialLoadRef = useRef(true);
@@ -100,18 +89,9 @@ const EmployeeListPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [statusList]); // Intentionally only depend on statusList to prevent infinite loop
 
-    useEffect(() => {
-        setPage(1);
-        setEmployees([]);
-        setHasNextPage(true);
-        fetchEmployees(1);
-    }, [debouncedSearch, filters, fetchEmployees]); // Reset when filter changes
-
     const loadNextPage = async () => {
         if (!loading && hasNextPage) {
-            const nextPage = page + 1;
-            setPage(nextPage);
-            await fetchEmployees(nextPage);
+            await fetchNextPage();
         }
     };
 
@@ -123,35 +103,33 @@ const EmployeeListPage = () => {
         }
     };
 
-    const handleConfirmDelete = async () => {
+    const handleConfirmDelete = () => {
         if (!employeeToDelete) return;
+        deleteMutation.mutate(employeeToDelete.id, {
+            onSuccess: () => {
+                toast.success('Karyawan berhasil dihapus');
+                setShowDeleteConfirm(false);
+                setEmployeeToDelete(null);
+            },
+            onError: (error: unknown) => {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                toast.error(axiosError.response?.data?.message || 'Gagal menghapus karyawan');
+            },
+        });
+    };
 
-        setDeleting(true);
-        try {
-            console.log(`Attempting to delete employee ID: ${employeeToDelete.id}`);
-            await api.delete(`/hr/employees/${employeeToDelete.id}`);
-            console.log(`Successfully deleted employee ID: ${employeeToDelete.id}`);
-            toast.success('Karyawan berhasil dihapus');
-            setShowDeleteConfirm(false);
-            setEmployeeToDelete(null);
-            // Refresh list
-            setPage(1);
-            fetchEmployees(1);
-        } catch (error: unknown) {
-            console.error('Failed to delete employee:', error);
-            const axiosError = error as { response?: { data?: { message?: string } } };
-            const message = axiosError.response?.data?.message || 'Gagal menghapus karyawan';
-            toast.error(message);
-        } finally {
-            setDeleting(false);
-        }
+    const handleRestoreClick = (id: number) => {
+        restoreMutation.mutate(id, {
+            onSuccess: () => toast.success('Karyawan berhasil dipulihkan'),
+            onError: (error: unknown) => {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                toast.error(axiosError.response?.data?.message || 'Gagal memulihkan karyawan');
+            },
+        });
     };
 
     const handleResetFilters = () => {
         setFilters({});
-        setPage(1);
-        setEmployees([]);
-        setHasNextPage(true);
         setSearch('');
     };
 
@@ -222,15 +200,28 @@ const EmployeeListPage = () => {
                         variant={showDrafts ? 'primary' : 'outline'}
                         onClick={() => {
                             setShowDrafts(!showDrafts);
-                            setPage(1);
-                            setEmployees([]);
-                            setHasNextPage(true);
+                            if (!showDrafts) setShowDeleted(false);
                         }}
                         className={`flex items-center gap-2 ${showDrafts ? 'bg-amber-500 hover:bg-amber-600 border-amber-500' : 'border-amber-300 text-amber-700 hover:bg-amber-50'}`}
                     >
                         <span className="material-symbols-outlined text-[20px]">draft</span>
                         {showDrafts ? 'Showing Drafts' : 'View Drafts'}
                     </Button>
+
+                    {/* Recycle Bin (soft-deleted employees) */}
+                    <PermissionGuard resource={RESOURCES.EMPLOYEES} action={ACTIONS.UPDATE}>
+                        <Button
+                            variant={showDeleted ? 'primary' : 'outline'}
+                            onClick={() => {
+                                setShowDeleted(!showDeleted);
+                                if (!showDeleted) setShowDrafts(false);
+                            }}
+                            className={`flex items-center gap-2 ${showDeleted ? 'bg-rose-500 hover:bg-rose-600 border-rose-500' : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                        >
+                            <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                            {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                        </Button>
+                    </PermissionGuard>
 
                     <div className="h-10 w-px bg-gray-200 dark:bg-slate-700 mx-1 hidden md:block"></div>
 
@@ -282,19 +273,21 @@ const EmployeeListPage = () => {
                 {layout === LayoutView.VIEW_4 ? (
                     <EmployeeGrid
                         employees={employees}
-                        hasNextPage={hasNextPage}
+                        hasNextPage={!!hasNextPage}
                         isNextPageLoading={loading}
                         loadNextPage={loadNextPage}
                         onRowClick={(employee) => navigate(`/hr/employees/${employee.id}`)}
-                        onDelete={canDelete ? handleDeleteClick : undefined}
+                        onDelete={showDeleted ? undefined : (canDelete ? handleDeleteClick : undefined)}
+                        onRestore={showDeleted && canRestore ? handleRestoreClick : undefined}
                     />
                 ) : (
                     <VirtualEmployeeTable
                         employees={employees}
-                        hasNextPage={hasNextPage}
+                        hasNextPage={!!hasNextPage}
                         isNextPageLoading={loading}
                         loadNextPage={loadNextPage}
                         onRowClick={(employee) => {
+                            if (showDeleted) return; // recycle-bin rows are not clickable
                             // Drafts go to edit page, regular employees go to detail page
                             if (employee.is_draft) {
                                 navigate(`/hr/employees/${employee.id}/edit`);
@@ -302,7 +295,8 @@ const EmployeeListPage = () => {
                                 navigate(`/hr/employees/${employee.id}`);
                             }
                         }}
-                        onDelete={canDelete ? handleDeleteClick : undefined}
+                        onDelete={showDeleted ? undefined : (canDelete ? handleDeleteClick : undefined)}
+                        onRestore={showDeleted && canRestore ? handleRestoreClick : undefined}
                         showDraftBadge={showDrafts}
                     />
                 )}
@@ -318,7 +312,7 @@ const EmployeeListPage = () => {
                     setShowDeleteConfirm(false);
                     setEmployeeToDelete(null);
                 }}
-                isLoading={deleting}
+                isLoading={deleteMutation.isPending}
                 itemPreview={employeeToDelete ? {
                     "NIK": employeeToDelete.nomor_induk_karyawan,
                     "Nama": employeeToDelete.nama_lengkap,

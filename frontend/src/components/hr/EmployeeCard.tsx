@@ -5,9 +5,10 @@ interface EmployeeCardProps {
     employee: Employee;
     onClick: (employee: Employee) => void;
     onDelete?: (id: number) => void;
+    onRestore?: (id: number) => void;
 }
 
-const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onClick, onDelete }) => {
+const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onClick, onDelete, onRestore }) => {
     // Determine status color
     const getStatusStyles = (status: string | undefined) => {
         const s = status?.toLowerCase() || '';
@@ -76,6 +77,20 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onClick, onDelete
             </div>
 
             {/* Quick Actions Overlay */}
+            {onRestore && (
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRestore(employee.id);
+                        }}
+                        className="p-1.5 rounded-full bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 transition-colors"
+                        title="Pulihkan Karyawan"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">restore</span>
+                    </button>
+                </div>
+            )}
             {onDelete && (
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button

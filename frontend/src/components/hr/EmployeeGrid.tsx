@@ -9,6 +9,7 @@ interface EmployeeGridProps {
     loadNextPage: () => Promise<void>;
     onRowClick: (employee: Employee) => void;
     onDelete?: (id: number) => void;
+    onRestore?: (id: number) => void;
 }
 
 const EmployeeGrid: React.FC<EmployeeGridProps> = ({
@@ -18,6 +19,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
     loadNextPage,
     onRowClick,
     onDelete,
+    onRestore,
 }) => {
     // Scroll handler for infinite loading
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -41,6 +43,7 @@ const EmployeeGrid: React.FC<EmployeeGridProps> = ({
                         employee={employee}
                         onClick={onRowClick}
                         onDelete={onDelete}
+                        onRestore={onRestore}
                     />
                 ))}
 

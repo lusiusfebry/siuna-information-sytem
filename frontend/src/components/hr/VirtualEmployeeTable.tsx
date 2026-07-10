@@ -20,11 +20,12 @@ interface VirtualEmployeeTableProps {
     loadNextPage: () => Promise<void>;
     onRowClick: (employee: Employee) => void;
     onDelete?: (id: number) => void;
+    onRestore?: (id: number) => void;
     showDraftBadge?: boolean;
 }
 
 const Row = ({ index, style, data }: ListChildComponentProps) => {
-    const { employees, isItemLoaded, onRowClick, onDelete, showDraftBadge } = data;
+    const { employees, isItemLoaded, onRowClick, onDelete, onRestore, showDraftBadge } = data;
 
     if (!isItemLoaded(index)) {
         return (
@@ -71,6 +72,18 @@ const Row = ({ index, style, data }: ListChildComponentProps) => {
             <div className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate px-2">{employee.posisi_jabatan?.nama || '-'}</div>
             <div className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate px-2">{employee.department?.nama || '-'}</div>
             <div className="w-20 flex justify-end">
+                {onRestore && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRestore(employee.id);
+                        }}
+                        className="text-green-600 hover:text-green-800 p-2 rounded-full hover:bg-green-50 transition-colors"
+                        title="Pulihkan Karyawan"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore</span>
+                    </button>
+                )}
                 {onDelete && (
                     <button
                         onClick={(e) => {
@@ -95,6 +108,7 @@ const VirtualEmployeeTable: React.FC<VirtualEmployeeTableProps> = ({
     loadNextPage,
     onRowClick,
     onDelete,
+    onRestore,
     showDraftBadge,
 }) => {
     const itemCount = hasNextPage ? employees.length + 1 : employees.length;
@@ -106,8 +120,9 @@ const VirtualEmployeeTable: React.FC<VirtualEmployeeTableProps> = ({
         isItemLoaded,
         onRowClick,
         onDelete,
+        onRestore,
         showDraftBadge
-    }), [employees, isItemLoaded, onRowClick, onDelete, showDraftBadge]);
+    }), [employees, isItemLoaded, onRowClick, onDelete, onRestore, showDraftBadge]);
 
     return (
         <div className="w-full bg-white dark:bg-slate-800 rounded-lg shadow border border-gray-200 dark:border-slate-700 h-[600px] flex flex-col">

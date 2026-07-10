@@ -54,5 +54,10 @@ export const employeeService = {
 
     deleteEmployee: async (id: number) => {
         await api.delete(`${BASE_URL}/${id}`);
+    },
+
+    restoreEmployee: async (id: number) => {
+        const response = await api.post(`${BASE_URL}/${id}/restore`);
+        return response.data.data;
     }
 };
