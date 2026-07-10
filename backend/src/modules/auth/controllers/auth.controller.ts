@@ -97,6 +97,14 @@ class AuthController {
                 return res.status(401).json({ message: 'User not found or inactive' });
             }
 
+            // Revocation check: a refresh token is only valid while its embedded
+            // token_version matches the user's current one. logout / password
+            // change bumps token_version, invalidating all previously issued
+            // refresh tokens (defends against reuse of a stolen/old token).
+            if ((decoded.tv ?? 0) !== (user.token_version ?? 0)) {
+                return res.status(401).json({ message: 'Refresh token telah dicabut' });
+            }
+
             const newAccess = authService.generateToken(user);
             const newRefresh = authService.generateRefreshToken(user);
             res.cookie('access_token', newAccess, accessCookieOpts);
@@ -145,6 +153,13 @@ class AuthController {
 
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
+            // Bump token_version so every refresh token issued before this logout
+            // is rejected at /refresh (true server-side revocation, not just a
+            // client cookie clear).
+            const userId = (req as any).user?.id;
+            if (userId) {
+                await User.increment('token_version', { where: { id: userId } });
+            }
             res.clearCookie('access_token', { path: '/' });
             res.clearCookie('refresh_token', { path: '/api/auth' });
             res.json({ status: 'success', message: 'Logged out successfully' });

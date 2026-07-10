@@ -94,7 +94,7 @@ class AuthService {
     // tokens. Carries minimal claims (just the user id).
     generateRefreshToken(user: User) {
         return jwt.sign(
-            { id: user.id, type: 'refresh' },
+            { id: user.id, type: 'refresh', tv: user.token_version ?? 0 },
             env.jwtSecret,
             { expiresIn: '7d' }
         );

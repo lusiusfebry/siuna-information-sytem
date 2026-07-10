@@ -13,6 +13,7 @@ export class User extends Model {
     public role_id!: number | null;
     public is_active!: boolean;
     public last_login!: Date | null;
+    public token_version!: number;
     public employee?: Employee;
     public roleDetails?: Role;
 
@@ -68,6 +69,11 @@ User.init({
     last_login: {
         type: DataTypes.DATE,
         allowNull: true,
+    },
+    token_version: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
     },
     created_at: {
         type: DataTypes.DATE,

@@ -43,7 +43,19 @@
 | **H-3** | prop `permissionResource` pada `MasterDataTable`; 13 halaman inv/fac teruskan resource benar | frontend 13/13 test ✅ |
 | **B-9** | hapus dead code `useApi.ts` + `useEmployeeList` duplikat di `useMasterData.ts` | type-check ✅ |
 
-**Ditunda ke Tahap 2b:** **B-4** (revocation refresh token) — butuh kolom `token_version`/migration + perubahan alur auth; porsi tersendiri agar tak setengah jadi. **Sisa P2/P3:** C-*, D-5..D-11, E-*, F-*, G-*, J-*, TD-8 (test 3 modul).
+**Ditunda ke Tahap 2b:** ~~**B-4**~~ → **SELESAI (lihat bawah)**. **Sisa P2/P3:** C-*, D-5..D-11, E-*, F-*, G-*, J-*, TD-8 (test 3 modul).
+
+---
+
+## STATUS PERBAIKAN — TAHAP 2b: B-4 SELESAI (10 Juli 2026)
+
+**B-4 (revocation refresh token) diperbaiki & diverifikasi runtime.** Backend type-check ✅, migration `58` dijalankan, 65/65 test ✅.
+
+| ID | Perbaikan | Verifikasi runtime |
+|---|---|---|
+| **B-4** | Kolom `token_version` (users) disisipkan sbg klaim `tv` di refresh token; dicek di `/refresh`; dinaikkan saat `logout` → mencabut semua refresh token lama. `User.ts`, `auth.service.ts`, `auth.controller.ts`, migration `58` | refresh pra-logout → **200**; logout → **200**; refresh token lama pasca-logout → **401 "Refresh token telah dicabut"**; login baru → **200** ✅ |
+
+**Catatan:** `token_version` default 0 → sesi lama tetap valid sampai logout pertama (tanpa memaksa semua user re-login). Untuk mencabut sesi saat ganti password, panggil `User.increment('token_version')` di alur ganti password (belum ada endpoint ganti password di skop ini).
 
 ---
 
