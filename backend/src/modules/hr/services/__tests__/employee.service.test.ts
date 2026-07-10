@@ -31,6 +31,10 @@ jest.mock('../../models/JenisHubunganKerja', () => ({ __esModule: true, default:
 jest.mock('../../models/KategoriPangkat', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Golongan', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/SubGolongan', () => ({ __esModule: true, default: {} }));
+// deleteEmployee dynamically imports the facility Occupant model to guard against
+// deleting an employee who still actively occupies a room. Mock it with a
+// count() so the guard is exercised without a DB.
+jest.mock('../../../facility/models/Occupant', () => ({ __esModule: true, default: { count: jest.fn().mockResolvedValue(0) } }));
 
 jest.mock('../../validators/business-rules.validator', () => ({
     validateManagerPosition: jest.fn().mockResolvedValue({ valid: true }),

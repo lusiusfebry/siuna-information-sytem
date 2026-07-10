@@ -8,6 +8,7 @@ import InvStok from '../models/Stok';
 import InvSerialNumber from '../models/SerialNumber';
 import InvTransaksi from '../models/Transaksi';
 import InvTransaksiDetail from '../models/TransaksiDetail';
+import inventoryMasterDataService from './master-data.service';
 
 interface ImportError {
     row: number;
@@ -98,6 +99,7 @@ class InventoryImportService {
                 const stokMin = parseInt(row['Stok Minimum'] || row['stok_minimum'] || '5', 10);
 
                 await InvProduk.create({
+                    code: await inventoryMasterDataService.generateCode(InvProduk),
                     nama,
                     brand_id: brandId,
                     uom_id: uomId,

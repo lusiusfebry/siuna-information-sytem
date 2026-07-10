@@ -77,6 +77,11 @@ class FacilityWorkOrderService {
     async create(data: any) {
         delete data.code;
         const code = await this.generateCode();
+        // Model requires tanggal_lapor (NOT NULL) but the validator marks it
+        // optional; default to today so create never fails on a missing date.
+        if (!data.tanggal_lapor) {
+            data.tanggal_lapor = new Date().toISOString().slice(0, 10);
+        }
         return await FacilityWorkOrder.create({ ...data, code });
     }
 

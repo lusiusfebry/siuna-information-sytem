@@ -267,10 +267,10 @@ function App() {
                             <PermissionGuard resource={RESOURCES.FACILITY_WORK_ORDER} action={ACTIONS.READ} redirectTo="/403"><FacWorkOrderPage /></PermissionGuard>
                         } />
                         <Route path="occupants" element={
-                            <PermissionGuard resource={RESOURCES.FACILITY_WORK_ORDER} action={ACTIONS.READ} redirectTo="/403"><FacOccupantPage /></PermissionGuard>
+                            <PermissionGuard resource={RESOURCES.FACILITY_MASTER_DATA} action={ACTIONS.READ} redirectTo="/403"><FacOccupantPage /></PermissionGuard>
                         } />
                         <Route path="assets" element={
-                            <PermissionGuard resource={RESOURCES.FACILITY_WORK_ORDER} action={ACTIONS.READ} redirectTo="/403"><FacAssetPage /></PermissionGuard>
+                            <PermissionGuard resource={RESOURCES.FACILITY_MASTER_DATA} action={ACTIONS.READ} redirectTo="/403"><FacAssetPage /></PermissionGuard>
                         } />
                     </Route>
 

@@ -207,11 +207,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         {
             name: 'Operasional',
             icon: 'engineering',
-            permission: { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.READ },
             subItems: [
-                { name: 'Work Order', path: '/facility/work-orders', icon: 'assignment' },
-                { name: 'Penghuni', path: '/facility/occupants', icon: 'person_pin' },
-                { name: 'Aset Ruangan', path: '/facility/assets', icon: 'devices' },
+                { name: 'Work Order', path: '/facility/work-orders', icon: 'assignment', permission: { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.READ } },
+                { name: 'Penghuni', path: '/facility/occupants', icon: 'person_pin', permission: { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.READ } },
+                { name: 'Aset Ruangan', path: '/facility/assets', icon: 'devices', permission: { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.READ } },
             ]
         },
     ];

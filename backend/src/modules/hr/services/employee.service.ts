@@ -471,6 +471,22 @@ class EmployeeService {
             const employee = await Employee.findByPk(id, { transaction: t });
             if (!employee) throw new Error('Employee not found');
 
+            // Guard: employees are now paranoid, so the DB-level RESTRICT on
+            // facility_occupants.employee_id never fires (destroy = UPDATE, not
+            // DELETE). Enforce the business rule at the app layer: an employee
+            // who still actively occupies a room must not be deletable.
+            // Dynamic import keeps the hr->facility dependency out of module load.
+            const { default: FacilityOccupant } = await import('../../facility/models/Occupant');
+            const activeOccupant = await FacilityOccupant.count({
+                where: { employee_id: id, status: 'Aktif' },
+                transaction: t,
+            });
+            if (activeOccupant > 0) {
+                const err: any = new Error('Karyawan masih menjadi penghuni aktif suatu ruangan dan tidak dapat dihapus. Lakukan checkout terlebih dahulu.');
+                err.statusCode = 409;
+                throw err;
+            }
+
             // Soft-delete is now paranoid, so destroy() only UPDATEs deleted_at on
             // the parent — the DB FK CASCADE does NOT fire. Soft-delete children
             // explicitly so they follow the parent and can be restored together.

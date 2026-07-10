@@ -41,8 +41,8 @@ class AuditService {
             include: [
                 {
                     model: User,
-                    as: 'user',
-                    attributes: ['id', 'username', 'email'] // Adjust based on User model attributes
+                    as: 'executor',
+                    attributes: ['id', 'nama', 'nik']
                 }
             ],
             offset,
@@ -63,8 +63,8 @@ class AuditService {
             include: [
                 {
                     model: User,
-                    as: 'user',
-                    attributes: ['id', 'username', 'email']
+                    as: 'executor',
+                    attributes: ['id', 'nama', 'nik']
                 }
             ]
         });
@@ -79,8 +79,8 @@ class AuditService {
             include: [
                 {
                     model: User,
-                    as: 'user',
-                    attributes: ['id', 'username', 'email']
+                    as: 'executor',
+                    attributes: ['id', 'nama', 'nik']
                 }
             ],
             order: [['timestamp', 'DESC']]

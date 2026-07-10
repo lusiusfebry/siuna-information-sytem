@@ -47,6 +47,26 @@ const seedRBAC = async () => {
         { resource: RESOURCES.USERS, action: ACTIONS.READ },
         { resource: RESOURCES.USERS, action: ACTIONS.UPDATE },
         { resource: RESOURCES.USERS, action: ACTIONS.DELETE },
+
+        // Inventory
+        { resource: RESOURCES.INVENTORY_MASTER_DATA, action: ACTIONS.CREATE },
+        { resource: RESOURCES.INVENTORY_MASTER_DATA, action: ACTIONS.READ },
+        { resource: RESOURCES.INVENTORY_MASTER_DATA, action: ACTIONS.UPDATE },
+        { resource: RESOURCES.INVENTORY_MASTER_DATA, action: ACTIONS.DELETE },
+        { resource: RESOURCES.INVENTORY_STOCK, action: ACTIONS.CREATE },
+        { resource: RESOURCES.INVENTORY_STOCK, action: ACTIONS.READ },
+        { resource: RESOURCES.INVENTORY_STOCK, action: ACTIONS.UPDATE },
+        { resource: RESOURCES.INVENTORY_STOCK, action: ACTIONS.DELETE },
+
+        // Facility
+        { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.CREATE },
+        { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.READ },
+        { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.UPDATE },
+        { resource: RESOURCES.FACILITY_MASTER_DATA, action: ACTIONS.DELETE },
+        { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.CREATE },
+        { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.READ },
+        { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.UPDATE },
+        { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.DELETE },
     ];
 
     // Upsert Permissions
