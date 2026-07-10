@@ -90,6 +90,32 @@ class FacilityOccupantService {
     async update(id: number, data: any) {
         const item = await FacilityOccupant.findByPk(id);
         if (!item) return null;
+
+        // If this update would (re)activate the occupant into a room, enforce the
+        // same capacity/FK rules as create — otherwise an update could push a room
+        // past kapasitas or point at a non-existent room.
+        const targetRoomId = data.room_id ?? item.room_id;
+        const willBeActive = (data.status ?? item.status) === 'Aktif';
+        const roomChanged = data.room_id && data.room_id !== item.room_id;
+        const reactivating = data.status === 'Aktif' && item.status !== 'Aktif';
+
+        if (willBeActive && (roomChanged || reactivating)) {
+            const room = await FacilityRoom.findByPk(targetRoomId);
+            if (!room) {
+                const error: any = new Error('Ruangan tidak ditemukan');
+                error.statusCode = 400;
+                throw error;
+            }
+            const activeCount = await FacilityOccupant.count({
+                where: { room_id: targetRoomId, status: 'Aktif', id: { [Op.ne]: id } },
+            });
+            if (activeCount >= room.kapasitas) {
+                const error: any = new Error('Kamar sudah penuh, tidak dapat menambah penghuni.');
+                error.statusCode = 400;
+                throw error;
+            }
+        }
+
         return await item.update(data);
     }
 

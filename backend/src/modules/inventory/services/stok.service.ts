@@ -300,7 +300,9 @@ class StokService {
                     status: 'Tersedia',
                     transaksi_terakhir_id: transaksi.id,
                 }, {
-                    where: { produk_id: detail.produk_id, serial_number: sn },
+                    // Scope by the returning employee so a same-serial unit held by
+                    // a DIFFERENT employee is never reset by this retur.
+                    where: { produk_id: detail.produk_id, serial_number: sn, karyawan_id: payload.karyawan_id },
                     transaction: t,
                 });
             }

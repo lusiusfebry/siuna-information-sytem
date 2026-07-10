@@ -59,6 +59,27 @@
 
 ---
 
+## STATUS PERBAIKAN — TAHAP 3 (Kualitas & Robustness) SEBAGIAN SELESAI (10 Juli 2026)
+
+**7 item kualitas diperbaiki & diverifikasi.** Backend type-check ✅, frontend type-check ✅, backend 65/65 + frontend 13/13 ✅, migration `59` dijalankan.
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **F-1** | Hapus `middleware/errorHandler.ts` (dead, tak di-mount) + fungsi `errorHandler`/`translateSequelizeError` di `utils/errorHandler.ts` yang tak dipakai (pertahankan `AppError`); handler aktif hanya inline di `index.ts` | type-check ✅ |
+| **C-1** | Retur Karyawan: `where` SN diberi `karyawan_id` agar tak reset unit serial-sama milik karyawan lain — `stok.service.ts` | type-check ✅ |
+| **C-3** | Occupant `update`: validasi kapasitas + FK ruangan saat reaktivasi/pindah — `occupant.service.ts` | pindah ke ruangan penuh → **400** ✅ |
+| **E-5** | Index FK `inv_transaksi_detail.uom_id`, `inv_transaksi.gudang_tujuan_id`, `created_by` — migration `59` | 3 index dibuat di DB ✅ |
+| **L-3** | Hapus `validateDepartmentDivisi` (validation.service) + `checkPermission` (permission.service) — dead | type-check ✅ |
+| **L-4** | Hapus `superRefine` kosong di `employee.schema.ts` | type-check ✅ |
+| **L-5** | Hapus `mutationLimiter`/`publicLimiter` yang tak dipakai (apiLimiter sudah mencakup `/api`) | type-check ✅ |
+
+**Ditunda (didokumentasikan, bukan dilewatkan):**
+- **TD-4 besar — 205 `console.log`→logger terstruktur & pengurangan 160 `as any`**: churn diff besar, nilai-bug rendah, risiko regresi tak sepadan untuk sesi ini. Layak dikerjakan sebagai satu PR khusus dengan logger util (mis. pino) + sweep bertahap.
+- **TD-6 — import per-baris savepoint, export streaming, race code transaksi (E-2/E-3)**: perubahan struktural pada jalur data-massal; porsi tersendiri.
+- **C-2, C-4, C-5..C-12, D-5..D-11, E-1/E-4/E-6..E-8, G-3..G-5, H-4..H-8, J-*, TD-8 (test 3 modul)**: sisa P2/P3 non-blocking.
+
+---
+
 ---
 
 ## 1. RINGKASAN EKSEKUTIF

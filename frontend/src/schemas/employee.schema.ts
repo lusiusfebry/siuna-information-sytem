@@ -86,14 +86,6 @@ export const employeeStep1Schema = z.object({
     nama_pemegang_rekening: z.string().optional().nullable(),
     nama_bank: z.string().optional().nullable(),
     cabang_bank: z.string().optional().nullable(),
-}).superRefine((data) => {
-    if (data.divisi_id && data.department_id) {
-        // Should validate department belongs to divisi.
-        // Since we can't async call API in sync Zod superRefine easily without side effects or complexity,
-        // we usually rely on form/hook logic to clear mismatch.
-        // Here we just placeholder or remove if logic is handled in UI.
-        // UI cascade handles clearing, so invalid combination is unlikely unless forced.
-    }
 });
 
 export type EmployeeStep1FormValues = z.infer<typeof employeeStep1Schema>;

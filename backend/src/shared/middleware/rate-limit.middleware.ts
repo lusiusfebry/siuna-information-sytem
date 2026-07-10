@@ -77,39 +77,3 @@ export const apiLimiter = rateLimit({
         return false;
     },
 });
-
-/**
- * Rate limiter for sensitive mutation operations (create, update, delete)
- * Moderate limit to prevent abuse
- * 
- * Limit: 100 mutation requests per minute per user
- */
-export const mutationLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 100, // 100 mutations per minute
-    message: {
-        status: 'error',
-        message: 'Terlalu banyak operasi perubahan data, silakan tunggu sebentar.',
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-    validate: false, // Disable validation to prevent IPv6 error
-    keyGenerator: userKeyGenerator,
-});
-
-/**
- * Rate limiter for public/unauthenticated endpoints
- * Moderate limit per IP
- * 
- * Limit: 500 requests per 15 minutes per IP
- */
-export const publicLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // 500 requests per IP
-    message: {
-        status: 'error',
-        message: 'Terlalu banyak permintaan dari alamat ini, silakan coba lagi nanti.',
-    },
-    standardHeaders: true,
-    legacyHeaders: false,
-});

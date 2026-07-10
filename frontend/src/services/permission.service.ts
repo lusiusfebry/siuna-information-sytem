@@ -30,11 +30,6 @@ class PermissionService {
         const response = await api.get('/auth/permissions');
         return response.data.data;
     }
-
-    // Helper to check permission on client side if we have the list
-    checkPermission(userPermissions: Permission[], resource: string, action: string): boolean {
-        return userPermissions.some(p => p.resource === resource && p.action === action);
-    }
 }
 
 export default new PermissionService();

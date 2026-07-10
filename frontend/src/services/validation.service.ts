@@ -29,17 +29,4 @@ export const validationService = {
             return true;
         }
     },
-
-    // Additional validations that might need server verification
-    validateDepartmentDivisi: async (departmentId: number, divisiId: number): Promise<boolean> => {
-        // Can be improved by dedicated endpoint, or just fetching dept details
-        try {
-            // We can use the generic master data endpoint
-            const response = await api.get(`/hr/master/department/${departmentId}`);
-            const dept = response.data.data;
-            return dept && dept.divisi_id === divisiId;
-        } catch (e) {
-            return false;
-        }
-    }
 };
