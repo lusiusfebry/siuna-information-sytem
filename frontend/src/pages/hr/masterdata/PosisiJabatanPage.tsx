@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { usePosisiJabatanList, useDepartmentList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData } from '../../../hooks/useMasterData';
+import { usePosisiJabatanList, useDepartmentList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData, useRestoreMasterData } from '../../../hooks/useMasterData';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
 import LayoutSwitcher from '../../../components/layout/LayoutSwitcher';
@@ -16,6 +16,8 @@ const PosisiJabatanPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
+    const [showDeleted, setShowDeleted] = useState(false);
+    const [departmentFilter, setDepartmentFilter] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<PosisiJabatan | null>(null);
@@ -27,12 +29,20 @@ const PosisiJabatanPage: React.FC = () => {
         return (saved as LayoutView) || LayoutView.VIEW_1;
     });
 
-    const { data, isLoading } = usePosisiJabatanList({ page, limit: 10, search, status });
+    const { data, isLoading } = usePosisiJabatanList({ page, limit: 10, search, status, department_id: departmentFilter, only_deleted: showDeleted });
     const { data: deptData } = useDepartmentList({ limit: 100, status: 'Aktif' }); // Assuming 'Aktif' over 'true'
 
     const createMutation = useCreateMasterData<PosisiJabatan>('posisi-jabatan');
     const updateMutation = useUpdateMasterData<PosisiJabatan>('posisi-jabatan');
     const deleteMutation = useDeleteMasterData('posisi-jabatan');
+    const restoreMutation = useRestoreMasterData('posisi-jabatan');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
 
     // Derived states for loading
     const isCreating = createMutation.isPending;
@@ -133,13 +143,31 @@ const PosisiJabatanPage: React.FC = () => {
 
                 <SearchFilter
                     onSearchChange={setSearch}
-                    onFilterChange={setStatus}
+                    onFilterChange={(v) => { setStatus(v); setPage(1); }}
+                    statusValue={status}
+                    extraFilters={[
+                        {
+                            placeholder: 'Semua Department',
+                            value: departmentFilter,
+                            options: (deptData?.data || []).map(d => ({ label: d.nama, value: d.id })),
+                            onChange: (v) => { setDepartmentFilter(v); setPage(1); },
+                        },
+                    ]}
                     onAdd={handleAdd}
                     addButtonText="Tambah Posisi"
                     transparent={true}
                 />
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
@@ -156,6 +184,7 @@ const PosisiJabatanPage: React.FC = () => {
                     }}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined}
                     transparent={true}
                 />
 

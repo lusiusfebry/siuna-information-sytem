@@ -44,15 +44,36 @@ export class BaseMasterDataService {
 
     async findAllWithFilter(model: ModelStatic<Model>, filters: any, include: any[] = []) {
         const nameField = this.config.searchNameField || 'nama';
-        const { status, search, page = 1, limit = 10 } = filters;
+        const { status, search, page = 1, limit = 10, only_deleted } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
+
+        // Recycle-bin view: list soft-deleted rows only. paranoid:false lifts the
+        // default deleted_at IS NULL scope; the explicit where re-adds the inverse.
+        const showDeleted = only_deleted === true || only_deleted === 'true';
+        if (showDeleted) {
+            where.deleted_at = { [Op.ne]: null };
+        }
 
         if (status) {
             if (status === 'true' || status === true || status === 'Aktif') {
                 where.status = 'Aktif';
             } else if (status === 'false' || status === false || status === 'Tidak Aktif') {
                 where.status = 'Tidak Aktif';
+            }
+        }
+
+        // Relational filters (e.g. department by divisi_id, posisi by department_id).
+        // Whitelisted keys are applied ONLY when the model actually has that column,
+        // so this is safe/generic across HR, inventory, and facility master data.
+        const RELATIONAL_FILTER_KEYS = [
+            'divisi_id', 'department_id', 'golongan_id', 'kategori_pangkat_id',
+            'kategori_id', 'sub_kategori_id', 'brand_id', 'building_id', 'room_type_id',
+        ];
+        const modelAttrs = (model as any).getAttributes ? (model as any).getAttributes() : {};
+        for (const key of RELATIONAL_FILTER_KEYS) {
+            if (filters[key] !== undefined && filters[key] !== '' && modelAttrs[key]) {
+                where[key] = Number(filters[key]);
             }
         }
 
@@ -70,6 +91,7 @@ export class BaseMasterDataService {
             offset: Number(offset),
             order: [['id', 'ASC']],
             distinct: true,
+            paranoid: !showDeleted,
         });
 
         return {

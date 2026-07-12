@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useDepartmentList, useDivisiList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData } from '../../../hooks/useMasterData';
+import { useDepartmentList, useDivisiList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData, useRestoreMasterData } from '../../../hooks/useMasterData';
 import { useEmployeeList } from '../../../hooks/useEmployee';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
@@ -19,6 +19,8 @@ const DepartmentPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
+    const [showDeleted, setShowDeleted] = useState(false);
+    const [divisiFilter, setDivisiFilter] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Department | null>(null);
@@ -31,7 +33,7 @@ const DepartmentPage: React.FC = () => {
     });
 
     // API Hooks
-    const { data, isLoading } = useDepartmentList({ page, limit: 10, search, status });
+    const { data, isLoading } = useDepartmentList({ page, limit: 10, search, status, divisi_id: divisiFilter, only_deleted: showDeleted });
     // Fetch generic options for dropdowns
     const { data: divisiData } = useDivisiList({ limit: 100, status: 'true' });
     const { data: employeeData } = useEmployeeList();
@@ -39,6 +41,14 @@ const DepartmentPage: React.FC = () => {
     const createMutation = useCreateMasterData<Department>('department');
     const updateMutation = useUpdateMasterData<Department>('department');
     const deleteMutation = useDeleteMasterData('department');
+    const restoreMutation = useRestoreMasterData('department');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
 
     // Columns
     const columns: Column<Department>[] = [
@@ -159,13 +169,32 @@ const DepartmentPage: React.FC = () => {
 
                 <SearchFilter
                     onSearchChange={setSearch}
-                    onFilterChange={setStatus}
+                    onFilterChange={(v) => { setStatus(v); setPage(1); }}
+                    statusValue={status}
+                    extraFilters={[
+                        {
+                            placeholder: 'Semua Divisi',
+                            value: divisiFilter,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            options: (divisiData?.data || []).map((d: any) => ({ label: d.nama, value: d.id })),
+                            onChange: (v) => { setDivisiFilter(v); setPage(1); },
+                        },
+                    ]}
                     onAdd={handleAdd}
                     addButtonText="Tambah Department"
                     transparent={true}
                 />
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
@@ -182,6 +211,7 @@ const DepartmentPage: React.FC = () => {
                     }}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined}
                     transparent={true}
                 />
 

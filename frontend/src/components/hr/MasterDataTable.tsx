@@ -1,5 +1,5 @@
 import React from 'react';
-import { PencilSquareIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { PencilSquareIcon, TrashIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
 import Button from '../common/Button';
 import { PermissionGuard } from '../auth/PermissionGuard';
 import { RESOURCES, ACTIONS } from '../../types/permission';
@@ -23,6 +23,9 @@ interface MasterDataTableProps<T> {
     };
     onEdit: (item: T) => void;
     onDelete: (item: T) => void;
+    /** When provided, rows are shown in recycle-bin mode: a "Pulihkan" button
+     *  replaces Edit/Delete. */
+    onRestore?: (item: T) => void;
     view?: LayoutView;
     transparent?: boolean;
     /** RBAC resource gating the Edit/Delete buttons. Defaults to HR master_data;
@@ -37,6 +40,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
     pagination,
     onEdit,
     onDelete,
+    onRestore,
     view = LayoutView.VIEW_1,
     transparent = false,
     permissionResource = RESOURCES.MASTER_DATA
@@ -139,17 +143,32 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
 
                                 {/* Quick Actions */}
                                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                    <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onDelete(item);
-                                            }}
-                                            className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 transition-colors shadow-sm"
-                                        >
-                                            <TrashIcon className="w-4 h-4" />
-                                        </button>
-                                    </PermissionGuard>
+                                    {onRestore ? (
+                                        <PermissionGuard resource={permissionResource} action={ACTIONS.UPDATE}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onRestore(item);
+                                                }}
+                                                title="Pulihkan"
+                                                className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 transition-colors shadow-sm"
+                                            >
+                                                <ArrowUturnLeftIcon className="w-4 h-4" />
+                                            </button>
+                                        </PermissionGuard>
+                                    ) : (
+                                        <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onDelete(item);
+                                                }}
+                                                className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 transition-colors shadow-sm"
+                                            >
+                                                <TrashIcon className="w-4 h-4" />
+                                            </button>
+                                        </PermissionGuard>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -195,26 +214,42 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                     ))}
                                     <td className={`px-6 ${isCompact ? 'py-2' : 'py-4'} text-right`}>
                                         <div className="flex items-center justify-end gap-2">
-                                            <PermissionGuard resource={permissionResource} action={ACTIONS.UPDATE}>
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    className={`!p-1.5 text-blue-600 hover:bg-blue-50 border-blue-100 ${isCompact ? 'h-7 w-7' : ''}`}
-                                                    onClick={() => onEdit(item)}
-                                                >
-                                                    <PencilSquareIcon className="w-4 h-4" />
-                                                </Button>
-                                            </PermissionGuard>
-                                            <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    className={`!p-1.5 text-red-600 hover:bg-red-50 border-red-100 ${isCompact ? 'h-7 w-7' : ''}`}
-                                                    onClick={() => onDelete(item)}
-                                                >
-                                                    <TrashIcon className="w-4 h-4" />
-                                                </Button>
-                                            </PermissionGuard>
+                                            {onRestore ? (
+                                                <PermissionGuard resource={permissionResource} action={ACTIONS.UPDATE}>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        className={`!p-1.5 text-emerald-600 hover:bg-emerald-50 border-emerald-100 ${isCompact ? 'h-7 w-7' : ''}`}
+                                                        onClick={() => onRestore(item)}
+                                                        title="Pulihkan"
+                                                    >
+                                                        <ArrowUturnLeftIcon className="w-4 h-4" />
+                                                    </Button>
+                                                </PermissionGuard>
+                                            ) : (
+                                                <>
+                                                    <PermissionGuard resource={permissionResource} action={ACTIONS.UPDATE}>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            className={`!p-1.5 text-blue-600 hover:bg-blue-50 border-blue-100 ${isCompact ? 'h-7 w-7' : ''}`}
+                                                            onClick={() => onEdit(item)}
+                                                        >
+                                                            <PencilSquareIcon className="w-4 h-4" />
+                                                        </Button>
+                                                    </PermissionGuard>
+                                                    <PermissionGuard resource={permissionResource} action={ACTIONS.DELETE}>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            className={`!p-1.5 text-red-600 hover:bg-red-50 border-red-100 ${isCompact ? 'h-7 w-7' : ''}`}
+                                                            onClick={() => onDelete(item)}
+                                                        >
+                                                            <TrashIcon className="w-4 h-4" />
+                                                        </Button>
+                                                    </PermissionGuard>
+                                                </>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

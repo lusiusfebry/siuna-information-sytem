@@ -6,6 +6,11 @@ export interface FilterParams {
     search?: string;
     page?: number;
     limit?: number;
+    // relational filters (e.g. department by divisi, posisi by department)
+    divisi_id?: string | number;
+    department_id?: string | number;
+    only_deleted?: boolean;
+    [key: string]: string | number | boolean | undefined;
 }
 
 export interface PaginatedResponse<T> {

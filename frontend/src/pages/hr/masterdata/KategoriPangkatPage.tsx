@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useKategoriPangkatList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData } from '../../../hooks/useMasterData';
+import { useKategoriPangkatList, useCreateMasterData, useUpdateMasterData, useDeleteMasterData, useRestoreMasterData } from '../../../hooks/useMasterData';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
 import LayoutSwitcher from '../../../components/layout/LayoutSwitcher';
@@ -16,6 +16,7 @@ const KategoriPangkatPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
+    const [showDeleted, setShowDeleted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<KategoriPangkat | null>(null);
@@ -26,10 +27,18 @@ const KategoriPangkatPage: React.FC = () => {
         return (saved as LayoutView) || LayoutView.VIEW_1;
     });
 
-    const { data, isLoading } = useKategoriPangkatList({ page, limit: 10, search, status });
+    const { data, isLoading } = useKategoriPangkatList({ page, limit: 10, search, status, only_deleted: showDeleted });
     const createMutation = useCreateMasterData<KategoriPangkat>('kategori-pangkat');
     const updateMutation = useUpdateMasterData<KategoriPangkat>('kategori-pangkat');
     const deleteMutation = useDeleteMasterData('kategori-pangkat');
+    const restoreMutation = useRestoreMasterData('kategori-pangkat');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
 
     const isCreating = createMutation.isPending;
     const isUpdating = updateMutation.isPending;
@@ -93,7 +102,16 @@ const KategoriPangkatPage: React.FC = () => {
                     </div>
                 </div>
                 <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Kategori" transparent={true} />
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
                 <MasterDataTable
@@ -109,6 +127,7 @@ const KategoriPangkatPage: React.FC = () => {
                     }}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined}
                     transparent={true}
                 />
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === 'create' ? 'Tambah Kategori' : 'Edit Kategori'}>
