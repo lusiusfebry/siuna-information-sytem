@@ -201,30 +201,32 @@ ${pages}
             : this.buildA4Html(labels, config.columns || 3);
 
         const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
+        try {
+            const page = await browser.newPage();
+            await page.setContent(html, { waitUntil: 'networkidle0' });
 
-        let pdfOptions: any;
-        if (isThermal) {
-            const sz = THERMAL_SIZES[config.thermalSize || '70x40'] || THERMAL_SIZES['70x40'];
-            pdfOptions = {
-                width: `${sz.w}mm`,
-                height: `${sz.h}mm`,
-                printBackground: true,
-                margin: { top: '0mm', bottom: '0mm', left: '0mm', right: '0mm' },
-            };
-        } else {
-            pdfOptions = {
-                format: 'A4',
-                printBackground: true,
-                margin: { top: '5mm', bottom: '5mm', left: '5mm', right: '5mm' },
-            };
+            let pdfOptions: any;
+            if (isThermal) {
+                const sz = THERMAL_SIZES[config.thermalSize || '70x40'] || THERMAL_SIZES['70x40'];
+                pdfOptions = {
+                    width: `${sz.w}mm`,
+                    height: `${sz.h}mm`,
+                    printBackground: true,
+                    margin: { top: '0mm', bottom: '0mm', left: '0mm', right: '0mm' },
+                };
+            } else {
+                pdfOptions = {
+                    format: 'A4',
+                    printBackground: true,
+                    margin: { top: '5mm', bottom: '5mm', left: '5mm', right: '5mm' },
+                };
+            }
+
+            const pdfBuffer = await page.pdf(pdfOptions);
+            return Buffer.from(pdfBuffer);
+        } finally {
+            await browser.close();
         }
-
-        const pdfBuffer = await page.pdf(pdfOptions);
-        await browser.close();
-
-        return Buffer.from(pdfBuffer);
     }
 
     async lookupQR(code: string) {

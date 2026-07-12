@@ -57,7 +57,11 @@ class InventoryDashboardService {
                 'gudang_id',
                 [Sequelize.fn('SUM', Sequelize.col('jumlah')), 'total_stok'],
             ],
-            include: [{ model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] }],
+            include: [
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
+                // Count only active products, consistent with the stats/low-stock cards.
+                { model: InvProduk, as: 'produk', attributes: [], where: { status: 'Aktif' } },
+            ],
             group: ['gudang_id', 'gudang.id'],
             raw: true,
             nest: true,
@@ -79,6 +83,7 @@ class InventoryDashboardService {
                 model: InvProduk,
                 as: 'produk',
                 attributes: [],
+                where: { status: 'Aktif' },
                 include: [{
                     model: InvBrand,
                     as: 'brand',

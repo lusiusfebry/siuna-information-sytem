@@ -180,12 +180,14 @@ ${stokData.map((item: any, idx: number) => `<tr>
 </body></html>`;
 
         const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '15mm', bottom: '15mm', left: '10mm', right: '10mm' } });
-        await browser.close();
-
-        return Buffer.from(pdfBuffer);
+        try {
+            const page = await browser.newPage();
+            await page.setContent(html, { waitUntil: 'networkidle0' });
+            const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '15mm', bottom: '15mm', left: '10mm', right: '10mm' } });
+            return Buffer.from(pdfBuffer);
+        } finally {
+            await browser.close();
+        }
     }
 
     private getHeaderStyle(): Partial<ExcelJS.Style> {
@@ -202,11 +204,14 @@ ${stokData.map((item: any, idx: number) => `<tr>
 
     private async generatePDF(html: string): Promise<Buffer> {
         const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-        const page = await browser.newPage();
-        await page.setContent(html, { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '15mm', bottom: '15mm', left: '10mm', right: '10mm' } });
-        await browser.close();
-        return Buffer.from(pdfBuffer);
+        try {
+            const page = await browser.newPage();
+            await page.setContent(html, { waitUntil: 'networkidle0' });
+            const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: '15mm', bottom: '15mm', left: '10mm', right: '10mm' } });
+            return Buffer.from(pdfBuffer);
+        } finally {
+            await browser.close();
+        }
     }
 
     private getPdfBaseStyles(): string {

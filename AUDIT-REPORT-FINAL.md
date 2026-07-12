@@ -142,6 +142,22 @@
 
 ---
 
+## STATUS PERBAIKAN — B-6 + P3 batch 3 SELESAI (10 Juli 2026)
+
+**B-6 (Major terakhir) + 4 item P3 diperbaiki & diverifikasi.** Backend 90/90, frontend 13/13, type-check ✅. Dengan ini **SELURUH Major (13/13) tuntas.**
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **B-6** | Semua 4 lokasi Puppeteer (`employee-asset`, `label`, `export`×2) dibungkus `try/finally` → `browser.close()` selalu jalan meski render gagal (cegah proses Chromium zombie / memory leak) | PDF export test hijau ✅ |
+| **C-7** | Validasi tipe: `role_id` harus integer, `is_active` harus boolean di user endpoints — `user.controller.ts` | type-check ✅ |
+| **C-8** | Dashboard `getStockByWarehouse`/`getCategoryBreakdown` filter produk `status:'Aktif'` (konsisten dgn kartu lain) — `dashboard.service.ts` | endpoint 200 ✅ |
+| **D-8** | `GET /company-settings`: `optionalAuthenticate` → anonim dapat subset branding (tanpa phone/email/address/app_version), ter-autentikasi dapat penuh — `company-settings.controller.ts`, `auth.middleware.ts` (baru: `optionalAuthenticate`) | anon tak bocor PII, authed penuh ✅ (runtime) |
+| **E-8** | `QueryClient` defaultOptions: retry hanya 5xx/network (maks 2×, tak retry 4xx), `staleTime 60s`, `refetchOnWindowFocus:false` — `main.tsx` | type-check ✅ |
+
+---
+
+---
+
 ## 1. RINGKASAN EKSEKUTIF
 
 **Kondisi aplikasi:** Fondasi arsitektur **baik dan konsisten** (modular per-domain, RBAC terpusat, transaksi stok atomik, migrasi rapi 00–56, hashing benar). Alur inti lintas-modul **terbukti berfungsi saat runtime** (buat karyawan → assign laptop → assign mess). Namun ada **4 bug Critical** yang membuat fitur tertentu tidak berfungsi/500, **9 Major** (mayoritas keamanan & integritas soft-delete), dan **1 pola risiko sistemik** (paranoid + FK RESTRICT tanpa guard aplikasi). Tiga modul (Inventory, Facility, Notifications) **tidak memiliki test otomatis**.

@@ -34,6 +34,10 @@ class UserController {
             const { id } = req.params;
             const { role_id } = req.body;
 
+            if (!Number.isInteger(role_id)) {
+                return res.status(400).json({ message: 'role_id harus berupa angka' });
+            }
+
             const user = await User.findByPk(id, {
                 include: [{ model: Role, as: 'roleDetails' }],
             });
@@ -76,6 +80,10 @@ class UserController {
         try {
             const { id } = req.params;
             const { is_active } = req.body;
+
+            if (typeof is_active !== 'boolean') {
+                return res.status(400).json({ message: 'is_active harus berupa boolean' });
+            }
 
             const user = await User.findByPk(id, {
                 include: [{ model: Role, as: 'roleDetails' }],

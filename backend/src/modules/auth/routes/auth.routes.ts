@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authController from '../controllers/auth.controller';
 import companySettingsController from '../controllers/company-settings.controller';
-import { authenticate, authorize } from '../../../shared/middleware/auth.middleware';
+import { authenticate, authorize, optionalAuthenticate } from '../../../shared/middleware/auth.middleware';
 import { authLimiter } from '../../../shared/middleware/rate-limit.middleware';
 import { uploadCompanyLogo } from '../../../shared/middleware/upload.middleware';
 
@@ -88,7 +88,7 @@ router.get('/me', authenticate, (req, res, next) => authController.me(req, res, 
 router.post('/logout', authenticate, (req, res, next) => authController.logout(req, res, next));
 
 // Company Settings (public read, admin-only write)
-router.get('/company-settings', (req, res, next) => companySettingsController.getSettings(req, res, next));
+router.get('/company-settings', optionalAuthenticate, (req, res, next) => companySettingsController.getSettings(req, res, next));
 router.put('/company-settings', authenticate, authorize(['superadmin', 'admin']), (req, res, next) => companySettingsController.updateSettings(req, res, next));
 router.post('/company-settings/logo', authenticate, authorize(['superadmin', 'admin']), uploadCompanyLogo, (req, res, next) => companySettingsController.uploadLogo(req, res, next));
 

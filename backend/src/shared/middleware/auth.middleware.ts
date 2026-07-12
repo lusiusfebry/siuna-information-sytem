@@ -74,6 +74,30 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+// Optional auth: if a valid token is present, attach req.user; otherwise proceed
+// as anonymous WITHOUT rejecting. Used by endpoints that serve a richer response
+// to logged-in users but must remain publicly reachable (e.g. company settings).
+export const optionalAuthenticate = async (req: Request, _res: Response, next: NextFunction) => {
+    try {
+        const cookieToken = (req as any).cookies?.access_token;
+        const authHeader = req.headers.authorization;
+        const headerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined;
+        const token = cookieToken || headerToken;
+        if (!token) return next();
+
+        const decoded = authService.verifyToken(token) as any;
+        const user = await User.findByPk(decoded.id, {
+            include: [{ model: Role, as: 'roleDetails' }],
+        });
+        if (user && (user as any).is_active !== false) {
+            req.user = user;
+        }
+    } catch {
+        // ignore — treat as anonymous
+    }
+    next();
+};
+
 // Deprecated: Use permission middleware instead. keeping for backward compatibility if any
 export const authorize = (roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
