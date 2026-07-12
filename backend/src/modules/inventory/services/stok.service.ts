@@ -51,6 +51,14 @@ class StokService {
         const prefix = CODE_PREFIX_MAP[tipe];
         if (!prefix) throw new AppError(`Tipe transaksi tidak valid: ${tipe}`, 400);
 
+        // Serialize code generation for this prefix across concurrent transactions.
+        // A row lock on MAX(code) does not stop a phantom insert; an advisory lock
+        // (held until the transaction ends) does. Prevents duplicate-code 500s.
+        await sequelize.query('SELECT pg_advisory_xact_lock(hashtext(:k))', {
+            replacements: { k: `inv_trx_code_${prefix}` },
+            transaction: t,
+        });
+
         const lastRecord = await InvTransaksi.findOne({
             where: { code: { [Op.like]: `${prefix}-%` } },
             order: [['code', 'DESC']],
@@ -85,6 +93,12 @@ class StokService {
         if (!kodeSite) return null;
 
         const tagPrefix = `${prefixTag}_${kodeSite}_`;
+
+        // Advisory lock per tag-prefix — same phantom-insert protection as codes.
+        await sequelize.query('SELECT pg_advisory_xact_lock(hashtext(:k))', {
+            replacements: { k: `inv_tag_${tagPrefix}` },
+            transaction: t,
+        });
 
         const lastTag = await InvSerialNumber.findOne({
             where: { tag_number: { [Op.like]: `${tagPrefix}%` } },
@@ -256,6 +270,26 @@ class StokService {
 
         if (produk.has_serial_number && detail.serial_numbers?.length) {
             for (const sn of detail.serial_numbers) {
+                // Transfer Masuk moves an EXISTING physical unit into this gudang —
+                // update the serial's location instead of creating a duplicate row
+                // (which would violate the unique (produk_id, serial_number) index).
+                if (payload.sub_tipe === 'Transfer Masuk') {
+                    const existing = await InvSerialNumber.findOne({
+                        where: { produk_id: detail.produk_id, serial_number: sn },
+                        transaction: t,
+                    });
+                    if (existing) {
+                        await existing.update({
+                            gudang_id: gudangId,
+                            karyawan_id: null,
+                            status: 'Tersedia',
+                            transaksi_terakhir_id: transaksi.id,
+                        }, { transaction: t });
+                        continue;
+                    }
+                    // fall through to create if the serial doesn't exist yet
+                }
+
                 const snRecord = await InvSerialNumber.create({
                     produk_id: detail.produk_id,
                     serial_number: sn,
@@ -475,6 +509,13 @@ class StokService {
     }
 
     private async upsertStok(produkId: number, gudangId: number, uomId: number, delta: number, t: Transaction) {
+        // Serialize first-time creation of this (produk, gudang) stock row so two
+        // concurrent transactions don't both INSERT and collide on the unique index.
+        await sequelize.query('SELECT pg_advisory_xact_lock(hashtext(:k))', {
+            replacements: { k: `inv_stok_${produkId}_${gudangId}` },
+            transaction: t,
+        });
+
         const stok = await InvStok.findOne({
             where: { produk_id: produkId, gudang_id: gudangId },
             transaction: t,

@@ -103,7 +103,7 @@ const StatusKaryawanPage: React.FC = () => {
                     </div>
                 </div>
 
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Status" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} onAdd={handleAdd} addButtonText="Tambah Status" transparent={true} />
 
                 <div className="mb-4 flex justify-between items-center">
                     <button

@@ -92,7 +92,25 @@
 | `facility/services/__tests__/work-order.service.test.ts` | **RT-1** (default `tanggal_lapor` + generate code) | 2 |
 | `shared/services/__tests__/base-master-data.service.test.ts` | **B-7** (`assertNotReferenced` → 409 saat masih dipakai) | 4 |
 
-**Ditunda:** integration/E2E test HTTP untuk ketiga modul (unit test service+validator sudah menutup logika inti; integration bisa menyusul), dan test frontend komponen inventory/facility.
+**Ditунda:** integration/E2E test HTTP untuk ketiga modul (unit test service+validator sudah menutup logika inti; integration bisa menyusul), dan test frontend komponen inventory/facility.
+
+---
+
+## STATUS PERBAIKAN — P2 (Sedang) SELESAI (10 Juli 2026)
+
+**7 item P2 diperbaiki & diverifikasi.** Backend type-check ✅, migration `60` dijalankan, 88/88 test lolos (1 test PDF-export gagal karena **Chrome tak terinstal di env**, bukan regresi — jalankan `npx puppeteer browsers install chrome`).
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **C-2** | Transfer Masuk memindahkan serial (update `gudang_id`) alih-alih membuat SN duplikat — `stok.service.ts` | type-check ✅ |
+| **C-4** | Guard: serial number tak boleh jadi asset Aktif di 2 ruangan — `asset.service.ts` | pasang SN ke ruang ke-2 → **409** ✅ |
+| **D-7** | Fail-fast secret lemah di **semua** env kecuali development/test (staging kini aman) + warning di dev — `env.ts` | type-check ✅ |
+| **D-9** | `checkDepartmentAccess` **fail-closed**: role non-privileged di-scope ke department sendiri (default `-1` bila tak ada) — `permission.middleware.ts` | type-check ✅ |
+| **E-1** | Hapus truncation diam-diam `limit:500` → `5000` + dokumentasi (laporan transaksi penuh di endpoint khusus) — `export.service.ts` | type-check ✅ |
+| **E-2/E-3** | `pg_advisory_xact_lock` per-prefix pada generate code transaksi & tag + first-insert stok — cegah race duplicate-code 500 — `stok.service.ts` | type-check ✅ |
+| **G-3** | Drop constraint warisan `employees_email_key` (UNIQUE `email_perusahaan`) — migration `60` | DB kini hanya `employees_nik_key` ✅ |
+
+**Ditунda ke porsi tersendiri:** **D-5** (CSRF token) & **D-6** (brute-force lockout → Redis) — perubahan lintas-request/infra yang lebih tepat sebagai PR keamanan khusus.
 
 ---
 

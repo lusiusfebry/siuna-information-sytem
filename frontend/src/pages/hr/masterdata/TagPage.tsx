@@ -115,7 +115,7 @@ const TagPage: React.FC = () => {
                     </div>
                 </div>
 
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Tag" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} onAdd={handleAdd} addButtonText="Tambah Tag" transparent={true} />
 
                 <div className="mb-4 flex justify-between items-center">
                     <button

@@ -8,22 +8,31 @@ const envPath = process.env.NODE_ENV === 'test'
 dotenv.config({ path: envPath });
 
 const isProd = process.env.NODE_ENV === 'production';
+// Weak/default secrets are only tolerated in local development and automated
+// tests. Any other environment (staging, uat, or an unset NODE_ENV on a real
+// server) must fail fast — a guessable JWT secret allows token forgery.
+const isDevOrTest = ['development', 'test'].includes(process.env.NODE_ENV || 'development');
 
-// Fail fast in production if critical secrets are missing or left at their
-// insecure development defaults — a weak/guessable JWT secret allows token
-// forgery (full auth bypass).
 const WEAK_JWT_SECRETS = ['secret', 'your-secret-key-change-in-production'];
-if (isProd) {
+if (!isDevOrTest) {
     const jwt = process.env.JWT_SECRET;
     if (!jwt || WEAK_JWT_SECRETS.includes(jwt) || jwt.length < 32) {
         throw new Error(
-            'FATAL: JWT_SECRET must be set to a strong (>=32 char) value in production.'
+            'FATAL: JWT_SECRET must be set to a strong (>=32 char) value outside development/test.'
         );
     }
     if (!process.env.DB_PASSWORD || process.env.DB_PASSWORD === '123456789') {
         throw new Error(
-            'FATAL: DB_PASSWORD must be set to a non-default value in production.'
+            'FATAL: DB_PASSWORD must be set to a non-default value outside development/test.'
         );
+    }
+}
+
+// Soft warning in development so the weak default doesn't silently ship.
+if (isDevOrTest && !isProd) {
+    if (!process.env.JWT_SECRET || WEAK_JWT_SECRETS.includes(process.env.JWT_SECRET || '')) {
+        // eslint-disable-next-line no-console
+        console.warn('[env] WARNING: using a weak/default JWT_SECRET (development only).');
     }
 }
 

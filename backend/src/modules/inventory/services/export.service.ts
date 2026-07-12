@@ -58,7 +58,11 @@ class InventoryExportService {
                 },
             ],
             order: [['created_at', 'DESC']],
-            limit: 500,
+            // Supplementary "recent transactions" sheet inside the STOK export. It
+            // is capped for memory safety; the full, unbounded transaction report
+            // is the dedicated /export/transaksi endpoint. Raised from 500 so normal
+            // periods are not silently truncated. Prefer passing a date range.
+            limit: 5000,
         });
 
         const branding = await this.getBranding();

@@ -103,7 +103,7 @@ const SubGolonganPage: React.FC = () => {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola sub golongan pangkat</p>
                     </div>
                 </div>
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Sub Golongan" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} onAdd={handleAdd} addButtonText="Tambah Sub Golongan" transparent={true} />
                 <div className="mb-4 flex justify-between items-center">
                     <button
                         onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}

@@ -41,6 +41,16 @@ class FacilityAssetService {
     }
 
     async create(data: any) {
+        // Guard: a physical unit (serial number) must not be an active asset in two
+        // rooms at once. Reject if it is already placed (status 'Aktif') elsewhere.
+        const existing = await FacilityAsset.count({
+            where: { serial_number_id: data.serial_number_id, status: 'Aktif' },
+        });
+        if (existing > 0) {
+            const err: any = new Error('Serial number sudah terpasang aktif di ruangan lain. Tarik (withdraw) terlebih dahulu.');
+            err.statusCode = 409;
+            throw err;
+        }
         return await FacilityAsset.create(data);
     }
 

@@ -47,17 +47,18 @@ export const checkDepartmentAccess = () => {
             const user = req.user;
             if (!user) return next();
 
-            // Only apply for managers (or roles that need filtering)
-            // If superadmin/admin, skip filtering
-            if (['superadmin', 'admin', 'staff'].includes(user.roleDetails?.name || '')) {
+            const roleName = user.roleDetails?.name || '';
+
+            // Privileged roles see everything (no department scoping).
+            if (['superadmin', 'admin', 'staff'].includes(roleName)) {
                 return next();
             }
 
-            if (user.roleDetails?.name === 'manager' && user.employee) {
-                req.departmentFilter = user.employee.department_id;
-            }
-
-            // For regular employee, maybe restrict to self? handled by checkResourceOwnership usually
+            // Everyone else is scoped to their own department. Fail CLOSED: if we
+            // cannot determine a department, set an impossible filter rather than
+            // leaking cross-department data.
+            const deptId = user.employee?.department_id;
+            req.departmentFilter = (deptId === undefined || deptId === null) ? -1 : deptId;
 
             next();
         } catch (error) {

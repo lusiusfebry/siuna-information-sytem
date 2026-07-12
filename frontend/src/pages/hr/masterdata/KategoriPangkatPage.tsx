@@ -101,7 +101,7 @@ const KategoriPangkatPage: React.FC = () => {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola kategori pangkat karyawan</p>
                     </div>
                 </div>
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Kategori" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} onAdd={handleAdd} addButtonText="Tambah Kategori" transparent={true} />
                 <div className="mb-4 flex justify-between items-center">
                     <button
                         onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
