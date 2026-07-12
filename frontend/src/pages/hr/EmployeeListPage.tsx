@@ -4,6 +4,7 @@ import Button from '../../components/common/Button';
 import VirtualEmployeeTable from '../../components/hr/VirtualEmployeeTable';
 import EmployeeGrid from '../../components/hr/EmployeeGrid';
 import LayoutSwitcher from '../../components/layout/LayoutSwitcher';
+import ErrorState from '../../components/common/ErrorState';
 import { LayoutView } from '../../types/layout';
 import { toast } from 'react-hot-toast';
 import { useMasterDataList } from '../../hooks/useMasterData';
@@ -55,6 +56,8 @@ const EmployeeListPage = () => {
     const {
         data,
         isLoading,
+        isError,
+        refetch,
         isFetchingNextPage,
         hasNextPage,
         fetchNextPage,
@@ -270,7 +273,9 @@ const EmployeeListPage = () => {
 
             {/* Data Representative */}
             <div className="flex-grow overflow-hidden">
-                {layout === LayoutView.VIEW_4 ? (
+                {isError ? (
+                    <ErrorState onRetry={() => refetch()} />
+                ) : layout === LayoutView.VIEW_4 ? (
                     <EmployeeGrid
                         employees={employees}
                         hasNextPage={!!hasNextPage}

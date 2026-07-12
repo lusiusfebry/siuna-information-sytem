@@ -92,7 +92,7 @@
 | `facility/services/__tests__/work-order.service.test.ts` | **RT-1** (default `tanggal_lapor` + generate code) | 2 |
 | `shared/services/__tests__/base-master-data.service.test.ts` | **B-7** (`assertNotReferenced` → 409 saat masih dipakai) | 4 |
 
-**Ditунda:** integration/E2E test HTTP untuk ketiga modul (unit test service+validator sudah menutup logika inti; integration bisa menyusul), dan test frontend komponen inventory/facility.
+**Ditunda:** integration/E2E test HTTP untuk ketiga modul (unit test service+validator sudah menutup logika inti; integration bisa menyusul), dan test frontend komponen inventory/facility.
 
 ---
 
@@ -110,7 +110,19 @@
 | **E-2/E-3** | `pg_advisory_xact_lock` per-prefix pada generate code transaksi & tag + first-insert stok — cegah race duplicate-code 500 — `stok.service.ts` | type-check ✅ |
 | **G-3** | Drop constraint warisan `employees_email_key` (UNIQUE `email_perusahaan`) — migration `60` | DB kini hanya `employees_nik_key` ✅ |
 
-**Ditунda ke porsi tersendiri:** **D-5** (CSRF token) & **D-6** (brute-force lockout → Redis) — perubahan lintas-request/infra yang lebih tepat sebagai PR keamanan khusus.
+**Ditunda ke porsi tersendiri:** **D-5** (CSRF token) & **D-6** (brute-force lockout → Redis) — perubahan lintas-request/infra yang lebih tepat sebagai PR keamanan khusus.
+
+---
+
+## STATUS PERBAIKAN — P3 (UX batch) SELESAI (10 Juli 2026)
+
+**H-4 & H-8 diperbaiki + env test diperbaiki.** Frontend type-check ✅, frontend 13/13, **backend 90/90** (test PDF pulih setelah `npx puppeteer browsers install chrome`).
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **H-4** | WelcomePage: badge lonceng pakai `useUnreadCount` (angka nyata), panel "Pemberitahuan Sistem" pakai `useNotifications` (data nyata + empty state); kartu "94.2%" palsu diganti kartu jujur "Absensi & Cuti — Segera Hadir" — `WelcomePage.tsx` | type-check ✅ |
+| **H-8** | Komponen `ErrorState` reusable + cabang `isError` (tombol Coba Lagi/`refetch`) di StokPage, OccupantPage, EmployeeListPage — error jaringan tak lagi tampil sebagai "Tidak ada data" | type-check ✅ |
+| env | Install Chrome puppeteer → test PDF export hijau kembali | backend 90/90 ✅ |
 
 ---
 

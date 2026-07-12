@@ -2,11 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import UserProfileDropdown from '../components/auth/UserProfileDropdown';
 import { useCompanySettings } from '../hooks/useCompanySettings';
+import { useNotifications, useUnreadCount } from '../hooks/useNotifications';
 
 const WelcomePage = () => {
     const { user } = useAuthStore();
     const navigate = useNavigate();
     const { data: settings } = useCompanySettings();
+    const { data: notifData } = useNotifications();
+    const { data: unreadData } = useUnreadCount();
+    const unreadCount = unreadData?.data?.count || 0;
+    const notifications = (notifData?.data || []).slice(0, 4);
 
     return (
         <div className="bg-background-light dark:bg-background-dark font-display text-[#0d121b] dark:text-slate-200 min-h-screen flex flex-col">
@@ -63,9 +68,13 @@ const WelcomePage = () => {
                     </nav>
                     <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden lg:block"></div>
                     <div className="flex items-center gap-4">
-                        <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-slate-300">
+                        <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-slate-300" title={`${unreadCount} notifikasi belum dibaca`}>
                             <span className="material-symbols-outlined">notifications</span>
-                            <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-red-500"></span>
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
                         </button>
                         <div className="flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-4">
                             <div className="hidden sm:flex flex-col items-end">
@@ -217,48 +226,43 @@ const WelcomePage = () => {
                         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between mb-6">
                                 <h4 className="font-bold text-[#0d121b] dark:text-white">Pemberitahuan Sistem</h4>
-                                <button className="text-xs font-bold text-primary">Lihat Semua</button>
                             </div>
                             <div className="space-y-4">
-                                <div className="flex gap-4 p-3 rounded-lg bg-background-light dark:bg-slate-800/50">
-                                    <div className="text-primary">
-                                        <span className="material-symbols-outlined">info</span>
+                                {notifications.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-8 text-center text-[#4c669a]">
+                                        <span className="material-symbols-outlined text-4xl opacity-30 mb-2">notifications_off</span>
+                                        <p className="text-sm">Tidak ada pemberitahuan</p>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-bold">Update Sistem v2.4 Berhasil</p>
-                                        <p className="text-xs text-[#4c669a]">Integrasi modul Inventory dan HR telah diperbarui.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 p-3 rounded-lg">
-                                    <div className="text-orange-500">
-                                        <span className="material-symbols-outlined">warning</span>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold">Maintenance Jadwal Mess</p>
-                                        <p className="text-xs text-[#4c669a]">
-                                            Akan dilakukan pembersihan data mess lama pada hari Sabtu.
-                                        </p>
-                                    </div>
-                                </div>
+                                ) : (
+                                    notifications.map((n) => (
+                                        <div
+                                            key={n.id}
+                                            className={`flex gap-4 p-3 rounded-lg ${n.is_read ? '' : 'bg-background-light dark:bg-slate-800/50'}`}
+                                        >
+                                            <div className={n.type === 'warning' ? 'text-orange-500' : 'text-primary'}>
+                                                <span className="material-symbols-outlined">
+                                                    {n.type === 'warning' ? 'warning' : 'info'}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold">{n.title}</p>
+                                                <p className="text-xs text-[#4c669a]">{n.message}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                         <div className="bg-primary rounded-xl p-6 text-white shadow-xl shadow-primary/20 flex flex-col justify-between">
                             <div>
-                                <p className="text-blue-100 text-sm font-medium mb-1">Status Kehadiran Hari Ini</p>
-                                <p className="text-3xl font-black">94.2%</p>
+                                <p className="text-blue-100 text-sm font-medium mb-1">Absensi &amp; Cuti</p>
+                                <p className="text-2xl font-black">Segera Hadir</p>
+                                <p className="text-blue-100 text-xs mt-2">Modul pencatatan kehadiran dan pengajuan cuti sedang dalam pengembangan.</p>
                             </div>
-                            <div className="mt-6">
-                                <div className="flex justify-between text-xs mb-1">
-                                    <span>Target Efisiensi</span>
-                                    <span>98%</span>
-                                </div>
-                                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
-                                    <div className="bg-white h-full rounded-full" style={{ width: '94.2%' }}></div>
-                                </div>
+                            <div className="mt-6 flex items-center gap-2 text-blue-100">
+                                <span className="material-symbols-outlined text-[20px]">schedule</span>
+                                <span className="text-xs font-medium">Dalam roadmap</span>
                             </div>
-                            <button className="mt-6 w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-xs font-bold border border-white/20">
-                                Buka Laporan HR
-                            </button>
                         </div>
                     </div>
                 </div>

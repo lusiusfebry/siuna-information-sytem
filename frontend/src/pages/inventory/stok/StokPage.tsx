@@ -3,6 +3,7 @@ import { useStokList } from '../../../hooks/useInventoryStok';
 import { useInvGudangList } from '../../../hooks/useInventoryMasterData';
 import { InvStok } from '../../../types/inventory';
 import SerialNumberModal from '../../../components/inventory/SerialNumberModal';
+import ErrorState from '../../../components/common/ErrorState';
 
 const StokPage = () => {
     const [page, setPage] = useState(1);
@@ -10,7 +11,7 @@ const StokPage = () => {
     const [gudangId, setGudangId] = useState<number | undefined>();
     const [selectedStok, setSelectedStok] = useState<InvStok | null>(null);
 
-    const { data, isLoading } = useStokList({ page, limit: 15, search, gudang_id: gudangId });
+    const { data, isLoading, isError, refetch } = useStokList({ page, limit: 15, search, gudang_id: gudangId });
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
 
     const isTracked = (item: InvStok) => item.produk?.has_serial_number || item.produk?.has_tag_number;
@@ -66,6 +67,12 @@ const StokPage = () => {
                                         ))}
                                     </tr>
                                 ))
+                            ) : isError ? (
+                                <tr>
+                                    <td colSpan={8} className="px-4 py-3">
+                                        <ErrorState onRetry={() => refetch()} />
+                                    </td>
+                                </tr>
                             ) : data?.data?.length === 0 ? (
                                 <tr>
                                     <td colSpan={8} className="px-4 py-12 text-center text-gray-400">Tidak ada data stok</td>

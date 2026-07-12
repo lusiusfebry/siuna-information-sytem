@@ -8,6 +8,7 @@ import MasterDataTable, { Column } from '../../components/hr/MasterDataTable';
 import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
 import { SearchableSelect } from '../../components/common/SearchableSelect';
+import ErrorState from '../../components/common/ErrorState';
 import { FacOccupant, OccupantPayload } from '../../types/facility';
 
 interface OccFormData { room_id: string; employee_id: string; tanggal_masuk: string; keterangan: string; }
@@ -141,7 +142,7 @@ const OccupantPage = () => {
     const { data: buildingData } = useFacBuildingList({ limit: 100 });
     const buildings = (buildingData?.data || []) as any[];
 
-    const { data, isLoading } = useOccupantList({
+    const { data, isLoading, isError, refetch } = useOccupantList({
         page, limit: 10, search,
         status: statusFilter as any,
         building_id: buildingFilter ? Number(buildingFilter) : undefined,
@@ -222,9 +223,13 @@ const OccupantPage = () => {
                 </select>
             </div>
 
-            <MasterDataTable permissionResource="facility_master_data" columns={columns} data={data?.data || []} isLoading={isLoading}
-                pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
-                onEdit={() => {}} onDelete={() => {}} transparent={true} />
+            {isError ? (
+                <ErrorState onRetry={() => refetch()} />
+            ) : (
+                <MasterDataTable permissionResource="facility_master_data" columns={columns} data={data?.data || []} isLoading={isLoading}
+                    pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
+                    onEdit={() => {}} onDelete={() => {}} transparent={true} />
+            )}
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Penghuni" size="lg">
                 <OccupantForm onSubmit={onFormSubmit} isLoading={createMutation.isPending} onCancel={() => setIsModalOpen(false)} />
