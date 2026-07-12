@@ -126,6 +126,20 @@
 
 ---
 
+## STATUS PERBAIKAN — P3 (UX batch 2) SELESAI (10 Juli 2026)
+
+**5 item konsistensi/robustness UI diperbaiki.** Frontend type-check ✅, frontend 13/13.
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **H-5** | Guard tombol aksi Facility: `PermissionGuard` pada Tambah Penghuni/Checkout (Occupant), Tempatkan Aset (Asset), `can()`-gated `onAdd` Work Order. Bonus: `WorkOrderPage` table resource dikoreksi `facility_master_data`→`facility_work_order` | type-check ✅ |
+| **H-6** | Menu "Perusahaan" diberi `permission USERS:READ` agar cocok guard route (tak muncul lalu 403) — `Sidebar.tsx` | type-check ✅ |
+| **H-7** | Sidebar filter mengembalikan objek baru (`map`+`filter`), tak memutasi `item.subItems` — `Sidebar.tsx` | type-check ✅ |
+| **F-4** | `ErrorBoundary` per-`Outlet` di `MainLayout` (keyed by pathname) — crash 1 page tak mem-blank seluruh app | type-check ✅ |
+| **J-1** | Fallback `*` → `NotFoundPage` (hormati auth) alih-alih `/login` — placeholder route (mis. Absensi & Cuti) tampil 404, bukan terlempar login | type-check ✅ |
+
+---
+
 ---
 
 ## 1. RINGKASAN EKSEKUTIF

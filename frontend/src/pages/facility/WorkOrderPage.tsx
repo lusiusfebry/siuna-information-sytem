@@ -15,6 +15,8 @@ import Modal from '../../components/common/Modal';
 import SearchFilter from '../../components/common/SearchFilter';
 import Button from '../../components/common/Button';
 import { SearchableSelect } from '../../components/common/SearchableSelect';
+import { usePermission } from '../../hooks/usePermission';
+import { RESOURCES, ACTIONS } from '../../types/permission';
 import {
     FacWorkOrder,
     WorkOrderPayload,
@@ -311,6 +313,7 @@ const WorkOrderForm = ({
 // === Main Page Component ===
 
 const WorkOrderPage = () => {
+    const { can } = usePermission();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<WorkOrderStatus | undefined>(undefined);
@@ -432,7 +435,7 @@ const WorkOrderPage = () => {
                 <SearchFilter
                     onSearchChange={setSearch}
                     onFilterChange={handleFilterChange}
-                    onAdd={handleAdd}
+                    onAdd={can(RESOURCES.FACILITY_WORK_ORDER, ACTIONS.CREATE) ? handleAdd : undefined}
                     addButtonText="Tambah Work Order"
                     filterOptions={STATUS_FILTER_OPTIONS}
                     transparent={true}
@@ -442,7 +445,7 @@ const WorkOrderPage = () => {
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
-                <MasterDataTable permissionResource="facility_master_data"
+                <MasterDataTable permissionResource="facility_work_order"
                     view={layout}
                     columns={columns}
                     data={data?.data || []}

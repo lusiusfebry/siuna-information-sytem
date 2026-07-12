@@ -1,10 +1,12 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { LayoutProvider, useLayout } from '../../context/LayoutContext';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 const MainLayoutContent = () => {
     const { sidebarCollapsed } = useLayout();
+    const location = useLocation();
 
     return (
         <div className="flex h-screen bg-[#f6f6f8] dark:bg-[#101622] overflow-hidden transition-colors duration-300">
@@ -18,7 +20,12 @@ const MainLayoutContent = () => {
                 <Header />
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#f6f6f8] dark:bg-[#101622] p-4 md:p-8">
                     <div className="mx-auto w-full">
-                        <Outlet />
+                        {/* Per-route ErrorBoundary: a crash in one page shows a
+                            localized fallback instead of blanking the whole app.
+                            Keyed by pathname so it resets on navigation. */}
+                        <ErrorBoundary key={location.pathname}>
+                            <Outlet />
+                        </ErrorBoundary>
                     </div>
                 </main>
             </div>

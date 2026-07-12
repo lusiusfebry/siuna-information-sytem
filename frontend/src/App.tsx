@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { PermissionGuard } from './components/auth/PermissionGuard';
 import { RESOURCES, ACTIONS } from './types/permission';
 import PermissionDeniedPage from './pages/error/PermissionDeniedPage';
+import NotFoundPage from './pages/error/NotFoundPage';
 import { Suspense, lazy, useEffect } from 'react';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { useCompanySettings } from './hooks/useCompanySettings';
@@ -306,7 +307,7 @@ function App() {
                 </Route>
 
                 {/* Fallback */}
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Suspense>
     );

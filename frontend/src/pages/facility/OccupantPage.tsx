@@ -9,6 +9,8 @@ import Modal from '../../components/common/Modal';
 import Button from '../../components/common/Button';
 import { SearchableSelect } from '../../components/common/SearchableSelect';
 import ErrorState from '../../components/common/ErrorState';
+import { PermissionGuard } from '../../components/auth/PermissionGuard';
+import { RESOURCES, ACTIONS } from '../../types/permission';
 import { FacOccupant, OccupantPayload } from '../../types/facility';
 
 interface OccFormData { room_id: string; employee_id: string; tanggal_masuk: string; keterangan: string; }
@@ -168,9 +170,11 @@ const OccupantPage = () => {
             </span>
         )},
         { header: 'Aksi', accessor: (item) => item.status === 'Aktif' ? (
-            <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleCheckout(item); }}>
-                <span className="material-symbols-outlined text-sm mr-1">logout</span>Checkout
-            </Button>
+            <PermissionGuard resource={RESOURCES.FACILITY_MASTER_DATA} action={ACTIONS.UPDATE}>
+                <Button variant="danger" size="sm" onClick={(e) => { e.stopPropagation(); handleCheckout(item); }}>
+                    <span className="material-symbols-outlined text-sm mr-1">logout</span>Checkout
+                </Button>
+            </PermissionGuard>
         ) : null, className: 'w-32' },
     ];
 
@@ -199,9 +203,11 @@ const OccupantPage = () => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Penghuni</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola data penghuni ruangan</p>
                 </div>
-                <Button variant="primary" onClick={handleAdd}>
-                    <span className="material-symbols-outlined text-sm mr-1">add</span> Tambah Penghuni
-                </Button>
+                <PermissionGuard resource={RESOURCES.FACILITY_MASTER_DATA} action={ACTIONS.CREATE}>
+                    <Button variant="primary" onClick={handleAdd}>
+                        <span className="material-symbols-outlined text-sm mr-1">add</span> Tambah Penghuni
+                    </Button>
+                </PermissionGuard>
             </div>
 
             <div className="flex flex-wrap gap-3 items-center">

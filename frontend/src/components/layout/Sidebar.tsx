@@ -176,6 +176,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
                     name: 'Perusahaan',
                     path: '/settings/company',
                     icon: 'business',
+                    // Match the route guard (App.tsx company route = USERS:READ) so
+                    // the menu item is not shown to users who would hit /403 on click.
+                    permission: { resource: RESOURCES.USERS, action: ACTIONS.READ }
                 }
             ]
         }
@@ -225,25 +228,28 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 
         const items = itemsMap[activeModule];
 
-        return items.filter(item => {
-            if (item.permission && !can(item.permission.resource, item.permission.action)) {
-                return false;
-            }
-
-            if (item.subItems) {
-                const visibleSubItems = item.subItems.filter(sub => {
-                    if (sub.permission) {
-                        return can(sub.permission.resource, sub.permission.action);
-                    }
-                    return true;
-                });
-
-                if (visibleSubItems.length === 0) return false;
-                item.subItems = visibleSubItems;
-            }
-
-            return true;
-        });
+        return items
+            // Return NEW objects instead of mutating item.subItems — mutating the
+            // source arrays would permanently drop unpermitted sub-items across
+            // renders if the nav arrays were ever hoisted to module scope.
+            .map(item => item.subItems
+                ? {
+                    ...item,
+                    subItems: item.subItems.filter(sub =>
+                        !sub.permission || can(sub.permission.resource, sub.permission.action)
+                    ),
+                }
+                : item
+            )
+            .filter(item => {
+                if (item.permission && !can(item.permission.resource, item.permission.action)) {
+                    return false;
+                }
+                if (item.subItems && item.subItems.length === 0) {
+                    return false;
+                }
+                return true;
+            });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [can, activeModule]);
 

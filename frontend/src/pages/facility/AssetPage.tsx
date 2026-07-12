@@ -9,6 +9,8 @@ import ConfirmDialog from '../../components/common/ConfirmDialog';
 import Button from '../../components/common/Button';
 import { SearchableSelect } from '../../components/common/SearchableSelect';
 import { FacAsset, AssetPayload } from '../../types/facility';
+import { PermissionGuard } from '../../components/auth/PermissionGuard';
+import { RESOURCES, ACTIONS } from '../../types/permission';
 
 interface AssetFormData { room_id: string; serial_number_id: string; tanggal_penempatan: string; keterangan: string; }
 
@@ -121,9 +123,11 @@ const AssetPage = () => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Aset Ruangan</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">Kelola penempatan aset di ruangan</p>
                 </div>
-                <Button variant="primary" onClick={handleAdd}>
-                    <span className="material-symbols-outlined text-sm mr-1">add</span> Tempatkan Aset
-                </Button>
+                <PermissionGuard resource={RESOURCES.FACILITY_MASTER_DATA} action={ACTIONS.CREATE}>
+                    <Button variant="primary" onClick={handleAdd}>
+                        <span className="material-symbols-outlined text-sm mr-1">add</span> Tempatkan Aset
+                    </Button>
+                </PermissionGuard>
             </div>
 
             <div className="flex gap-3 items-center">
