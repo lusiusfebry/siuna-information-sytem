@@ -234,7 +234,7 @@ const OccupantPage = () => {
             ) : (
                 <MasterDataTable permissionResource="facility_master_data" columns={columns} data={data?.data || []} isLoading={isLoading}
                     pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
-                    onEdit={() => {}} onDelete={() => {}} transparent={true} />
+                    onEdit={() => {}} onDelete={() => {}} hideActions transparent={true} />
             )}
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Tambah Penghuni" size="lg">

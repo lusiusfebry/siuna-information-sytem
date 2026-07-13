@@ -158,6 +158,27 @@
 
 ---
 
+## STATUS PERBAIKAN — P3 minor batch SELESAI (10 Juli 2026)
+
+**Sekelompok item minor diselesaikan.** Backend **91/91** (test dedup baru), frontend 13/13, type-check ✅, migration `61` dijalankan.
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **C-5** | Dedup notifikasi low-stock: lewati (user, stok) yang sudah punya notif belum-dibaca — `notification.service.ts` | panggil 2× → tetap 2 notif (bukan 4) ✅ runtime + unit test |
+| **C-6** | Import stok-masuk memicu `checkLowStockAndNotify` setelah commit — `import.service.ts` | type-check ✅ |
+| **C-12** | Guard 401 bila `req.user.id` undefined di 4 handler notifikasi — `notification.controller.ts` | type-check ✅ |
+| **C-9** | `uploadPhoto` produk meng-`invalidateCache('InvProduk')` — foto baru langsung tampil | type-check ✅ |
+| **C-11/J-2** | Prop `hideActions` pada `MasterDataTable`; OccupantPage tak lagi render kolom Edit/Hapus no-op | type-check ✅ |
+| **E-7** | Partial index `deleted_at` pada 25 tabel paranoid (recycle-bin cepat) — migration `61` | 25 index dibuat ✅ |
+| **G-4** | `audit_logs.user_id` FK onUpdate `SET NULL`→`CASCADE` — migration `61` | FK confupdtype=`c` ✅ |
+| **D-11** | Rate-limit `apiLimiter` skip **hanya** di `development` (staging/prod/unset selalu limit) — komentar diperjelas | type-check ✅ |
+| **J-5** | Bersihkan komentar developer usang di route `master-data` — `App.tsx` | type-check ✅ |
+| **bonus** | Bug ketemu saat verifikasi: `produkSchema` membuang `stok_minimum`/`uom_id` (zod strip) → default 5. Ditambahkan ke schema — `validateInventoryMasterData.ts` | type-check ✅ |
+
+**Ditunda dengan alasan (risiko > nilai untuk P3-minor):** **E-4** (N+1 tag — jalur transaksi), **E-6** (deep include — detail endpoint), **D-10** (token di body — perlu audit alur login FE agar tak putus sesi), **F-3** (ekstraksi velocity 80-baris — 2 lokasi). Layak sebagai refaktor terpisah.
+
+---
+
 ## 1. RINGKASAN EKSEKUTIF
 
 **Kondisi aplikasi:** Fondasi arsitektur **baik dan konsisten** (modular per-domain, RBAC terpusat, transaksi stok atomik, migrasi rapi 00–56, hashing benar). Alur inti lintas-modul **terbukti berfungsi saat runtime** (buat karyawan → assign laptop → assign mess). Namun ada **4 bug Critical** yang membuat fitur tertentu tidak berfungsi/500, **9 Major** (mayoritas keamanan & integritas soft-delete), dan **1 pola risiko sistemik** (paranoid + FK RESTRICT tanpa guard aplikasi). Tiga modul (Inventory, Facility, Notifications) **tidak memiliki test otomatis**.

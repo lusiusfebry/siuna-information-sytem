@@ -68,12 +68,7 @@ export const apiLimiter = rateLimit({
     validate: false, // Disable validation to prevent IPv6 error
     // Use user ID for authenticated requests, IP as fallback
     keyGenerator: userKeyGenerator,
-    // Skip rate limiting for successful requests (optional - comment out if you want strict limiting)
-    skip: (_req) => {
-        // Skip rate limiting in development
-        if (process.env.NODE_ENV === 'development') {
-            return true;
-        }
-        return false;
-    },
+    // Skip ONLY in local development (for convenience). Staging/production and an
+    // unset NODE_ENV are always rate-limited.
+    skip: () => process.env.NODE_ENV === 'development',
 });

@@ -186,6 +186,10 @@ class InventoryMasterDataController {
             const gambarPath = `/uploads/inventory/photos/${req.file.filename}`;
             await produk.update({ gambar: gambarPath });
 
+            // Invalidate the produk list HTTP cache so the new photo shows
+            // immediately instead of after the 1h TTL.
+            await masterDataService.invalidateCache('InvProduk');
+
             res.json({ status: 'success', data: { gambar: gambarPath } });
         } catch (error) {
             next(error);

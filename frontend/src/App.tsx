@@ -146,19 +146,9 @@ function App() {
                         {/* Master Data Routes */}
                         <Route path="master-data" element={
                             <PermissionGuard resource={RESOURCES.MASTER_DATA} action={ACTIONS.READ} redirectTo="/403">
-                                {/* Represents layout for master data if any, direct children rendered below */}
-                                {/* React Router outlet logic handled by parent or just grouping */}
                                 <Navigate to="divisi" replace />
                             </PermissionGuard>
                         } />
-                        {/* Note: In v6 nested routes render in Outlet. If Route has no element, it acts as wrapper.
-                            Here I want to protect the whole block. 
-                            However, defining element on parent requires Outlet. 
-                            I'll wrap each child or use a wrapper component. 
-                            Simple way: Wrap the block? No, Route element props.
-                            I will wrap individual routes for now to be safe, or assume parent check is enough if I had a layout.
-                            I'll just wrap the sub-routes since I don't have a shared MasterDataLayout file handy.
-                        */}
                         <Route path="master-data/divisi" element={
                             <PermissionGuard resource={RESOURCES.MASTER_DATA} action={ACTIONS.READ} redirectTo="/403"><DivisiPage /></PermissionGuard>
                         } />

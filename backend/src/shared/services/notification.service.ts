@@ -79,11 +79,25 @@ class NotificationService {
             );
 
             const notifications: any[] = [];
+
+            // Dedup: skip (user, stok) pairs that already have an UNREAD low-stock
+            // notification, so repeated transactions on the same item don't spam.
+            const stokIds = lowStockItems.map((i: any) => i.id);
+            const existing = await Notification.findAll({
+                where: { entity_type: 'inv_stok', entity_id: { [Op.in]: stokIds }, is_read: false },
+                attributes: ['user_id', 'entity_id'],
+                raw: true,
+            });
+            const alreadyNotified = new Set(
+                (existing as any[]).map((e) => `${e.user_id}:${e.entity_id}`)
+            );
+
             for (const item of lowStockItems) {
                 const produk = (item as any).produk;
                 const stokMin = produk?.stok_minimum ?? 5;
 
                 for (const user of targetUsers) {
+                    if (alreadyNotified.has(`${user.id}:${item.id}`)) continue;
                     notifications.push({
                         user_id: user.id,
                         title: 'Stok Rendah',

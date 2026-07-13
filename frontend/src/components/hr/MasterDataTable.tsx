@@ -31,6 +31,9 @@ interface MasterDataTableProps<T> {
     /** RBAC resource gating the Edit/Delete buttons. Defaults to HR master_data;
      *  inventory/facility pages must pass their own resource. */
     permissionResource?: string;
+    /** Hide the built-in Aksi column entirely (for pages that render their own
+     *  action column, e.g. OccupantPage's Checkout). */
+    hideActions?: boolean;
 }
 
 const MasterDataTable = <T extends { id: number | string; code?: string; status?: string; nama?: string; name?: string }>({
@@ -43,7 +46,8 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
     onRestore,
     view = LayoutView.VIEW_1,
     transparent = false,
-    permissionResource = RESOURCES.MASTER_DATA
+    permissionResource = RESOURCES.MASTER_DATA,
+    hideActions = false
 }: MasterDataTableProps<T>) => {
 
     const config = LAYOUT_CONFIGS[view];
@@ -198,7 +202,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                     {col.header}
                                 </th>
                             ))}
-                            <th scope="col" className={`px-6 ${isCompact ? 'py-2' : 'py-4'} text-right`}>Aksi</th>
+                            {!hideActions && <th scope="col" className={`px-6 ${isCompact ? 'py-2' : 'py-4'} text-right`}>Aksi</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -212,6 +216,7 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                                 : (item[col.accessor] as React.ReactNode)}
                                         </td>
                                     ))}
+                                    {!hideActions && (
                                     <td className={`px-6 ${isCompact ? 'py-2' : 'py-4'} text-right`}>
                                         <div className="flex items-center justify-end gap-2">
                                             {onRestore ? (
@@ -252,11 +257,12 @@ const MasterDataTable = <T extends { id: number | string; code?: string; status?
                                             )}
                                         </div>
                                     </td>
+                                    )}
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={columns.length + 1} className="px-6 py-12 text-center text-gray-500">
+                                <td colSpan={columns.length + (hideActions ? 0 : 1)} className="px-6 py-12 text-center text-gray-500">
                                     Tidak ada data untuk ditampilkan
                                 </td>
                             </tr>

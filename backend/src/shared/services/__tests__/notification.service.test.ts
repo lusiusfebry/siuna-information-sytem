@@ -9,7 +9,7 @@ import { User } from '../../../modules/auth/models/User';
 //  - per-user scoping of read operations (a user cannot mark another's notif).
 jest.mock('../../models/Notification', () => ({
     __esModule: true,
-    default: { findAndCountAll: jest.fn(), count: jest.fn(), findOne: jest.fn(), update: jest.fn(), bulkCreate: jest.fn() },
+    default: { findAndCountAll: jest.fn(), count: jest.fn(), findOne: jest.fn(), findAll: jest.fn(), update: jest.fn(), bulkCreate: jest.fn() },
 }));
 jest.mock('../../../modules/inventory/models/Stok', () => ({ __esModule: true, default: { findAll: jest.fn() } }));
 jest.mock('../../../modules/inventory/models/Produk', () => ({ __esModule: true, default: {} }));
@@ -21,7 +21,11 @@ const Notif = Notification as any;
 const Stok = InvStok as any;
 const Usr = User as any;
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+    jest.clearAllMocks();
+    // Default: no existing unread notifications (dedup query returns empty).
+    Notif.findAll.mockResolvedValue([]);
+});
 
 describe('NotificationService read-path scoping', () => {
     it('getUnreadCount is scoped to the user', async () => {
@@ -78,5 +82,22 @@ describe('NotificationService.checkLowStockAndNotify (RT-3)', () => {
         ]);
         await notificationService.checkLowStockAndNotify([1]);
         expect(Notif.bulkCreate).not.toHaveBeenCalled();
+    });
+
+    it('dedups: skips a user who already has an UNREAD notif for the same stok (C-5)', async () => {
+        Stok.findAll.mockResolvedValue([
+            { id: 11, jumlah: 2, produk: { id: 1, code: 'IPR-0001', nama: 'Laptop', stok_minimum: 5 } },
+        ]);
+        Usr.findAll.mockResolvedValue([
+            { id: 100, roleDetails: { name: 'staff', permissions: [{ resource: 'inventory_stock', action: 'read' }] } },
+            { id: 200, roleDetails: { name: 'staff', permissions: [{ resource: 'inventory_stock', action: 'read' }] } },
+        ]);
+        // user 100 already has an unread notif for stok 11 → only user 200 gets one.
+        Notif.findAll.mockResolvedValue([{ user_id: 100, entity_id: 11 }]);
+        await notificationService.checkLowStockAndNotify([1]);
+        expect(Notif.bulkCreate).toHaveBeenCalledTimes(1);
+        const payload = Notif.bulkCreate.mock.calls[0][0];
+        expect(payload).toHaveLength(1);
+        expect(payload[0].user_id).toBe(200);
     });
 });

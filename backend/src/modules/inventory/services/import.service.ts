@@ -9,6 +9,7 @@ import InvSerialNumber from '../models/SerialNumber';
 import InvTransaksi from '../models/Transaksi';
 import InvTransaksiDetail from '../models/TransaksiDetail';
 import inventoryMasterDataService from './master-data.service';
+import notificationService from '../../../shared/services/notification.service';
 
 interface ImportError {
     row: number;
@@ -235,6 +236,13 @@ class InventoryImportService {
         } catch (error: any) {
             await t.rollback();
             throw new Error(`Gagal import stok: ${error.message}`);
+        }
+
+        // After a successful import, re-check low stock so items still below the
+        // minimum after import trigger a notification (parity with createTransaksi).
+        const affectedProdukIds = Array.from(new Set(produkList.map((p: any) => p.id)));
+        if (affectedProdukIds.length > 0) {
+            notificationService.checkLowStockAndNotify(affectedProdukIds).catch(() => {});
         }
 
         return result;

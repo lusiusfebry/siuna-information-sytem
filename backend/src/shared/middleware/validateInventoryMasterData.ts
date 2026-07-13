@@ -43,6 +43,8 @@ const produkSchema = baseSchema.extend({
         })
         .optional()
         .default(false),
+    uom_id: z.number().int().positive().optional().nullable(),
+    stok_minimum: z.coerce.number().int().min(0).optional().default(5),
 });
 
 const gudangSchema = baseSchema.extend({
