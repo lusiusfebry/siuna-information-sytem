@@ -259,12 +259,14 @@ class ExcelImportService {
             return s === '' ? null : val;
         };
 
-        // Normalize gender codes (L/P) to full labels used across the app.
+        // Normalize gender codes to the enum labels used across the app.
+        // Accepts L/P, Laki-laki/Perempuan, and the common Indonesian forms
+        // PRIA / WANITA / PEREMPUAN from real HR spreadsheets.
         const normalizeGender = (val: any) => {
-            const s = val ? String(val).trim() : '';
-            if (s === 'L' || s.toLowerCase() === 'laki-laki') return 'Laki-laki';
-            if (s === 'P' || s.toLowerCase() === 'perempuan') return 'Perempuan';
-            return s || null;
+            const s = val ? String(val).trim().toLowerCase() : '';
+            if (['l', 'laki-laki', 'laki', 'pria', 'male', 'm'].includes(s)) return 'Laki-laki';
+            if (['p', 'perempuan', 'wanita', 'female', 'w', 'f'].includes(s)) return 'Perempuan';
+            return (val ? String(val).trim() : null);
         };
 
         const checkLookup = async (type: string, dbField: string, excelKey: string) => {
@@ -548,7 +550,7 @@ class ExcelImportService {
                         data: row
                     });
                 } else {
-                    validEmployees.push(mappedData);
+                    validEmployees.push({ ...mappedData, _rowNumber: row._rowNumber });
                 }
             } catch (e: any) {
                 result.failed++;
@@ -556,52 +558,46 @@ class ExcelImportService {
             }
         }
 
-        // Phase 2: Bulk Insert/Update in Transaction
-        if (validEmployees.length > 0) {
+        // Phase 2: per-row transaction. Each employee commits (or rolls back)
+        // independently, so one bad row no longer discards the whole import —
+        // good rows are saved and each failure is reported with its Excel row.
+        for (const item of validEmployees) {
             const t = await sequelize.transaction();
             try {
-                for (const item of validEmployees) {
-                    try {
-                        // Check if NIK exists to determine Create vs Update
-                        const existingEmployee = await employeeService.validateNIKUnique(item.employeeData.nomor_induk_karyawan)
-                            ? null
-                            : await import('../models/Employee').then(m => m.default.findOne({ where: { nomor_induk_karyawan: item.employeeData.nomor_induk_karyawan }, transaction: t }));
+                const existingEmployee = await employeeService.validateNIKUnique(item.employeeData.nomor_induk_karyawan)
+                    ? null
+                    : await import('../models/Employee').then(m => m.default.findOne({ where: { nomor_induk_karyawan: item.employeeData.nomor_induk_karyawan }, transaction: t }));
 
-                        if (existingEmployee) {
-                            // UDPATE
-                            await employeeService.updateEmployeeComplete(
-                                existingEmployee.id,
-                                item.employeeData,
-                                item.personalInfoData,
-                                item.hrInfoData,
-                                item.familyInfoData,
-                                undefined,
-                                { transaction: t }
-                            );
-                        } else {
-                            // CREATE
-                            await employeeService.createEmployeeComplete(
-                                item.employeeData,
-                                item.personalInfoData,
-                                item.hrInfoData,
-                                item.familyInfoData,
-                                undefined,
-                                { transaction: t }
-                            );
-                        }
-                        result.success++;
-                    } catch (e: any) {
-                        // If ANY operation fails, we must rollback ALL 
-                        throw new Error(`DB Error for NIK ${item.employeeData.nomor_induk_karyawan}: ${e.message}`);
-                    }
+                if (existingEmployee) {
+                    await employeeService.updateEmployeeComplete(
+                        existingEmployee.id,
+                        item.employeeData,
+                        item.personalInfoData,
+                        item.hrInfoData,
+                        item.familyInfoData,
+                        undefined,
+                        { transaction: t }
+                    );
+                } else {
+                    await employeeService.createEmployeeComplete(
+                        item.employeeData,
+                        item.personalInfoData,
+                        item.hrInfoData,
+                        item.familyInfoData,
+                        undefined,
+                        { transaction: t }
+                    );
                 }
                 await t.commit();
+                result.success++;
             } catch (e: any) {
                 await t.rollback();
-                // If rollback, all "success" must be reverted to failed
-                result.failed += result.success;
-                result.success = 0;
-                result.errors.push({ row: 0, message: `Import Transaction Failed: ${e.message}` });
+                result.failed++;
+                result.errors.push({
+                    row: item._rowNumber || 0,
+                    message: `Gagal simpan NIK ${item.employeeData.nomor_induk_karyawan}: ${e.message}`,
+                    data: item.employeeData,
+                });
             }
         }
 

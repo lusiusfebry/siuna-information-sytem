@@ -25,9 +25,11 @@ export const issueCsrfToken = (res: Response): string => {
     return token;
 };
 
-// Endpoints that establish the session and therefore run BEFORE a CSRF cookie
-// exists. They are protected by credentials, not CSRF.
-const EXEMPT_PATHS = ['/api/auth/login', '/api/auth/refresh'];
+// Endpoints that establish or tear down the session and therefore may run
+// without a matching CSRF cookie. login/refresh run BEFORE a cookie exists;
+// logout must always succeed to clear cookies (a forced-logout CSRF is negligible
+// risk — no data loss). They are protected by credentials, not CSRF.
+const EXEMPT_PATHS = ['/api/auth/login', '/api/auth/refresh', '/api/auth/logout'];
 
 /**
  * Double-submit-cookie CSRF guard. For state-changing methods it requires the
