@@ -158,6 +158,18 @@
 
 ---
 
+## STATUS PERBAIKAN — D-5 (CSRF) SELESAI (10 Juli 2026)
+
+**CSRF protection ditambahkan (double-submit cookie).** Backend **97/97** (6 unit test CSRF baru), frontend 13/13, type-check ✅.
+
+| ID | Perbaikan | Verifikasi |
+|---|---|---|
+| **D-5** | Middleware `csrfProtection` (double-submit): login/refresh set cookie `csrf_token` (readable) via `issueCsrfToken`; frontend echo balik header `X-CSRF-Token` untuk POST/PUT/PATCH/DELETE; server tolak 403 bila header≠cookie. Metode aman, login/refresh, dan request Bearer dikecualikan. — `csrf.middleware.ts` (baru), `auth.controller.ts`, `index.ts`, `client.ts` | 6/6 unit test ✅ (GET lolos, login exempt, no-header→403, mismatch→403, match→lolos, Bearer exempt) |
+
+**Catatan:** SameSite=Lax yang sudah ada tetap sebagai lapis pertama; CSRF token kini menambah defense-in-depth. Runtime penuh aktif setelah backend restart (memuat kode baru).
+
+---
+
 ## STATUS PERBAIKAN — P3 minor batch SELESAI (10 Juli 2026)
 
 **Sekelompok item minor diselesaikan.** Backend **91/91** (test dedup baru), frontend 13/13, type-check ✅, migration `61` dijalankan.

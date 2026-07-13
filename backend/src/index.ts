@@ -60,6 +60,12 @@ app.get('/api/health', async (_req, res) => {
     }
 });
 
+// CSRF guard (double-submit cookie) for all state-changing API requests. Mounted
+// after body/cookie parsing and after the public health check. Safe methods and
+// the login/refresh bootstrap endpoints are exempted inside the middleware.
+import { csrfProtection } from './shared/middleware/csrf.middleware';
+app.use('/api/', csrfProtection);
+
 app.use('/api/hr', hrRoutes);
 import inventoryRoutes from './modules/inventory/routes/inventory.routes';
 app.use('/api/inventory', inventoryRoutes);

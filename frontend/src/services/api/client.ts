@@ -9,12 +9,27 @@ const api = axios.create({
     },
 });
 
+// Read a non-httpOnly cookie value by name (used for the CSRF double-submit token).
+const readCookie = (name: string): string | undefined => {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : undefined;
+};
+
 // Legacy fallback: if a token still lives in localStorage (older sessions),
 // attach it. New logins rely on the httpOnly cookie and won't set this.
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Echo the CSRF cookie back as a header on state-changing requests
+    // (double-submit-cookie pattern).
+    const method = (config.method || 'get').toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        const csrf = readCookie('csrf_token');
+        if (csrf) {
+            config.headers['X-CSRF-Token'] = csrf;
+        }
     }
     return config;
 });

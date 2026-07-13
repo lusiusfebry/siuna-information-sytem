@@ -4,6 +4,7 @@ import User from '../models/User';
 import { Role } from '../models/Role';
 import Employee from '../../hr/models/Employee';
 import { env } from '../../../config/env';
+import { issueCsrfToken } from '../../../shared/middleware/csrf.middleware';
 
 const isProd = env.nodeEnv === 'production';
 const ACCESS_MAX_AGE = 15 * 60 * 1000; // 15 minutes
@@ -51,6 +52,8 @@ class AuthController {
             // Set auth cookies (primary transport).
             res.cookie('access_token', token, accessCookieOpts);
             res.cookie('refresh_token', refreshToken, refreshCookieOpts);
+            // Issue the CSRF token (double-submit cookie) for mutating requests.
+            issueCsrfToken(res);
 
             res.json({
                 status: 'success',
@@ -109,6 +112,8 @@ class AuthController {
             const newRefresh = authService.generateRefreshToken(user);
             res.cookie('access_token', newAccess, accessCookieOpts);
             res.cookie('refresh_token', newRefresh, refreshCookieOpts);
+            // Rotate the CSRF token alongside the session.
+            issueCsrfToken(res);
 
             res.json({ status: 'success', data: { token: newAccess } });
         } catch (error) {
@@ -162,6 +167,7 @@ class AuthController {
             }
             res.clearCookie('access_token', { path: '/' });
             res.clearCookie('refresh_token', { path: '/api/auth' });
+            res.clearCookie('csrf_token', { path: '/' });
             res.json({ status: 'success', message: 'Logged out successfully' });
         } catch (error) {
             next(error);
