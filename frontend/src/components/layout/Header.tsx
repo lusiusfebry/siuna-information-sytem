@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import UserProfileDropdown from '../auth/UserProfileDropdown';
-import { useAuthStore } from '../../stores/authStore';
 import { useUnreadCount, useNotifications, useMarkAsRead, useMarkAllAsRead } from '../../hooks/useNotifications';
 import type { NotificationItem } from '../../services/api/notification.service';
 
@@ -16,7 +15,6 @@ const MODULE_HEADERS: Record<string, { title: string; links: { label: string; hr
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuthStore();
     const [showNotifDropdown, setShowNotifDropdown] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
 
@@ -128,17 +126,7 @@ const Header = () => {
                     </button>
                 </div>
                 <div className="h-10 w-[1px] bg-[#e7ebf3] dark:bg-[#2a3447] mx-2"></div>
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end hidden sm:flex">
-                        <span className="text-sm font-extrabold text-[#0d121b] dark:text-white leading-none">
-                            {user?.employee?.nama_lengkap || user?.nik || 'User'}
-                        </span>
-                        <span className="text-[11px] font-bold text-[#4c669a] dark:text-gray-400 mt-1 uppercase tracking-wider">
-                            {user?.roleDetails?.display_name || user?.roleDetails?.name || 'Administrator'}
-                        </span>
-                    </div>
-                    <UserProfileDropdown />
-                </div>
+                <UserProfileDropdown />
             </div>
         </header>
     );

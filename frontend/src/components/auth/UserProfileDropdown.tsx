@@ -30,13 +30,25 @@ const UserProfileDropdown = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-slate-300 overflow-hidden border border-gray-200 dark:border-gray-700"
+                className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-[#f6f6f8] dark:hover:bg-slate-800 transition-colors"
+                title="Menu akun (klik untuk logout)"
             >
-                {user?.employee?.foto_karyawan ? (
-                    <img src={user.employee.foto_karyawan} alt={user?.employee?.nama_lengkap} className="h-full w-full object-cover" />
-                ) : (
-                    <span className="material-symbols-outlined">person</span>
-                )}
+                <span className="hidden sm:flex flex-col items-end leading-tight">
+                    <span className="text-sm font-extrabold text-[#0d121b] dark:text-white leading-none">
+                        {user?.employee?.nama_lengkap || user?.nik || 'User'}
+                    </span>
+                    <span className="text-[11px] font-bold text-[#4c669a] dark:text-gray-400 mt-1 uppercase tracking-wider">
+                        {user?.roleDetails?.display_name || user?.roleDetails?.name || 'Administrator'}
+                    </span>
+                </span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e7ebf3] dark:bg-slate-800 text-[#0d121b] dark:text-slate-300 overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
+                    {user?.employee?.foto_karyawan ? (
+                        <img src={user.employee.foto_karyawan} alt={user?.employee?.nama_lengkap} className="h-full w-full object-cover" />
+                    ) : (
+                        <span className="material-symbols-outlined">person</span>
+                    )}
+                </span>
+                <span className={`material-symbols-outlined text-[#4c669a] text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`}>expand_more</span>
             </button>
 
             {isOpen && (
