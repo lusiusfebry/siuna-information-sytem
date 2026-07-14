@@ -5,7 +5,9 @@ import InvTransaksi from '../models/Transaksi';
 class StokController {
     async getStok(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stokService.getStokList(req.query);
+            // Spread query first, then override with the middleware-set departmentFilter so a
+            // client cannot spoof it via a query param; undefined for privileged roles (INV-M07).
+            const result = await stokService.getStokList({ ...req.query, departmentFilter: req.departmentFilter });
             res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);
@@ -14,7 +16,7 @@ class StokController {
 
     async getSerialNumbers(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stokService.getSerialNumberList(req.query);
+            const result = await stokService.getSerialNumberList({ ...req.query, departmentFilter: req.departmentFilter });
             res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);
@@ -33,7 +35,7 @@ class StokController {
 
     async getTransaksiList(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stokService.getTransaksiList(req.query);
+            const result = await stokService.getTransaksiList({ ...req.query, departmentFilter: req.departmentFilter });
             res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);
@@ -42,7 +44,7 @@ class StokController {
 
     async getTransaksiDetail(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stokService.getTransaksiDetail(Number(req.params.id));
+            const result = await stokService.getTransaksiDetail(Number(req.params.id), req.departmentFilter);
             res.json({ status: 'success', data: result });
         } catch (error) {
             next(error);
@@ -51,7 +53,7 @@ class StokController {
 
     async getKartuStok(req: Request, res: Response, next: NextFunction) {
         try {
-            const result = await stokService.getKartuStok(req.query);
+            const result = await stokService.getKartuStok({ ...req.query, departmentFilter: req.departmentFilter });
             res.json({ status: 'success', ...result });
         } catch (error) {
             next(error);

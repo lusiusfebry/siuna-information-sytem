@@ -13,22 +13,39 @@ import Employee from '../../hr/models/Employee';
 import User from '../../auth/models/User';
 
 class InventoryDashboardService {
-    async getStats() {
+    // Include options that scope a joined InvGudang by department (INV-M07). undefined =
+    // privileged role (no scoping); a number (incl. fail-closed -1) = INNER JOIN filtered
+    // to that department. Mirrors StokService.gudangDeptScope.
+    private gudangDeptScope(departmentFilter?: number) {
+        if (departmentFilter === undefined || departmentFilter === null) return {};
+        return { required: true, where: { department_id: departmentFilter } };
+    }
+
+    async getStats(departmentFilter?: number) {
+        const scoped = departmentFilter !== undefined && departmentFilter !== null;
+        const gudangInclude = { model: InvGudang, as: 'gudang', attributes: [], ...this.gudangDeptScope(departmentFilter) };
+
+        // Product catalog count is global (a product is not tied to a single warehouse);
+        // it is not department-scopable and stays global by design (INV-M07).
         const totalProduk = await InvProduk.count({ where: { status: 'Aktif' } });
 
         const totalStokResult = await InvStok.findOne({
             attributes: [[Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('jumlah')), 0), 'total']],
+            include: scoped ? [gudangInclude] : [],
             raw: true,
         }) as any;
         const totalStok = parseInt(totalStokResult?.total || '0', 10);
 
         const lowStockCount = await InvStok.count({
-            include: [{
-                model: InvProduk,
-                as: 'produk',
-                attributes: [],
-                where: { status: 'Aktif' },
-            }],
+            include: [
+                {
+                    model: InvProduk,
+                    as: 'produk',
+                    attributes: [],
+                    where: { status: 'Aktif' },
+                },
+                ...(scoped ? [gudangInclude] : []),
+            ],
             where: Sequelize.where(
                 Sequelize.col('jumlah'),
                 Op.lt,
@@ -37,6 +54,8 @@ class InventoryDashboardService {
             subQuery: false,
         } as any);
 
+        // Borrowed assets are assigned to an employee and carry gudang_id=null (not in any
+        // warehouse), so they have no department anchor and stay global by design (INV-M07).
         const asetDipinjam = await InvSerialNumber.count({
             where: { karyawan_id: { [Op.ne]: null as any } },
         });
@@ -46,19 +65,20 @@ class InventoryDashboardService {
         startOfMonth.setHours(0, 0, 0, 0);
         const transaksiBulanIni = await InvTransaksi.count({
             where: { created_at: { [Op.gte]: startOfMonth } },
+            include: scoped ? [gudangInclude] : [],
         });
 
         return { totalProduk, totalStok, lowStockCount, asetDipinjam, transaksiBulanIni };
     }
 
-    async getStockByWarehouse() {
+    async getStockByWarehouse(departmentFilter?: number) {
         const data = await InvStok.findAll({
             attributes: [
                 'gudang_id',
                 [Sequelize.fn('SUM', Sequelize.col('jumlah')), 'total_stok'],
             ],
             include: [
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 // Count only active products, consistent with the stats/low-stock cards.
                 { model: InvProduk, as: 'produk', attributes: [], where: { status: 'Aktif' } },
             ],
@@ -74,32 +94,37 @@ class InventoryDashboardService {
         }));
     }
 
-    async getCategoryBreakdown() {
+    async getCategoryBreakdown(departmentFilter?: number) {
+        const scoped = departmentFilter !== undefined && departmentFilter !== null;
         const data = await InvStok.findAll({
             attributes: [
                 [Sequelize.fn('SUM', Sequelize.col('jumlah')), 'total_stok'],
             ],
-            include: [{
-                model: InvProduk,
-                as: 'produk',
-                attributes: [],
-                where: { status: 'Aktif' },
-                include: [{
-                    model: InvBrand,
-                    as: 'brand',
+            include: [
+                {
+                    model: InvProduk,
+                    as: 'produk',
                     attributes: [],
+                    where: { status: 'Aktif' },
                     include: [{
-                        model: InvSubKategori,
-                        as: 'sub_kategori',
+                        model: InvBrand,
+                        as: 'brand',
                         attributes: [],
                         include: [{
-                            model: InvKategori,
-                            as: 'kategori',
+                            model: InvSubKategori,
+                            as: 'sub_kategori',
                             attributes: [],
+                            include: [{
+                                model: InvKategori,
+                                as: 'kategori',
+                                attributes: [],
+                            }],
                         }],
                     }],
-                }],
-            }],
+                },
+                // Department scoping (INV-M07): only aggregate stock from warehouses of the dept.
+                ...(scoped ? [{ model: InvGudang, as: 'gudang', attributes: [], ...this.gudangDeptScope(departmentFilter) }] : []),
+            ],
             group: [Sequelize.col('produk.brand.sub_kategori.kategori.nama')],
             raw: true,
         });
@@ -110,10 +135,11 @@ class InventoryDashboardService {
         }));
     }
 
-    async getRecentTransactions(limit = 10) {
+    async getRecentTransactions(limit = 10, departmentFilter?: number) {
         const transaksi = await InvTransaksi.findAll({
             include: [
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                // Department scoping (INV-M07): scope recent movements by source warehouse's dept.
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
@@ -125,11 +151,12 @@ class InventoryDashboardService {
         return transaksi;
     }
 
-    async getLowStockItems() {
+    async getLowStockItems(departmentFilter?: number) {
         const items = await InvStok.findAll({
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama', 'stok_minimum'], where: { status: 'Aktif' } },
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                // Department scoping (INV-M07).
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
             ],
             where: Sequelize.where(
@@ -145,7 +172,7 @@ class InventoryDashboardService {
         return items;
     }
 
-    async getItemVelocity(days = 90) {
+    async getItemVelocity(days = 90, departmentFilter?: number) {
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -161,6 +188,10 @@ class InventoryDashboardService {
                     as: 'transaksi',
                     attributes: [],
                     where: { tanggal: { [Op.gte]: cutoffDate } },
+                    // Department scoping (INV-M07): scope velocity by the movement's source dept.
+                    include: (departmentFilter !== undefined && departmentFilter !== null)
+                        ? [{ model: InvGudang, as: 'gudang', attributes: [], ...this.gudangDeptScope(departmentFilter) }]
+                        : [],
                 },
                 {
                     model: InvProduk,
@@ -190,6 +221,10 @@ class InventoryDashboardService {
             where: deadWhere,
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
+                // Department scoping (INV-M07): dead stock only within the caller's warehouses.
+                ...((departmentFilter !== undefined && departmentFilter !== null)
+                    ? [{ model: InvGudang, as: 'gudang', attributes: [], ...this.gudangDeptScope(departmentFilter) }]
+                    : []),
             ],
             attributes: ['produk_id', [Sequelize.fn('SUM', Sequelize.col('jumlah')), 'total_stok']],
             group: ['produk_id', 'produk.id'],

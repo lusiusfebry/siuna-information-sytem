@@ -248,9 +248,9 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-M02** | Hapus karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4 | Major | Integritas | OPEN |
 | **INV-M03** | Lokasi serial pasca Ke-Gedung/Mess tak tersimpan di record serial | B-3 | Minor | Desain | OPEN |
 | **INV-M04** | facility_assets non-paranoid & tak terikat siklus transaksi → placement basi | B-4 | Minor | Integritas | OPEN |
-| **INV-M05** | RBAC kasar: IMPORT/EXPORT action tak dipakai | C-3 | Minor | RBAC | OPEN |
-| **INV-M06** | Konflasi resource: data HR/Facility dijaga permission inventory_stock | C-4 | Minor | RBAC | OPEN |
-| **INV-M07** | Tanpa department/site scoping padahal gudang punya department_id | C-5 | **Major** (mining multi-site) | RBAC | OPEN |
+| **INV-M05** | RBAC kasar: IMPORT/EXPORT action tak dipakai | C-3 | Minor | RBAC | ACCEPTED (by design) |
+| **INV-M06** | Konflasi resource: data HR/Facility dijaga permission inventory_stock | C-4 | Minor | RBAC | ACCEPTED (by design) |
+| **INV-M07** | Tanpa department/site scoping padahal gudang punya department_id | C-5 | **Major** (mining multi-site) | RBAC | FIXED |
 | **INV-M08** | Validasi master-data fail-open untuk slug tak dikenal | D-2 | Minor | Validasi | FIXED |
 | **INV-M09** | facility_room_id tak divalidasi milik building terpilih | D-4 | Minor | Validasi | FIXED |
 | **INV-M10** | generateTagNumber return null diam-diam → produk bisa masuk tanpa tag | G-2 | Major | Bug/Integritas | FIXED |
@@ -314,6 +314,30 @@ Ketiga keputusan kebijakan bisnis di bawah **sudah disetujui pemilik** dan menja
 1. **INV-C01 (penempatan facility): AUTO-SINKRON.** Transaksi "Ke Gedung/Mess" harus otomatis membuat/menutup baris `facility_assets`. `facility_assets` menjadi turunan dari transaksi inventory — satu sumber kebenaran. Aset tak boleh timpang (Tersedia di gudang tapi Aktif di kamar).
 2. **INV-M07 (department/site scoping): SCOPING PER DEPARTMENT/SITE.** User non-admin hanya melihat gudang & transaksi milik department/site-nya (pola sama seperti HR `checkDepartmentAccess`). Role privileged tetap melihat semua.
 3. **INV-M02 (aset saat karyawan keluar): BLOKIR + ARAHKAN RETUR.** Penghapusan/penonaktifan karyawan diblokir selama masih memegang aset inventory, dengan pesan agar melakukan retur/serah-terima dulu (pola sama seperti HR memblokir hapus penghuni mess aktif).
+
+---
+
+## 9b. RESOLUSI BATCH RBAC (INV-M05 / M06 / M07 / C-6)
+
+**INV-M07 — department/site scoping: DIIMPLEMENTASI (FIXED).**
+Mengikuti pola HR `checkDepartmentAccess`. Middleware disematkan pada seluruh route baca inventory (`/stok`, `/serial-numbers`, `/transaksi`, `/transaksi/:id`, `/kartu-stok`, dan 6 route `/dashboard/*`). Controller meneruskan `req.departmentFilter` ke service (query di-*spread* dahulu lalu di-*override*, sehingga klien tak bisa memalsukan lewat query param). Service memfilter lewat join `inv_gudang.department_id`:
+- `undefined` (role privileged) → tanpa scoping.
+- angka / `-1` fail-closed dari middleware → `INNER JOIN` terfilter; `-1` tak cocok gudang manapun sehingga tak ada kebocoran.
+- `getTransaksiDetail` mengembalikan **404** (bukan 403) untuk transaksi di luar department — tak membocorkan keberadaan record.
+- Metrik dashboard yang secara alami global (jumlah katalog produk, jumlah aset dipinjam yang `gudang_id=null`) **tetap global by design** dan didokumentasikan di kode.
+
+Diverifikasi runtime terhadap DB: dept berisi data melihat penuh; dept lain & `-1` melihat nol; role privileged melihat semua. `tsc --noEmit` bersih.
+
+Catatan operasional: saat ini **hanya `superadmin`** yang memegang permission `inventory_stock` (2 user, semuanya privileged), sehingga scoping ini bersifat **defense-in-depth / forward-looking** — aktif otomatis begitu role inventory non-privileged ditambahkan.
+
+**INV-M05 — action IMPORT/EXPORT: DITERIMA (by design).**
+Impor tetap di bawah `inventory_stock:create`, ekspor di bawah `inventory_stock:read`. Tanpa permission/seed/frontend baru. Pemetaan create-untuk-impor dan read-untuk-ekspor dinilai memadai; tidak diperlukan action inventory khusus.
+
+**INV-M06 — konflasi resource lintas-modul: DITERIMA (by design).**
+Endpoint lintas-modul (`/employees/search`, `/employee/:id/assets`, berita-acara, `/facility/:id/inventory`) melayani alur penugasan aset di dalam inventory; data diperlakukan sebagai milik alur inventory sehingga `inventory_stock:read` memadai. Tidak menambah syarat permission ganda (yang justru akan memutus pencarian karyawan karena user inventory tak memegang `employees:read`).
+
+**C-6 (POST /label/print dijaga READ): DITERIMA (by design).**
+`printLabels` hanya menghasilkan PDF dari daftar item yang di-*post* tanpa mutasi DB; POST dipakai semata untuk membawa body ID. Guard `READ` sudah tepat.
 
 ---
 

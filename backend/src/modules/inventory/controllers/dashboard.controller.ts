@@ -4,7 +4,7 @@ import dashboardService from '../services/dashboard.service';
 class DashboardController {
     async getStats(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await dashboardService.getStats();
+            const data = await dashboardService.getStats(req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);
@@ -13,7 +13,7 @@ class DashboardController {
 
     async getStockByWarehouse(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await dashboardService.getStockByWarehouse();
+            const data = await dashboardService.getStockByWarehouse(req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);
@@ -22,7 +22,7 @@ class DashboardController {
 
     async getCategoryBreakdown(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await dashboardService.getCategoryBreakdown();
+            const data = await dashboardService.getCategoryBreakdown(req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);
@@ -32,7 +32,7 @@ class DashboardController {
     async getRecentTransactions(req: Request, res: Response, next: NextFunction) {
         try {
             const limit = req.query.limit ? Number(req.query.limit) : 10;
-            const data = await dashboardService.getRecentTransactions(limit);
+            const data = await dashboardService.getRecentTransactions(limit, req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);
@@ -41,7 +41,7 @@ class DashboardController {
 
     async getLowStockItems(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await dashboardService.getLowStockItems();
+            const data = await dashboardService.getLowStockItems(req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);
@@ -51,7 +51,7 @@ class DashboardController {
     async getItemVelocity(req: Request, res: Response, next: NextFunction) {
         try {
             const days = req.query.days ? Number(req.query.days) : 90;
-            const data = await dashboardService.getItemVelocity(days);
+            const data = await dashboardService.getItemVelocity(days, req.departmentFilter);
             res.json({ status: 'success', data });
         } catch (error) {
             next(error);

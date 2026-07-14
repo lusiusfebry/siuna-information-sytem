@@ -8,7 +8,7 @@ import exportController from '../controllers/export.controller';
 import importController from '../controllers/import.controller';
 import employeeAssetController from '../controllers/employee-asset.controller';
 import labelController from '../controllers/label.controller';
-import { checkPermission } from '../../../shared/middleware/permission.middleware';
+import { checkPermission, checkDepartmentAccess } from '../../../shared/middleware/permission.middleware';
 import { authenticate } from '../../../shared/middleware/auth.middleware';
 import { RESOURCES, ACTIONS } from '../../../shared/constants/permissions';
 import { cacheMiddleware } from '../../../shared/middleware/cache.middleware';
@@ -80,12 +80,14 @@ router.put(
 router.get(
     '/stok',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => stokController.getStok(req, res, next)
 );
 
 router.get(
     '/serial-numbers',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => stokController.getSerialNumbers(req, res, next)
 );
 
@@ -100,18 +102,21 @@ router.post(
 router.get(
     '/transaksi',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => stokController.getTransaksiList(req, res, next)
 );
 
 router.get(
     '/transaksi/:id',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => stokController.getTransaksiDetail(req, res, next)
 );
 
 router.get(
     '/kartu-stok',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => stokController.getKartuStok(req, res, next)
 );
 
@@ -127,36 +132,42 @@ router.post(
 router.get(
     '/dashboard/stats',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getStats(req, res, next)
 );
 
 router.get(
     '/dashboard/stock-by-warehouse',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getStockByWarehouse(req, res, next)
 );
 
 router.get(
     '/dashboard/category-breakdown',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getCategoryBreakdown(req, res, next)
 );
 
 router.get(
     '/dashboard/recent-transactions',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getRecentTransactions(req, res, next)
 );
 
 router.get(
     '/dashboard/low-stock',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getLowStockItems(req, res, next)
 );
 
 router.get(
     '/dashboard/item-velocity',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
     (req, res, next) => dashboardController.getItemVelocity(req, res, next)
 );
 

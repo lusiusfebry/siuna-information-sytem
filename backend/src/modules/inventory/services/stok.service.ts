@@ -129,8 +129,17 @@ class StokService {
         return `${tagPrefix}${String(nextNumber).padStart(7, '0')}`;
     }
 
+    // Builds the include options that scope a joined InvGudang by department (INV-M07).
+    // - undefined  → privileged role, no scoping (plain LEFT JOIN)
+    // - number/-1  → non-privileged; INNER JOIN filtered to that department. The fail-closed
+    //   -1 set by checkDepartmentAccess matches no warehouse, so nothing leaks.
+    private gudangDeptScope(departmentFilter: number | undefined) {
+        if (departmentFilter === undefined || departmentFilter === null) return {};
+        return { required: true, where: { department_id: departmentFilter } };
+    }
+
     async getStokList(filters: any) {
-        const { gudang_id, produk_id, search, page = 1, limit = 10 } = filters;
+        const { gudang_id, produk_id, search, departmentFilter, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
@@ -139,7 +148,9 @@ class StokService {
 
         const include: any[] = [
             { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama', 'has_serial_number', 'has_tag_number'], include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }] },
-            { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+            // Department scoping (INV-M07): non-privileged roles carry a departmentFilter and
+            // only see stock in warehouses of their department. required:true excludes others.
+            { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
             { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
         ];
 
@@ -170,7 +181,7 @@ class StokService {
     }
 
     async getSerialNumberList(filters: any) {
-        const { produk_id, gudang_id, karyawan_id, status, search, page = 1, limit = 10 } = filters;
+        const { produk_id, gudang_id, karyawan_id, status, search, departmentFilter, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
@@ -189,7 +200,11 @@ class StokService {
             where,
             include: [
                 { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                // Department scoping (INV-M07). NOTE: units in use by an employee have
+                // gudang_id=null and thus no department anchor; with required:true they are
+                // excluded from a non-privileged view. Acceptable — such assets are not in any
+                // warehouse to scope by. Privileged roles (undefined filter) still see all.
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] , paranoid: false },
             ],
             limit: Number(limit),
@@ -609,7 +624,7 @@ class StokService {
     }
 
     async getTransaksiList(filters: any) {
-        const { tipe, sub_tipe, gudang_id, facility_building_id, tanggal_dari, tanggal_sampai, search, page = 1, limit = 10 } = filters;
+        const { tipe, sub_tipe, gudang_id, facility_building_id, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
@@ -635,7 +650,9 @@ class StokService {
         const { rows, count } = await InvTransaksi.findAndCountAll({
             where,
             include: [
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                // Department scoping (INV-M07): scope by the source warehouse's department.
+                // Every transaksi has a source gudang_id, so required:true is safe here.
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityBuilding, as: 'facility_building', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
@@ -657,10 +674,10 @@ class StokService {
         };
     }
 
-    async getTransaksiDetail(id: number) {
+    async getTransaksiDetail(id: number, departmentFilter?: number) {
         const transaksi = await InvTransaksi.findByPk(id, {
             include: [
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama', 'department_id'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityBuilding, as: 'facility_building', attributes: ['id', 'code', 'nama'] },
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
@@ -678,6 +695,13 @@ class StokService {
         });
 
         if (!transaksi) throw new AppError('Transaksi tidak ditemukan', 404);
+
+        // Department scoping (INV-M07): a non-privileged caller may only open a transaksi whose
+        // source warehouse is in their department. 404 (not 403) so we don't reveal existence.
+        if (departmentFilter !== undefined && departmentFilter !== null) {
+            const deptId = (transaksi as any).gudang?.department_id ?? null;
+            if (deptId !== departmentFilter) throw new AppError('Transaksi tidak ditemukan', 404);
+        }
 
         // Serial numbers are not directly associated to a transaksi_detail, but each
         // record carries transaksi_masuk_id (created here) / transaksi_terakhir_id
@@ -711,7 +735,7 @@ class StokService {
     }
 
     async getKartuStok(filters: any) {
-        const { produk_id, gudang_id, dari, sampai, page = 1, limit = 20 } = filters;
+        const { produk_id, gudang_id, dari, sampai, departmentFilter, page = 1, limit = 20 } = filters;
 
         if (!produk_id) throw new AppError('produk_id harus diisi', 400);
 
@@ -737,7 +761,9 @@ class StokService {
                     as: 'transaksi',
                     where: transaksiWhere,
                     include: [
-                        { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                        // Department scoping (INV-M07): scope the kartu-stok movements by the
+                        // source warehouse's department.
+                        { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                         { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'code', 'nama'] },
                         { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                     ],
