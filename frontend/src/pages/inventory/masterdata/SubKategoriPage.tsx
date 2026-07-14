@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useInvSubKategoriList, useInvKategoriList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData } from '../../../hooks/useInventoryMasterData';
+import { useInvSubKategoriList, useInvKategoriList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData, useRestoreInventoryMasterData } from '../../../hooks/useInventoryMasterData';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
 import LayoutSwitcher from '../../../components/layout/LayoutSwitcher';
@@ -16,6 +16,8 @@ const SubKategoriPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('Aktif');
+    const [showDeleted, setShowDeleted] = useState(false);
+    const [kategoriFilter, setKategoriFilter] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<InvSubKategori | null>(null);
@@ -26,11 +28,19 @@ const SubKategoriPage = () => {
         return (saved as LayoutView) || LayoutView.VIEW_1;
     });
 
-    const { data, isLoading } = useInvSubKategoriList({ page, limit: 10, search, status });
+    const { data, isLoading } = useInvSubKategoriList({ page, limit: 10, search, status, only_deleted: showDeleted, kategori_id: kategoriFilter });
     const { data: kategoriData } = useInvKategoriList({ limit: 100, status: 'true' });
     const createMutation = useCreateInventoryMasterData<InvSubKategori>('sub-kategori');
     const updateMutation = useUpdateInventoryMasterData<InvSubKategori>('sub-kategori');
-    const deleteMutation = useDeleteInventoryMasterData('sub-kategori');
+        const deleteMutation = useDeleteInventoryMasterData('sub-kategori');
+    const restoreMutation = useRestoreInventoryMasterData('sub-kategori');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
 
     const columns: Column<InvSubKategori>[] = [
         { header: 'No', accessor: (_, index) => (page - 1) * 10 + index + 1, className: 'w-16' },
@@ -95,15 +105,25 @@ const SubKategoriPage = () => {
                     </div>
                 </div>
 
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Sub Kategori" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} extraFilters={[{ placeholder: 'Semua Kategori', value: kategoriFilter, options: (kategoriData?.data || []).map((d: any) => ({ label: d.nama, value: d.id })), onChange: (v: string) => { setKategoriFilter(v); setPage(1); } }]} onAdd={handleAdd} addButtonText="Tambah Sub Kategori" transparent={true} />
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
                 <MasterDataTable permissionResource="inventory_master_data" view={layout} columns={columns} data={data?.data || []} isLoading={isLoading}
                     pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
-                    onEdit={handleEdit} onDelete={handleDelete} transparent={true} />
+                    onEdit={handleEdit} onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined} transparent={true} />
 
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === 'create' ? 'Tambah Sub Kategori' : 'Edit Sub Kategori'}>
                     <MasterDataForm fields={formFields} initialValues={(selectedItem || {}) as Record<string, unknown>}

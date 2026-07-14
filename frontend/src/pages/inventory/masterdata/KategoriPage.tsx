@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useInvKategoriList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData } from '../../../hooks/useInventoryMasterData';
+import { useInvKategoriList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData, useRestoreInventoryMasterData } from '../../../hooks/useInventoryMasterData';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
 import LayoutSwitcher from '../../../components/layout/LayoutSwitcher';
@@ -16,6 +16,7 @@ const KategoriPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('Aktif');
+    const [showDeleted, setShowDeleted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<InvKategori | null>(null);
@@ -26,10 +27,18 @@ const KategoriPage = () => {
         return (saved as LayoutView) || LayoutView.VIEW_1;
     });
 
-    const { data, isLoading } = useInvKategoriList({ page, limit: 10, search, status });
+    const { data, isLoading } = useInvKategoriList({ page, limit: 10, search, status, only_deleted: showDeleted });
     const createMutation = useCreateInventoryMasterData<InvKategori>('kategori');
     const updateMutation = useUpdateInventoryMasterData<InvKategori>('kategori');
-    const deleteMutation = useDeleteInventoryMasterData('kategori');
+        const deleteMutation = useDeleteInventoryMasterData('kategori');
+    const restoreMutation = useRestoreInventoryMasterData('kategori');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
 
     const columns: Column<InvKategori>[] = [
         { header: 'No', accessor: (_, index) => (page - 1) * 10 + index + 1, className: 'w-16' },
@@ -110,9 +119,18 @@ const KategoriPage = () => {
                     </div>
                 </div>
 
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Kategori" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} onAdd={handleAdd} addButtonText="Tambah Kategori" transparent={true} />
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
@@ -129,6 +147,7 @@ const KategoriPage = () => {
                     }}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined}
                     transparent={true}
                 />
 

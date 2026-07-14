@@ -50,6 +50,16 @@ export const useDeleteInventoryMasterData = (modelName: string) => {
     });
 };
 
+export const useRestoreInventoryMasterData = (modelName: string) => {
+    const queryClient = useQueryClient();
+    return useMutation<{ status: string; data: MasterData }, AxiosError<{ message: string }>, number>({
+        mutationFn: (id: number) => inventoryMasterDataService.restore(modelName, id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['inventoryMasterData', modelName] });
+        },
+    });
+};
+
 // Convenience hooks per entity
 export const useInvKategoriList = (filters?: FilterParams) => useInventoryMasterDataList<InvKategori>('kategori', filters);
 export const useInvSubKategoriList = (filters?: FilterParams) => useInventoryMasterDataList<InvSubKategori>('sub-kategori', filters);

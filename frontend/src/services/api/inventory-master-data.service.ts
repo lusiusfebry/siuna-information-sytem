@@ -6,6 +6,11 @@ export interface FilterParams {
     search?: string;
     page?: number;
     limit?: number;
+    only_deleted?: boolean;
+    // relational filters (e.g. sub-kategori by kategori, produk by brand)
+    kategori_id?: string | number;
+    brand_id?: string | number;
+    [key: string]: string | number | boolean | undefined;
 }
 
 export interface PaginatedResponse<T> {

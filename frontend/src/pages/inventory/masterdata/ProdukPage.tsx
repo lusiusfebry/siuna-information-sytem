@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useInvProdukList, useInvBrandList, useInvUomList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData } from '../../../hooks/useInventoryMasterData';
+import { useInvProdukList, useInvBrandList, useInvUomList, useCreateInventoryMasterData, useUpdateInventoryMasterData, useDeleteInventoryMasterData, useRestoreInventoryMasterData } from '../../../hooks/useInventoryMasterData';
 import { useQueryClient } from '@tanstack/react-query';
 import MasterDataTable, { Column } from '../../../components/hr/MasterDataTable';
 import MasterDataForm from '../../../components/hr/MasterDataForm';
@@ -20,6 +20,8 @@ const ProdukPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('Aktif');
+    const [showDeleted, setShowDeleted] = useState(false);
+    const [brandFilter, setBrandFilter] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<InvProduk | null>(null);
@@ -30,14 +32,22 @@ const ProdukPage = () => {
         return (saved as LayoutView) || LayoutView.VIEW_1;
     });
 
-    const { data, isLoading } = useInvProdukList({ page, limit: 10, search, status });
+    const { data, isLoading } = useInvProdukList({ page, limit: 10, search, status, only_deleted: showDeleted, brand_id: brandFilter });
     const { data: brandData } = useInvBrandList({ limit: 100, status: 'true' });
     const { data: uomData } = useInvUomList({ limit: 100, status: 'true' });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const uomOptions = uomData?.data?.map((d: any) => ({ label: d.nama, value: d.id })) || [];
     const createMutation = useCreateInventoryMasterData<InvProduk>('produk');
     const updateMutation = useUpdateInventoryMasterData<InvProduk>('produk');
-    const deleteMutation = useDeleteInventoryMasterData('produk');
+        const deleteMutation = useDeleteInventoryMasterData('produk');
+    const restoreMutation = useRestoreInventoryMasterData('produk');
+    const handleRestore = (item: { id: number | string }) => {
+        restoreMutation.mutate(Number(item.id), {
+            onSuccess: () => toast.success('Data berhasil dipulihkan'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError: (err: any) => toast.error(err?.response?.data?.message || 'Gagal memulihkan data'),
+        });
+    };
     const queryClient = useQueryClient();
     const photoInputRef = useRef<HTMLInputElement>(null);
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -144,15 +154,25 @@ const ProdukPage = () => {
                     </div>
                 </div>
 
-                <SearchFilter onSearchChange={setSearch} onFilterChange={setStatus} onAdd={handleAdd} addButtonText="Tambah Produk" transparent={true} />
+                <SearchFilter onSearchChange={setSearch} onFilterChange={(v) => { setStatus(v); setPage(1); }} statusValue={status} extraFilters={[{ placeholder: 'Semua Brand', value: brandFilter, options: (brandData?.data || []).map((d: any) => ({ label: d.nama, value: d.id })), onChange: (v: string) => { setBrandFilter(v); setPage(1); } }]} onAdd={handleAdd} addButtonText="Tambah Produk" transparent={true} />
 
-                <div className="mb-4 flex justify-end">
+                <div className="mb-4 flex justify-between items-center">
+                    <button
+                        onClick={() => { setShowDeleted(!showDeleted); setPage(1); }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${showDeleted
+                            ? 'bg-rose-500 hover:bg-rose-600 border-rose-500 text-white'
+                            : 'border-rose-300 text-rose-700 hover:bg-rose-50'}`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">restore_from_trash</span>
+                        {showDeleted ? 'Data Terhapus' : 'Lihat Terhapus'}
+                    </button>
                     <LayoutSwitcher currentLayout={layout} onLayoutChange={setLayout} />
                 </div>
 
                 <MasterDataTable permissionResource="inventory_master_data" view={layout} columns={columns} data={data?.data || []} isLoading={isLoading}
                     pagination={{ page: data?.pagination?.page || 1, totalPages: data?.pagination?.totalPages || 1, totalItems: data?.pagination?.total || 0, onPageChange: setPage }}
-                    onEdit={handleEdit} onDelete={handleDelete} transparent={true} />
+                    onEdit={handleEdit} onDelete={handleDelete}
+                    onRestore={showDeleted ? handleRestore : undefined} transparent={true} />
 
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === 'create' ? 'Tambah Produk' : 'Edit Produk'}>
                     {modalMode === 'edit' && selectedItem && (
