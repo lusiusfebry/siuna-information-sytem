@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import StatCard from '../../components/dashboard/StatCard';
 import { useInventoryStats, useStockByWarehouse, useCategoryBreakdown, useRecentInventoryTransactions, useLowStockItems, useItemVelocity } from '../../hooks/useInventoryDashboard';
 import type { ItemVelocityItem } from '../../services/api/inventory-dashboard.service';
-import inventoryDashboardService from '../../services/api/inventory-dashboard.service';
+import inventoryLaporanService from '../../services/api/inventory-laporan.service';
 import { InvTransaksi, InvStok } from '../../types/inventory';
 
 const PIE_COLORS = ['#4472C4', '#ED7D31', '#A5A5A5', '#FFC000'];
@@ -37,8 +37,8 @@ const InventoryDashboardPage = () => {
         setExporting(type);
         try {
             const blob = type === 'excel'
-                ? await inventoryDashboardService.exportStokExcel()
-                : await inventoryDashboardService.exportStokPDF();
+                ? await inventoryLaporanService.exportStokExcel()
+                : await inventoryLaporanService.exportStokPDF();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';

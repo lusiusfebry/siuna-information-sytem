@@ -75,14 +75,21 @@ class StokService {
         return `${prefix}-${String(nextNumber).padStart(4, '0')}`;
     }
 
-    private async generateTagNumber(produkId: number, gudangId: number, t: Transaction): Promise<string | null> {
+    private async generateTagNumber(produkId: number, gudangId: number, t: Transaction): Promise<string> {
         const produk = await InvProduk.findByPk(produkId, {
             include: [{ model: InvBrand, as: 'brand', include: [{ model: InvSubKategori, as: 'sub_kategori' }] }],
             transaction: t,
         });
 
         const prefixTag = produk?.brand?.sub_kategori?.prefix_tag;
-        if (!prefixTag) return null;
+        if (!prefixTag) {
+            // Fail-closed: a tag-tracked product with no prefix_tag on its sub-category
+            // cannot produce an asset tag. Reject clearly instead of creating untagged stock.
+            throw new AppError(
+                `Produk ${produk?.code || produkId} - ${produk?.nama || ''} membutuhkan asset tag, tetapi Sub Kategori-nya belum memiliki "prefix tag". Lengkapi prefix tag pada master data Sub Kategori terlebih dahulu.`,
+                400
+            );
+        }
 
         const gudang = await InvGudang.findByPk(gudangId, {
             include: [{ model: LokasiKerja, as: 'lokasi_kerja' }],
@@ -90,7 +97,12 @@ class StokService {
         });
 
         const kodeSite = gudang?.lokasi_kerja?.kode_site?.toUpperCase();
-        if (!kodeSite) return null;
+        if (!kodeSite) {
+            throw new AppError(
+                `Gudang ${gudang?.nama || gudangId} membutuhkan kode site untuk membuat asset tag, tetapi Lokasi Kerja gudang belum memiliki "kode site". Lengkapi kode site pada master data Lokasi Kerja terlebih dahulu.`,
+                400
+            );
+        }
 
         const tagPrefix = `${prefixTag}_${kodeSite}_`;
 
@@ -319,26 +331,22 @@ class StokService {
 
                 if (produk.has_tag_number) {
                     const tagNumber = await this.generateTagNumber(detail.produk_id, gudangId, t);
-                    if (tagNumber) {
-                        await snRecord.update({ tag_number: tagNumber }, { transaction: t });
-                    }
+                    await snRecord.update({ tag_number: tagNumber }, { transaction: t });
                 }
             }
         } else if (produk.has_tag_number && !produk.has_serial_number) {
             for (let i = 0; i < detail.jumlah; i++) {
                 const tagNumber = await this.generateTagNumber(detail.produk_id, gudangId, t);
-                if (tagNumber) {
-                    await InvSerialNumber.create({
-                        produk_id: detail.produk_id,
-                        serial_number: null,
-                        tag_number: tagNumber,
-                        gudang_id: gudangId,
-                        karyawan_id: null,
-                        status: 'Tersedia',
-                        transaksi_masuk_id: transaksi.id,
-                        transaksi_terakhir_id: transaksi.id,
-                    }, { transaction: t });
-                }
+                await InvSerialNumber.create({
+                    produk_id: detail.produk_id,
+                    serial_number: null,
+                    tag_number: tagNumber,
+                    gudang_id: gudangId,
+                    karyawan_id: null,
+                    status: 'Tersedia',
+                    transaksi_masuk_id: transaksi.id,
+                    transaksi_terakhir_id: transaksi.id,
+                }, { transaction: t });
             }
         }
 

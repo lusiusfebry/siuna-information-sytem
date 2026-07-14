@@ -14,7 +14,13 @@ const REPORT_TABS = [
 
 type TabKey = typeof REPORT_TABS[number]['key'];
 
-const TIPE_OPTIONS = ['Barang Masuk', 'Barang Keluar', 'Transfer', 'Penyesuaian'];
+// value harus cocok dengan enum DB inv_transaksi.tipe ('Masuk'/'Keluar'/'Adjustment');
+// label boleh ramah pengguna. (Transfer bukan tipe tersendiri — ia sub_tipe dari Keluar/Masuk.)
+const TIPE_OPTIONS = [
+    { value: 'Masuk', label: 'Barang Masuk' },
+    { value: 'Keluar', label: 'Barang Keluar' },
+    { value: 'Adjustment', label: 'Penyesuaian (Adjustment)' },
+];
 const STATUS_OPTIONS = ['Tersedia', 'Digunakan', 'Rusak', 'Disposed'];
 const DAYS_OPTIONS = [
     { value: 30, label: '30 Hari' },
@@ -34,7 +40,7 @@ const LaporanPage = () => {
     const [days, setDays] = useState<number>(90);
 
     const { data: gudangData } = useInventoryMasterDataList<InvGudang>('gudang', { limit: 100 });
-    const gudangList: InvGudang[] = (gudangData as any)?.data?.rows || (gudangData as any)?.data || [];
+    const gudangList: InvGudang[] = gudangData?.data || [];
 
     const resetFilters = () => {
         setGudangId('');
@@ -167,7 +173,7 @@ const LaporanPage = () => {
                                 <select value={tipe} onChange={e => setTipe(e.target.value)} className={selectClass}>
                                     <option value="">Semua Tipe</option>
                                     {TIPE_OPTIONS.map(t => (
-                                        <option key={t} value={t}>{t}</option>
+                                        <option key={t.value} value={t.value}>{t.label}</option>
                                     ))}
                                 </select>
                             </div>

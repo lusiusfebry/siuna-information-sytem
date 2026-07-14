@@ -66,16 +66,6 @@ const getItemVelocity = async (days = 90): Promise<{ status: string; data: ItemV
     return response.data;
 };
 
-const exportStokExcel = async (filters?: any): Promise<Blob> => {
-    const response = await client.get('/inventory/export/stok/excel', { params: filters, responseType: 'blob' });
-    return response.data;
-};
-
-const exportStokPDF = async (filters?: any): Promise<Blob> => {
-    const response = await client.get('/inventory/export/stok/pdf', { params: filters, responseType: 'blob' });
-    return response.data;
-};
-
 const inventoryDashboardService = {
     getStats,
     getStockByWarehouse,
@@ -83,8 +73,6 @@ const inventoryDashboardService = {
     getRecentTransactions,
     getLowStockItems,
     getItemVelocity,
-    exportStokExcel,
-    exportStokPDF,
 };
 
 export default inventoryDashboardService;

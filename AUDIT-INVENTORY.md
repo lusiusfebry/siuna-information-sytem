@@ -180,9 +180,9 @@ Referensi: prinsip §3; query integritas.
 
 ### 6.F — KONSISTENSI, KUALITAS KODE & KESIAPAN EKSTENSI
 
-- [ ] **F-1** **[INV-B01 — BUG]** `LaporanPage.tsx:17` `TIPE_OPTIONS=['Barang Masuk','Barang Keluar','Transfer','Penyesuaian']` dikirim sebagai filter `tipe`, tapi backend cocokkan ke enum `'Masuk'|'Keluar'|'Adjustment'` → filter tipe **selalu nihil**. **Terverifikasi bug.**
-- [ ] **F-2** **[INV-N01]** Komponen `components/inventory/InventoryQRCode.tsx` **dead code** (tak diimpor mana pun).
-- [ ] **F-3** **[INV-N02]** Duplikasi `exportStokExcel/PDF` di `inventory-dashboard.service.ts` **dan** `inventory-laporan.service.ts` (endpoint sama).
+- [x] **F-1** **[INV-B01 — BUG]** `LaporanPage.tsx:17` `TIPE_OPTIONS=['Barang Masuk','Barang Keluar','Transfer','Penyesuaian']` dikirim sebagai filter `tipe`, tapi backend cocokkan ke enum `'Masuk'|'Keluar'|'Adjustment'` → filter tipe **selalu nihil**. **Terverifikasi bug.**
+- [x] **F-2** **[INV-N01]** Komponen `components/inventory/InventoryQRCode.tsx` **dead code** (tak diimpor mana pun).
+- [x] **F-3** **[INV-N02]** Duplikasi `exportStokExcel/PDF` di `inventory-dashboard.service.ts` **dan** `inventory-laporan.service.ts` (endpoint sama).
 - [ ] **F-4** **[INV-N03]** Inkonsistensi path: `/inventory/employees/search` (plural) vs `/inventory/employee/:id/...` (singular). Berfungsi (FE ikut), tapi tak rapi.
 - [ ] **F-5** **[INV-N04]** `LaporanPage.tsx:37` akses defensif `.data.rows || .data` padahal service kembalikan `{data:T[]}` — sisa copy-paste.
 - [ ] **F-6** Duplikasi logika serial vs tag-only di `handleStokKeluar` (blok hampir identik) — peluang refaktor.
@@ -195,7 +195,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 
 **G.1 — Tagging / Asset Tag** — ref `stok.service.ts:generateTagNumber` (78-93), `SubKategori.prefix_tag`, `LokasiKerja.kode_site`.
 - [ ] **G-1** Format tag `${prefix_tag}_${kode_site}_${urut(7)}`; auto saat "Masuk" bila produk `has_tag_number`. Uji end-to-end.
-- [ ] **G-2** **[INV-M10]** `generateTagNumber` **mengembalikan `null` diam-diam** bila sub-kategori tak punya `prefix_tag` ATAU gudang tak punya `lokasi_kerja.kode_site` → produk `has_tag_number` bisa masuk **tanpa tag** tanpa peringatan. Verifikasi & rencanakan peringatan/penolakan.
+- [x] **G-2** **[INV-M10]** `generateTagNumber` **mengembalikan `null` diam-diam** bila sub-kategori tak punya `prefix_tag` ATAU gudang tak punya `lokasi_kerja.kode_site` → produk `has_tag_number` bisa masuk **tanpa tag** tanpa peringatan. Verifikasi & rencanakan peringatan/penolakan.
 - [ ] **G-3** Keunikan `tag_number` global (`unique` di DB) — uji tak ada tabrakan lintas gudang/produk; urutan per-prefix bebas race (advisory lock).
 - [ ] **G-4** Tag-only vs serial+tag vs serial-only: ketiga kombinasi `has_serial_number`/`has_tag_number` berperilaku benar di Masuk/Keluar (kait A-3/INV-M01).
 
@@ -203,7 +203,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 - [ ] **G-5** Generate QR produk/serial/tag (payload `INV:PRODUK|SN|TAG:<kode>`) benar; `lookupQR` membalik payload ke record; format tak dikenal → 400.
 - [ ] **G-6** Cetak label PDF: A4 (kolom) & thermal (50x30/70x40/100x50) render benar; asset-tag pakai `company_legal_name`.
 - [ ] **G-7** **[INV-M11 — GAP SPESIFIKASI]** **Scan kamera/barcode TIDAK ADA.** Spek §3/§11 minta "scan kamera/scanner". Tak ada lib scan, `getUserMedia`, atau `BarcodeDetector` di kode. `lookupQR` ada di backend tapi tak ada antarmuka scan di frontend. → fitur belum dibangun; putuskan prioritas.
-- [ ] **G-8** **[INV-N05]** QR frontend inventory (`InventoryQRCode.tsx`) dead code (duplikasi F-2); QR nyata via backend PDF. Rapikan.
+- [x] **G-8** **[INV-N05]** QR frontend inventory (`InventoryQRCode.tsx`) dead code (duplikasi F-2); QR nyata via backend PDF. Rapikan.
 
 **G.3 — Import Excel** — ref `import.service.ts`, `ImportPage.tsx`.
 - [ ] **G-9** Import Produk: resolve brand/uom by nama, generate kode, **per-baris independen** (bukan satu transaksi) — verifikasi gagal-sebagian dilaporkan benar (No. Baris).
@@ -242,7 +242,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 
 | ID | Judul | Area | Severity | Kategori | Status |
 |----|-------|------|----------|----------|--------|
-| **INV-B01** | Filter `tipe` LaporanPage mismatch enum → hasil selalu kosong | F-1 | **Major** | Bug | OPEN |
+| **INV-B01** | Filter `tipe` LaporanPage mismatch enum → hasil selalu kosong | F-1 | **Major** | Bug | FIXED |
 | **INV-C01** | Dua mekanisme penempatan facility terputus (transaksi vs facility_assets) — bertentangan spesifikasi | B-2 | **Major** | Integritas/Struktural | OPEN |
 | **INV-M01** | Produk tag-only tak punya jalur Retur Karyawan → aset nyangkut Digunakan | A-3 | Major | Bug/Integritas | OPEN |
 | **INV-M02** | Hapus karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4 | Major | Integritas | OPEN |
@@ -253,14 +253,14 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-M07** | Tanpa department/site scoping padahal gudang punya department_id | C-5 | **Major** (mining multi-site) | RBAC | OPEN |
 | **INV-M08** | Validasi master-data fail-open untuk slug tak dikenal | D-2 | Minor | Validasi | OPEN |
 | **INV-M09** | facility_room_id tak divalidasi milik building terpilih | D-4 | Minor | Validasi | OPEN |
-| **INV-M10** | generateTagNumber return null diam-diam → produk bisa masuk tanpa tag | G-2 | Major | Bug/Integritas | OPEN |
+| **INV-M10** | generateTagNumber return null diam-diam → produk bisa masuk tanpa tag | G-2 | Major | Bug/Integritas | FIXED |
 | **INV-M11** | Scan kamera/barcode belum ada (diminta spesifikasi §3/§11) | G-7 | Major (gap fitur) | Fitur | OPEN |
 | **INV-M12** | Import Stok Masuk all-or-nothing (satu baris gagal batalkan semua) | G-10 | Minor | Robustness | OPEN |
-| **INV-N01** | Dead code InventoryQRCode.tsx | F-2 | Info | Kualitas | OPEN |
-| **INV-N02** | Duplikasi fungsi export stok | F-3 | Info | Kualitas | OPEN |
+| **INV-N01** | Dead code InventoryQRCode.tsx | F-2 | Info | Kualitas | FIXED |
+| **INV-N02** | Duplikasi fungsi export stok | F-3 | Info | Kualitas | FIXED |
 | **INV-N03** | Inkonsistensi path employee (plural/singular) | F-4 | Info | Kualitas | OPEN |
 | **INV-N04** | Akses response-shape defensif keliru di LaporanPage | F-5 | Info | Kualitas | OPEN |
-| **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | OPEN |
+| **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | FIXED |
 | **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | OPEN |
 | **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | OPEN |
 | **INV-N08** | Reminder pengembalian aset/barang rusak belum ada (spek §6) | G-24 | Info (gap fitur) | Fitur | OPEN |
@@ -307,13 +307,13 @@ Dijalankan pada tahap verifikasi dinamis; setiap alur menghasilkan bukti (respon
 
 ---
 
-## 9. KEPUTUSAN YANG MENUNGGU INPUT PEMILIK
+## 9. KEPUTUSAN PEMILIK — SUDAH DIPUTUSKAN (15 Juli 2026)
 
-Beberapa temuan adalah **keputusan kebijakan bisnis**, bukan bug murni — perlu keputusan sebelum perbaikan:
+Ketiga keputusan kebijakan bisnis di bawah **sudah disetujui pemilik** dan menjadi arahan resmi perbaikan:
 
-1. **INV-C01 (penempatan facility):** Haruskah transaksi "Ke Gedung/Mess" otomatis membuat/menutup baris `facility_assets` (sinkron penuh sesuai spesifikasi), atau kedua mekanisme sengaja dipisah? *Rekomendasi awal: satukan — jadikan `facility_assets` turunan dari transaksi.*
-2. **INV-M07 (department/site scoping):** Untuk multi-site mining, apakah user hanya boleh melihat gudang/transaksi department/site-nya? *Rekomendasi awal: ya, terapkan scoping seperti HR.*
-3. **INV-M02 (aset saat karyawan keluar):** Blokir penghapusan karyawan yang masih pegang aset (seperti facility occupant), atau paksa retur otomatis, atau sekadar peringatan? *Rekomendasi awal: blokir + arahkan retur.*
+1. **INV-C01 (penempatan facility): AUTO-SINKRON.** Transaksi "Ke Gedung/Mess" harus otomatis membuat/menutup baris `facility_assets`. `facility_assets` menjadi turunan dari transaksi inventory — satu sumber kebenaran. Aset tak boleh timpang (Tersedia di gudang tapi Aktif di kamar).
+2. **INV-M07 (department/site scoping): SCOPING PER DEPARTMENT/SITE.** User non-admin hanya melihat gudang & transaksi milik department/site-nya (pola sama seperti HR `checkDepartmentAccess`). Role privileged tetap melihat semua.
+3. **INV-M02 (aset saat karyawan keluar): BLOKIR + ARAHKAN RETUR.** Penghapusan/penonaktifan karyawan diblokir selama masih memegang aset inventory, dengan pesan agar melakukan retur/serah-terima dulu (pola sama seperti HR memblokir hapus penghuni mess aktif).
 
 ---
 
