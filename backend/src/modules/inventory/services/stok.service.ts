@@ -211,6 +211,22 @@ class StokService {
         const t = await sequelize.transaction();
 
         try {
+            // Referential validation for facility placement (INV-M09): if a room is given,
+            // it must exist and belong to the selected building. Runs before any insert so a
+            // bad reference returns a clean 400 rather than a downstream FK violation.
+            if (payload.facility_room_id) {
+                const room = await FacilityRoom.findByPk(payload.facility_room_id, { transaction: t });
+                if (!room) {
+                    throw new AppError(`Kamar/ruang dengan ID ${payload.facility_room_id} tidak ditemukan`, 400);
+                }
+                if (!payload.facility_building_id) {
+                    throw new AppError('Gedung wajib dipilih jika kamar/ruang diisi', 400);
+                }
+                if (room.building_id !== payload.facility_building_id) {
+                    throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
+                }
+            }
+
             const code = await this.generateCode(payload.tipe, t);
 
             const transaksi = await InvTransaksi.create({
@@ -362,6 +378,21 @@ class StokService {
                     // Scope by the returning employee so a same-serial unit held by
                     // a DIFFERENT employee is never reset by this retur.
                     where: { produk_id: detail.produk_id, serial_number: sn, karyawan_id: payload.karyawan_id },
+                    transaction: t,
+                });
+            }
+        } else if (payload.sub_tipe === 'Retur Karyawan' && produk.has_tag_number && !produk.has_serial_number && detail.serial_numbers?.length) {
+            // Tag-only products are identified by tag_number (carried in serial_numbers),
+            // mirroring the Keluar side. Without this branch a tag-only asset assigned to
+            // an employee could never be returned and stayed 'Digunakan' forever (INV-M01).
+            for (const tn of detail.serial_numbers) {
+                await InvSerialNumber.update({
+                    gudang_id: gudangId,
+                    karyawan_id: null,
+                    status: 'Tersedia',
+                    transaksi_terakhir_id: transaksi.id,
+                }, {
+                    where: { produk_id: detail.produk_id, tag_number: tn, karyawan_id: payload.karyawan_id },
                     transaction: t,
                 });
             }

@@ -138,6 +138,26 @@ class InventoryImportService {
 
         const t = await sequelize.transaction();
         try {
+            // Pre-fetch serials already in the system (serial_number is globally unique).
+            // A colliding serial is the dominant cause of a mid-write failure; detecting it
+            // here turns it into a per-row error instead of rolling back the whole import (INV-M12).
+            const allSerials: string[] = [];
+            for (const row of rows) {
+                const snCell = row['Serial Number'] || row['serial_number'] || '';
+                if (snCell) allSerials.push(...snCell.split(',').map((s: string) => s.trim()).filter(Boolean));
+            }
+            const existingSerials = new Set<string>();
+            if (allSerials.length > 0) {
+                const found = await InvSerialNumber.findAll({
+                    where: { serial_number: allSerials },
+                    attributes: ['serial_number'],
+                    raw: true,
+                    transaction: t,
+                });
+                found.forEach((f: any) => { if (f.serial_number) existingSerials.add(String(f.serial_number).toLowerCase()); });
+            }
+            const seenSerials = new Set<string>();
+
             const grouped = new Map<string, { produk: any; uom_id: number; gudang_id: number; jumlah: number; serial_numbers: string[]; rowNum: number }>();
 
             for (const row of rows) {
@@ -176,6 +196,18 @@ class InventoryImportService {
 
                 const sn = row['Serial Number'] || row['serial_number'] || '';
                 const serialNumbers = sn ? sn.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+
+                // Reject serials that already exist or are duplicated within the file, so a
+                // colliding serial fails only its own row instead of the whole batch (INV-M12).
+                if (serialNumbers.length > 0) {
+                    const dup = serialNumbers.find((s: string) => existingSerials.has(s.toLowerCase()) || seenSerials.has(s.toLowerCase()));
+                    if (dup) {
+                        result.errors.push({ row: row._rowNumber, field: 'serial_number', message: `Serial number "${dup}" sudah terdaftar atau duplikat di file` });
+                        result.failed++;
+                        continue;
+                    }
+                    serialNumbers.forEach((s: string) => seenSerials.add(s.toLowerCase()));
+                }
 
                 const key = `${produk.id}-${gudangId}-${uomId}`;
                 const existing = grouped.get(key);

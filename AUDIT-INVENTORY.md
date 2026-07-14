@@ -117,7 +117,7 @@ Referensi kode: `stok.service.ts` (Ke/Retur Karyawan), `employee-asset.service.t
 
 - [ ] **A-1** Assign aset ke karyawan ("Ke Karyawan") mengubah serial: `karyawan_id` diset, `status='Digunakan'`, `gudang_id=null`, stok berkurang. → uji end-to-end (§8-T4).
 - [ ] **A-2** Retur karyawan ("Retur Karyawan") mengembalikan serial: `karyawan_id=null`, `status='Tersedia'`, stok bertambah; scoping per-karyawan benar (tak me-reset unit milik karyawan lain).
-- [ ] **A-3** **[INV-M01]** Produk *tag-only* (`has_tag_number && !has_serial_number`) yang di-assign ke karyawan **tidak punya jalur retur** → aset nyangkut `Digunakan` selamanya. Verifikasi & rencanakan simetri.
+- [x] **A-3** **[INV-M01]** Produk *tag-only* (`has_tag_number && !has_serial_number`) yang di-assign ke karyawan **tidak punya jalur retur** → aset nyangkut `Digunakan` selamanya. Verifikasi & rencanakan simetri.
 - [ ] **A-4** **[INV-M02]** Hapus (soft-delete) karyawan **tidak** memeriksa/mengembalikan aset inventory yang masih dipegang. FK `SET NULL` tak pernah aktif pada soft-delete → aset tetap `Digunakan` milik karyawan terhapus (orphan custody). Bandingkan: HR memblokir hapus bila masih jadi penghuni facility (`FacilityOccupant`), tapi tak ada guard serupa untuk aset inventory.
 - [ ] **A-5** Nonaktif karyawan (status≠'Aktif'): tak ada penanganan aset; karyawan hilang dari pencarian assign tapi aset lama tetap tercatat. Tentukan apakah perlu peringatan.
 - [ ] **A-6** Pencarian karyawan untuk assign hanya menampilkan `status='Aktif'` & non-deleted — verifikasi benar & diinginkan.
@@ -155,9 +155,9 @@ Referensi: `shared/constants/permissions.ts`, `types/permission.ts`, `routes/inv
 Referensi: `validateInventoryMasterData.ts`, `validateInventoryStok.ts`, cek inline `master-data.controller.ts`, constraint DB.
 
 - [ ] **D-1** Validasi master data (Zod): status/boolean coercion, code di-strip (server-generated), stok_minimum≥0. Uji tiap model.
-- [ ] **D-2** **[INV-M08]** `validateInventoryMasterData` **meloloskan tanpa validasi** bila slug `:model` tak ada di schemaMap (silent pass-through). Fail-open — bertentangan prinsip #8. Rencanakan reject default.
+- [x] **D-2** **[INV-M08]** `validateInventoryMasterData` **meloloskan tanpa validasi** bila slug `:model` tak ada di schemaMap (silent pass-through). Fail-open — bertentangan prinsip #8. Rencanakan reject default.
 - [ ] **D-3** Validasi transaksi (Zod `superRefine`): Supplier→supplier_nama; Transfer→gudang_tujuan_id; Ke Gedung/Mess→facility_building_id; Ke/Retur Karyawan→karyawan_id; jumlah≥1 (Adjustment boleh negatif). Uji tiap cabang.
-- [ ] **D-4** **[INV-M09]** `facility_room_id` diterima tapi tak pernah divalidasi/diwajibkan; tak dicek apakah room milik building yang dipilih. Evaluasi.
+- [x] **D-4** **[INV-M09]** `facility_room_id` diterima tapi tak pernah divalidasi/diwajibkan; tak dicek apakah room milik building yang dipilih. Evaluasi.
 - [ ] **D-5** Validasi jumlah serial = kuantitas + no-duplikat (baru ditambahkan). Verifikasi tetap berlaku semua jalur.
 - [ ] **D-6** Serial global-unique (DB partial index + cek service + cek frontend lintas-produk) — verifikasi 3 lapis konsisten (baru diperbaiki).
 - [ ] **D-7** Saldo stok tak boleh negatif: `validateStokCukup` + `upsertStok` throw bila delta bikin negatif. Uji batas.
@@ -207,7 +207,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 
 **G.3 — Import Excel** — ref `import.service.ts`, `ImportPage.tsx`.
 - [ ] **G-9** Import Produk: resolve brand/uom by nama, generate kode, **per-baris independen** (bukan satu transaksi) — verifikasi gagal-sebagian dilaporkan benar (No. Baris).
-- [ ] **G-10** **[INV-M12]** Import Stok Masuk: **satu transaksi besar (all-or-nothing)** — satu baris gagal membatalkan semua. Bandingkan perbaikan import karyawan (per-baris) yang sudah diterapkan. Evaluasi konsistensi/robustness.
+- [x] **G-10** **[INV-M12]** Import Stok Masuk: **satu transaksi besar (all-or-nothing)** — satu baris gagal membatalkan semua. Bandingkan perbaikan import karyawan (per-baris) yang sudah diterapkan. Evaluasi konsistensi/robustness.
 - [ ] **G-11** Preview → import (`/import/preview` simpan file, `/import/produk|stok-masuk` baca path) — verifikasi alur file & pembersihan temp.
 - [ ] **G-12** Template & error report Excel benar; pesan Indonesia.
 
@@ -244,18 +244,18 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 |----|-------|------|----------|----------|--------|
 | **INV-B01** | Filter `tipe` LaporanPage mismatch enum → hasil selalu kosong | F-1 | **Major** | Bug | FIXED |
 | **INV-C01** | Dua mekanisme penempatan facility terputus (transaksi vs facility_assets) — bertentangan spesifikasi | B-2 | **Major** | Integritas/Struktural | OPEN |
-| **INV-M01** | Produk tag-only tak punya jalur Retur Karyawan → aset nyangkut Digunakan | A-3 | Major | Bug/Integritas | OPEN |
+| **INV-M01** | Produk tag-only tak punya jalur Retur Karyawan → aset nyangkut Digunakan | A-3 | Major | Bug/Integritas | FIXED |
 | **INV-M02** | Hapus karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4 | Major | Integritas | OPEN |
 | **INV-M03** | Lokasi serial pasca Ke-Gedung/Mess tak tersimpan di record serial | B-3 | Minor | Desain | OPEN |
 | **INV-M04** | facility_assets non-paranoid & tak terikat siklus transaksi → placement basi | B-4 | Minor | Integritas | OPEN |
 | **INV-M05** | RBAC kasar: IMPORT/EXPORT action tak dipakai | C-3 | Minor | RBAC | OPEN |
 | **INV-M06** | Konflasi resource: data HR/Facility dijaga permission inventory_stock | C-4 | Minor | RBAC | OPEN |
 | **INV-M07** | Tanpa department/site scoping padahal gudang punya department_id | C-5 | **Major** (mining multi-site) | RBAC | OPEN |
-| **INV-M08** | Validasi master-data fail-open untuk slug tak dikenal | D-2 | Minor | Validasi | OPEN |
-| **INV-M09** | facility_room_id tak divalidasi milik building terpilih | D-4 | Minor | Validasi | OPEN |
+| **INV-M08** | Validasi master-data fail-open untuk slug tak dikenal | D-2 | Minor | Validasi | FIXED |
+| **INV-M09** | facility_room_id tak divalidasi milik building terpilih | D-4 | Minor | Validasi | FIXED |
 | **INV-M10** | generateTagNumber return null diam-diam → produk bisa masuk tanpa tag | G-2 | Major | Bug/Integritas | FIXED |
 | **INV-M11** | Scan kamera/barcode belum ada (diminta spesifikasi §3/§11) | G-7 | Major (gap fitur) | Fitur | OPEN |
-| **INV-M12** | Import Stok Masuk all-or-nothing (satu baris gagal batalkan semua) | G-10 | Minor | Robustness | OPEN |
+| **INV-M12** | Import Stok Masuk all-or-nothing (satu baris gagal batalkan semua) | G-10 | Minor | Robustness | FIXED |
 | **INV-N01** | Dead code InventoryQRCode.tsx | F-2 | Info | Kualitas | FIXED |
 | **INV-N02** | Duplikasi fungsi export stok | F-3 | Info | Kualitas | FIXED |
 | **INV-N03** | Inkonsistensi path employee (plural/singular) | F-4 | Info | Kualitas | OPEN |

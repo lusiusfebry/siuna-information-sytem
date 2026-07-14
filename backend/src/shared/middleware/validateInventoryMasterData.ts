@@ -68,7 +68,10 @@ export const validateInventoryMasterData = (req: Request, res: Response, next: N
     const schema = schemaMap[modelParams];
 
     if (!schema) {
-        return next();
+        // Fail-closed: the 6 slugs in schemaMap are the complete set of valid
+        // inventory master-data models. An unknown slug is a bad route/typo, not
+        // something to silently pass through unvalidated (INV-M08).
+        return next(new AppError(`Model master data inventory tidak dikenal: ${req.params.model}`, 400));
     }
 
     try {
