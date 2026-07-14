@@ -102,6 +102,7 @@ export interface InvTransaksiDetail {
     produk?: { id: number; code: string; nama: string; has_serial_number: boolean };
     uom?: { id: number; nama: string };
     transaksi?: InvTransaksi;
+    serial_numbers?: { id: number; produk_id: number; serial_number: string | null; tag_number: string | null; status: string }[];
 }
 
 export interface InvSerialNumber {

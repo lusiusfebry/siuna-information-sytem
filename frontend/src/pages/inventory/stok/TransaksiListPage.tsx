@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransaksiList, useTransaksiDetail } from '../../../hooks/useInventoryStok';
 import { useInvGudangList } from '../../../hooks/useInventoryMasterData';
@@ -223,12 +223,28 @@ const TransaksiDetailModal = ({ transaksi, onClose }: { transaksi: InvTransaksi;
                                 </thead>
                                 <tbody>
                                     {detail.details?.map((d) => (
-                                        <tr key={d.id} className="border-b border-gray-50">
-                                            <td className="px-3 py-2">{d.produk?.nama} <span className="text-gray-400 text-xs">({d.produk?.code})</span></td>
-                                            <td className="px-3 py-2 text-right font-semibold">{d.jumlah}</td>
-                                            <td className="px-3 py-2 text-gray-500">{d.uom?.nama}</td>
-                                            <td className="px-3 py-2 text-gray-500">{d.catatan || '-'}</td>
-                                        </tr>
+                                        <React.Fragment key={d.id}>
+                                            <tr className="border-b border-gray-50">
+                                                <td className="px-3 py-2">{d.produk?.nama} <span className="text-gray-400 text-xs">({d.produk?.code})</span></td>
+                                                <td className="px-3 py-2 text-right font-semibold">{d.jumlah}</td>
+                                                <td className="px-3 py-2 text-gray-500">{d.uom?.nama}</td>
+                                                <td className="px-3 py-2 text-gray-500">{d.catatan || '-'}</td>
+                                            </tr>
+                                            {d.serial_numbers && d.serial_numbers.length > 0 && (
+                                                <tr className="border-b border-gray-50 bg-gray-50/50 dark:bg-gray-800/30">
+                                                    <td colSpan={4} className="px-3 py-2">
+                                                        <div className="text-xs text-gray-500 mb-1 font-medium">Serial Number ({d.serial_numbers.length}):</div>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {d.serial_numbers.map((sn) => (
+                                                                <span key={sn.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-xs bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                                                                    {sn.serial_number || sn.tag_number || '—'}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
                                     ))}
                                 </tbody>
                             </table>

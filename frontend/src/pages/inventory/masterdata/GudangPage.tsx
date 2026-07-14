@@ -53,7 +53,7 @@ const GudangForm = ({
     const watchPjId = watch('penanggung_jawab_id');
 
     const deptIdNum = watchDeptId ? parseInt(watchDeptId, 10) : undefined;
-    const { data: deptData } = useDepartmentList({ limit: 100, status: 'Aktif' });
+    const { data: deptData, isLoading: deptLoading, isError: deptError } = useDepartmentList({ limit: 100, status: 'Aktif' });
     const { data: empData } = useEmployeesByDepartment(deptIdNum);
     const { data: lokasiData } = useLokasiKerjaList({ limit: 100, status: 'Aktif' });
 
@@ -140,7 +140,7 @@ const GudangForm = ({
             </div>
 
             <div className="flex flex-col gap-1.5">
-                <label className={labelClass}>Department</label>
+                <label className={labelClass}>Department <span className="text-red-500">*</span></label>
                 <Controller
                     control={control}
                     name="department_id"
@@ -154,10 +154,18 @@ const GudangForm = ({
                                 setValue('penanggung_jawab_id', '');
                                 setValue('lokasi_kerja_id', '');
                             }}
-                            placeholder="Pilih Department"
+                            placeholder="Pilih Department terlebih dahulu"
+                            loading={deptLoading}
                         />
                     )}
                 />
+                {deptError ? (
+                    <span className="text-xs text-red-600">Gagal memuat daftar department. Pastikan server aktif, lalu muat ulang halaman.</span>
+                ) : !deptLoading && departments.length === 0 ? (
+                    <span className="text-xs text-red-600">Daftar department kosong. Pastikan server aktif, lalu muat ulang halaman.</span>
+                ) : (
+                    <span className="text-xs text-gray-400">Penanggung jawab akan diambil dari karyawan department ini.</span>
+                )}
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -170,12 +178,19 @@ const GudangForm = ({
                             options={employees.map((e: any) => ({ label: e.nama_lengkap, value: e.id }))}
                             value={value || null}
                             onChange={(val) => setValue('penanggung_jawab_id', val ? String(val) : '')}
-                            placeholder={watchDeptId ? 'Pilih Penanggung Jawab' : 'Pilih Department terlebih dahulu'}
-                            disabled={!watchDeptId}
+                            placeholder={
+                                !watchDeptId
+                                    ? 'Pilih Department terlebih dahulu'
+                                    : employees.length === 0
+                                        ? 'Tidak ada karyawan di department ini'
+                                        : 'Pilih Penanggung Jawab'
+                            }
+                            disabled={!watchDeptId || employees.length === 0}
                         />
                     )}
                 />
-                {!watchDeptId && <span className="text-xs text-gray-400">Pilih department untuk menampilkan daftar karyawan</span>}
+                {!watchDeptId && <span className="text-xs text-amber-600">Pilih Department dulu untuk menampilkan daftar karyawan.</span>}
+                {watchDeptId && employees.length === 0 && <span className="text-xs text-amber-600">Department ini belum memiliki karyawan. Pilih department lain atau kosongkan penanggung jawab.</span>}
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -192,7 +207,13 @@ const GudangForm = ({
                         />
                     )}
                 />
-                {watchPjId && <span className="text-xs text-gray-400">Otomatis terisi berdasarkan lokasi karyawan</span>}
+                {lokasiList.length === 0 ? (
+                    <span className="text-xs text-red-600">Daftar lokasi kerja kosong. Tambahkan lokasi kerja di master data HR terlebih dahulu.</span>
+                ) : watchPjId ? (
+                    <span className="text-xs text-gray-400">Terisi otomatis dari lokasi karyawan (jika ada). Bisa dipilih manual.</span>
+                ) : (
+                    <span className="text-xs text-gray-400">Pilih lokasi kerja gudang.</span>
+                )}
             </div>
 
             <div className="flex flex-col gap-1.5">

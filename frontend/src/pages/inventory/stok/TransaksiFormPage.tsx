@@ -158,7 +158,11 @@ const TransaksiFormPage = () => {
     };
 
     const updateSerialNumbers = (key: string, value: string) => {
-        const sns = value.split('\n').map(s => s.trim()).filter(Boolean);
+        // Keep raw lines (including empty/in-progress ones) so the user can press
+        // Enter to move to the next line. Trimming/removing blanks is deferred to
+        // submit — filtering here would strip the trailing newline on every keystroke
+        // and make it impossible to type more than one serial number.
+        const sns = value.split('\n');
         setDetails(prev => prev.map(d => d._key === key ? { ...d, serial_numbers: sns } : d));
     };
 
@@ -180,6 +184,36 @@ const TransaksiFormPage = () => {
         const invalidDetail = details.find(d => !d.produk_id || !d.uom_id || d.jumlah === 0);
         if (invalidDetail) { toast.error('Lengkapi semua detail item'); return; }
 
+        // For serial-tracked products on an incoming (Masuk) transaction, the number
+        // of serial numbers must exactly match the quantity, and each must be unique.
+        // Serial numbers are globally unique, so also reject the same serial reused
+        // across different product lines in this same form.
+        const seenSerials = new Map<string, string>(); // serial -> "code - nama"
+        for (const d of details) {
+            const produk = produkData?.data?.find(p => p.id === d.produk_id);
+            if (produk?.has_serial_number && tipe === 'Masuk') {
+                const sns = (d.serial_numbers || []).map(s => s.trim()).filter(Boolean);
+                if (sns.length !== d.jumlah) {
+                    toast.error(`${produk.code} - ${produk.nama}: jumlah serial number (${sns.length}) harus sama dengan kuantitas (${d.jumlah})`);
+                    return;
+                }
+                const dupes = sns.filter((s, i) => sns.indexOf(s) !== i);
+                if (dupes.length > 0) {
+                    toast.error(`${produk.code} - ${produk.nama}: serial number duplikat — ${[...new Set(dupes)].join(', ')}`);
+                    return;
+                }
+                for (const sn of sns) {
+                    const key = sn.toLowerCase();
+                    const prevOwner = seenSerials.get(key);
+                    if (prevOwner) {
+                        toast.error(`Serial number "${sn}" dipakai di dua produk (${prevOwner} dan ${produk.code} - ${produk.nama}). Serial number harus unik.`);
+                        return;
+                    }
+                    seenSerials.set(key, `${produk.code} - ${produk.nama}`);
+                }
+            }
+        }
+
         const payload: TransaksiPayload = {
             tipe,
             sub_tipe: subTipe,
@@ -192,10 +226,14 @@ const TransaksiFormPage = () => {
             supplier_nama: showSupplier ? supplierNama : null,
             no_referensi: noReferensi || null,
             catatan: catatan || null,
-            details: details.map(({ _key, ...rest }) => ({
-                ...rest,
-                serial_numbers: rest.serial_numbers?.length ? rest.serial_numbers : undefined,
-            })),
+            details: details.map(({ _key, ...rest }) => {
+                // Normalize serial numbers only at submit: trim + drop blank lines.
+                const cleanedSNs = rest.serial_numbers?.map(s => s.trim()).filter(Boolean) || [];
+                return {
+                    ...rest,
+                    serial_numbers: cleanedSNs.length ? cleanedSNs : undefined,
+                };
+            }),
         };
 
         createMutation.mutate(payload, {
@@ -445,7 +483,7 @@ const TransaksiFormPage = () => {
                                             <label className="text-xs font-medium text-gray-500">
                                                 Serial Numbers (satu per baris)
                                                 <span className="ml-2 text-gray-400">
-                                                    {detail.serial_numbers?.length || 0} / {detail.jumlah} diisi
+                                                    {detail.serial_numbers?.filter(s => s.trim()).length || 0} / {detail.jumlah} diisi
                                                 </span>
                                             </label>
                                             <textarea

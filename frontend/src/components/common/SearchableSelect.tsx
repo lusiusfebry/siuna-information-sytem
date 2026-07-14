@@ -41,8 +41,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     const inputRef = useRef<HTMLInputElement>(null);
     const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-    // Find selected label
-    const selectedOption = options.find(opt => opt.value === value);
+    // Find selected label. Compare with String() coercion so a numeric option
+    // value (e.g. 1) still matches a string form value (e.g. "1") — react-hook-form
+    // stores ids as strings while option values are often numbers.
+    const isSelected = (optValue: string | number) =>
+        value !== null && value !== undefined && value !== '' && String(optValue) === String(value);
+    const selectedOption = options.find(opt => isSelected(opt.value));
 
     // Filter options
     const filteredOptions = options.filter(opt =>
@@ -205,17 +209,17 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                                 key={option.value}
                                 ref={(el) => { optionRefs.current[index] = el; }}
                                 role="option"
-                                aria-selected={option.value === value}
+                                aria-selected={isSelected(option.value)}
                                 className={clsx(
                                     "relative cursor-default select-none py-2 pl-3 pr-9",
                                     index === highlightedIndex ? "bg-primary/10 text-primary-900" : "text-gray-900",
-                                    option.value === value && "font-semibold"
+                                    isSelected(option.value) && "font-semibold"
                                 )}
                                 onClick={() => selectOption(option)}
                                 onMouseEnter={() => setHighlightedIndex(index)}
                             >
                                 <span className="block truncate">{option.label}</span>
-                                {option.value === value && (
+                                {isSelected(option.value) && (
                                     <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
                                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                                     </span>

@@ -271,15 +271,17 @@ class StokService {
         if (produk.has_serial_number && detail.serial_numbers?.length) {
             for (const sn of detail.serial_numbers) {
                 // Transfer Masuk moves an EXISTING physical unit into this gudang —
-                // update the serial's location instead of creating a duplicate row
-                // (which would violate the unique (produk_id, serial_number) index).
+                // update the serial's location instead of creating a duplicate row.
+                // Serials are globally unique, so we look one up by serial_number and
+                // reconcile it to this product line.
                 if (payload.sub_tipe === 'Transfer Masuk') {
                     const existing = await InvSerialNumber.findOne({
-                        where: { produk_id: detail.produk_id, serial_number: sn },
+                        where: { serial_number: sn },
                         transaction: t,
                     });
                     if (existing) {
                         await existing.update({
+                            produk_id: detail.produk_id,
                             gudang_id: gudangId,
                             karyawan_id: null,
                             status: 'Tersedia',
@@ -288,6 +290,21 @@ class StokService {
                         continue;
                     }
                     // fall through to create if the serial doesn't exist yet
+                }
+
+                // Serial numbers are globally unique (one physical unit = one serial,
+                // regardless of product). Reject if this serial already exists anywhere.
+                const clash = await InvSerialNumber.findOne({
+                    where: { serial_number: sn },
+                    include: [{ model: InvProduk, as: 'produk', attributes: ['code', 'nama'] }],
+                    transaction: t,
+                });
+                if (clash) {
+                    const owner = (clash as any).produk;
+                    throw new AppError(
+                        `Serial number "${sn}" sudah terdaftar${owner ? ` pada produk ${owner.code} - ${owner.nama}` : ''}. Serial number harus unik di seluruh sistem.`,
+                        400
+                    );
                 }
 
                 const snRecord = await InvSerialNumber.create({
@@ -622,7 +639,36 @@ class StokService {
         });
 
         if (!transaksi) throw new AppError('Transaksi tidak ditemukan', 404);
-        return transaksi;
+
+        // Serial numbers are not directly associated to a transaksi_detail, but each
+        // record carries transaksi_masuk_id (created here) / transaksi_terakhir_id
+        // (last movement). Fetch the ones tied to this transaksi and group them by
+        // produk so the frontend can show them under the matching detail line.
+        const serials = await InvSerialNumber.findAll({
+            where: {
+                [Op.or]: [
+                    { transaksi_masuk_id: id },
+                    { transaksi_terakhir_id: id },
+                ],
+            },
+            attributes: ['id', 'produk_id', 'serial_number', 'tag_number', 'status'],
+            order: [['serial_number', 'ASC']],
+        });
+
+        const serialsByProduk = new Map<number, any[]>();
+        for (const sn of serials) {
+            const list = serialsByProduk.get(sn.produk_id) || [];
+            list.push(sn);
+            serialsByProduk.set(sn.produk_id, list);
+        }
+
+        const result: any = transaksi.toJSON();
+        result.details = (result.details || []).map((d: any) => ({
+            ...d,
+            serial_numbers: serialsByProduk.get(d.produk_id) || [],
+        }));
+
+        return result;
     }
 
     async getKartuStok(filters: any) {
