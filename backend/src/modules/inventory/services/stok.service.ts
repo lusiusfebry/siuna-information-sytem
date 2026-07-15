@@ -16,6 +16,7 @@ import User from '../../auth/models/User';
 import notificationService from '../../../shared/services/notification.service';
 import FacilityBuilding from '../../facility/models/Building';
 import FacilityRoom from '../../facility/models/Room';
+import FacilityAsset from '../../facility/models/Asset';
 
 const CODE_PREFIX_MAP: Record<string, string> = {
     'Masuk': 'STM',
@@ -44,6 +45,9 @@ interface TransaksiPayload {
     no_referensi?: string;
     catatan?: string;
     details: TransaksiDetailPayload[];
+    // Set internally from the authenticated user in createTransaksi so downstream
+    // helpers (e.g. facility placement) can stamp created_by without a wider signature.
+    created_by?: number | null;
 }
 
 class StokService {
@@ -181,7 +185,7 @@ class StokService {
     }
 
     async getSerialNumberList(filters: any) {
-        const { produk_id, gudang_id, karyawan_id, status, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const { produk_id, gudang_id, karyawan_id, status, search, departmentFilter, facility_placed, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
@@ -189,6 +193,18 @@ class StokService {
         if (gudang_id) where.gudang_id = gudang_id;
         if (karyawan_id) where.karyawan_id = karyawan_id;
         if (status) where.status = status;
+
+        // facility_placed selects units currently installed in a building/mess for the
+        // "Ambil dari Gedung" picker: in use, but neither in a warehouse nor held by an
+        // employee. These have no warehouse to dept-scope by, so the gudang join must
+        // stay optional (mirrors the employee-held note below).
+        const placedFilter = facility_placed === true || facility_placed === 'true';
+        if (placedFilter) {
+            where.status = 'Digunakan';
+            where.gudang_id = null;
+            where.karyawan_id = null;
+        }
+
         if (search) {
             where[Op.or] = [
                 { serial_number: { [Op.iLike]: `%${search}%` } },
@@ -204,7 +220,7 @@ class StokService {
                 // gudang_id=null and thus no department anchor; with required:true they are
                 // excluded from a non-privileged view. Acceptable — such assets are not in any
                 // warehouse to scope by. Privileged roles (undefined filter) still see all.
-                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...(placedFilter ? {} : this.gudangDeptScope(departmentFilter)) },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] , paranoid: false },
             ],
             limit: Number(limit),
@@ -222,7 +238,7 @@ class StokService {
         };
     }
 
-    async createTransaksi(payload: TransaksiPayload, userId: number) {
+    async createTransaksi(payload: TransaksiPayload, userId: number | null) {
         const t = await sequelize.transaction();
 
         try {
@@ -241,6 +257,8 @@ class StokService {
                     throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
                 }
             }
+
+            payload.created_by = userId;
 
             const code = await this.generateCode(payload.tipe, t);
 
@@ -311,7 +329,15 @@ class StokService {
 
         await this.upsertStok(detail.produk_id, gudangId, detail.uom_id, detail.jumlah, t);
 
-        if (produk.has_serial_number && detail.serial_numbers?.length) {
+        // Only sub-types that bring a NEW or RELOCATED physical unit into a warehouse
+        // register/reconcile serial rows here: 'Supplier' mints new serials, 'Transfer
+        // Masuk' relocates an existing one. Return-type inbounds ('Retur Karyawan',
+        // 'Ambil dari Gedung') reference serials that ALREADY exist; they must skip the
+        // create path — otherwise the global-uniqueness clash check below rejects them
+        // before the return-update block runs (regression from the global-unique change).
+        const registersSerial = payload.sub_tipe === 'Supplier' || payload.sub_tipe === 'Transfer Masuk';
+
+        if (registersSerial && produk.has_serial_number && detail.serial_numbers?.length) {
             for (const sn of detail.serial_numbers) {
                 // Transfer Masuk moves an EXISTING physical unit into this gudang —
                 // update the serial's location instead of creating a duplicate row.
@@ -365,7 +391,7 @@ class StokService {
                     await snRecord.update({ tag_number: tagNumber }, { transaction: t });
                 }
             }
-        } else if (produk.has_tag_number && !produk.has_serial_number) {
+        } else if (registersSerial && produk.has_tag_number && !produk.has_serial_number) {
             for (let i = 0; i < detail.jumlah; i++) {
                 const tagNumber = await this.generateTagNumber(detail.produk_id, gudangId, t);
                 await InvSerialNumber.create({
@@ -412,6 +438,46 @@ class StokService {
                 });
             }
         }
+
+        // Ambil dari Gedung: mirror of "Ke Gedung/Mess" (INV-C01). The unit was placed
+        // in a building (serial gudang_id=null, status 'Digunakan', no karyawan). Bring
+        // it back to the receiving warehouse and close its live facility_assets row so
+        // the two modules stay in sync.
+        if (payload.sub_tipe === 'Ambil dari Gedung' && detail.serial_numbers?.length) {
+            for (const identifier of detail.serial_numbers) {
+                const where: any = produk.has_serial_number
+                    ? { produk_id: detail.produk_id, serial_number: identifier }
+                    : { produk_id: detail.produk_id, tag_number: identifier };
+                // Only pick a unit that is actually placed (not held by an employee, not
+                // already in a warehouse) so a same-code unit elsewhere is never touched.
+                where.karyawan_id = null;
+                where.gudang_id = null;
+
+                const snRecord = await InvSerialNumber.findOne({ where, transaction: t });
+                if (!snRecord) {
+                    throw new AppError(`Unit "${identifier}" tidak ditemukan sedang terpasang di gedung/mess`, 400);
+                }
+
+                await snRecord.update({
+                    gudang_id: gudangId,
+                    karyawan_id: null,
+                    status: 'Tersedia',
+                    transaksi_terakhir_id: transaksi.id,
+                }, { transaction: t });
+
+                await this.closeFacilityPlacement(snRecord.id, payload.tanggal, t);
+            }
+        }
+    }
+
+    // Close any live (status 'Aktif') facility_assets placement for a serial, marking it
+    // withdrawn. Shared by the "Ambil dari Gedung" transaction and the facility withdraw
+    // path so a returned unit is never left "Aktif" in a room while back in the warehouse.
+    private async closeFacilityPlacement(serialNumberId: number, tanggal: string, t: Transaction) {
+        await FacilityAsset.update(
+            { status: 'Ditarik', tanggal_penarikan: tanggal },
+            { where: { serial_number_id: serialNumberId, status: 'Aktif' }, transaction: t }
+        );
     }
 
     private async handleStokKeluar(
@@ -454,6 +520,7 @@ class StokService {
                 }
 
                 await snRecord.update(updateData, { transaction: t });
+                await this.openFacilityPlacement(payload, snRecord.id, transaksi.id, t);
             }
         } else if (produk.has_tag_number && !produk.has_serial_number && detail.serial_numbers?.length) {
             for (const tn of detail.serial_numbers) {
@@ -483,8 +550,39 @@ class StokService {
                 }
 
                 await snRecord.update(updateData, { transaction: t });
+                await this.openFacilityPlacement(payload, snRecord.id, transaksi.id, t);
             }
         }
+    }
+
+    // Create a live facility_assets placement when a unit is sent to a building AND a
+    // specific room is given (INV-C01). facility_assets.room_id is NOT NULL, so a
+    // building-only placement (no room) is recorded on the transaction header only.
+    // Guards against double-placing a unit that is already 'Aktif' in another room.
+    private async openFacilityPlacement(
+        payload: TransaksiPayload,
+        serialNumberId: number,
+        transaksiId: number,
+        t: Transaction
+    ) {
+        if (payload.sub_tipe !== 'Ke Gedung/Mess' || !payload.facility_room_id) return;
+
+        const alreadyPlaced = await FacilityAsset.count({
+            where: { serial_number_id: serialNumberId, status: 'Aktif' },
+            transaction: t,
+        });
+        if (alreadyPlaced > 0) {
+            throw new AppError('Unit sudah terpasang aktif di ruangan lain. Tarik (withdraw) terlebih dahulu.', 409);
+        }
+
+        await FacilityAsset.create({
+            room_id: payload.facility_room_id,
+            serial_number_id: serialNumberId,
+            tanggal_penempatan: payload.tanggal,
+            status: 'Aktif',
+            transaksi_id: transaksiId,
+            created_by: payload.created_by ?? null,
+        }, { transaction: t });
     }
 
     private async handleAdjustment(
@@ -519,7 +617,7 @@ class StokService {
     private async createPairedTransferKeluar(
         payload: TransaksiPayload,
         transaksiMasuk: InvTransaksi,
-        userId: number,
+        userId: number | null,
         t: Transaction
     ) {
         const code = await this.generateCode('Keluar', t);
@@ -551,7 +649,7 @@ class StokService {
     private async createPairedTransferMasuk(
         payload: TransaksiPayload,
         transaksiKeluar: InvTransaksi,
-        userId: number,
+        userId: number | null,
         t: Transaction
     ) {
         const code = await this.generateCode('Masuk', t);

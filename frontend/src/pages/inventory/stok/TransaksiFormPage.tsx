@@ -16,6 +16,7 @@ const SUB_TIPE_MAP: Record<TransaksiTipe, { value: TransaksiSubTipe; label: stri
         { value: 'Supplier', label: 'Dari Supplier' },
         { value: 'Transfer Masuk', label: 'Transfer Masuk' },
         { value: 'Retur Karyawan', label: 'Retur dari Karyawan' },
+        { value: 'Ambil dari Gedung', label: 'Ambil dari Gedung/Mess' },
     ],
     'Keluar': [
         { value: 'Ke Karyawan', label: 'Ke Karyawan' },
@@ -97,12 +98,16 @@ const TransaksiFormPage = () => {
     ]);
 
     useEffect(() => {
-        if (tipe === 'Masuk' || gudangId === 0) return;
+        // The picker is used by every outbound flow (needs a warehouse) plus the inbound
+        // "Ambil dari Gedung" (picks placed units, no warehouse needed).
+        const usesPicker = subTipe === 'Ambil dari Gedung' || tipe !== 'Masuk';
+        if (!usesPicker) return;
+        if (subTipe !== 'Ambil dari Gedung' && gudangId === 0) return;
         details.forEach(d => {
-            if (d.produk_id > 0) fetchAvailableSNs(d._key, d.produk_id, gudangId);
+            if (d.produk_id > 0) fetchAvailableSNs(d._key, d.produk_id, gudangId, subTipe);
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [gudangId, tipe]);
+    }, [gudangId, tipe, subTipe]);
 
     const handleTipeChange = (newTipe: TransaksiTipe) => {
         setTipe(newTipe);
@@ -129,16 +134,20 @@ const TransaksiFormPage = () => {
             }
             return updated;
         }));
-        if (field === 'produk_id' && Number(value) > 0 && gudangId > 0 && tipe !== 'Masuk') {
-            fetchAvailableSNs(key, Number(value), gudangId);
+        if (field === 'produk_id' && Number(value) > 0) {
+            const ambil = subTipe === 'Ambil dari Gedung';
+            if (ambil || (gudangId > 0 && tipe !== 'Masuk')) {
+                fetchAvailableSNs(key, Number(value), gudangId, subTipe);
+            }
         }
     };
 
-    const fetchAvailableSNs = async (key: string, produkId: number, gId: number) => {
+    const fetchAvailableSNs = async (key: string, produkId: number, gId: number, sub: TransaksiSubTipe) => {
         try {
-            const res = await inventoryStokService.getSerialNumbers({
-                produk_id: produkId, gudang_id: gId, status: 'Tersedia', limit: 200,
-            });
+            const res = sub === 'Ambil dari Gedung'
+                // Placed units live in a building: no warehouse, status 'Digunakan'.
+                ? await inventoryStokService.getSerialNumbers({ produk_id: produkId, facility_placed: true, limit: 200 })
+                : await inventoryStokService.getSerialNumbers({ produk_id: produkId, gudang_id: gId, status: 'Tersedia', limit: 200 });
             setAvailableSNs(prev => ({ ...prev, [key]: res.data || [] }));
         } catch {
             setAvailableSNs(prev => ({ ...prev, [key]: [] }));
@@ -170,6 +179,10 @@ const TransaksiFormPage = () => {
     const showBuilding = subTipe === 'Ke Gedung/Mess';
     const showKaryawan = subTipe === 'Ke Karyawan' || subTipe === 'Retur Karyawan';
     const showSupplier = subTipe === 'Supplier';
+    // "Ambil dari Gedung" is a Masuk transaction, but the user must PICK units already
+    // installed in a building (not free-type new serials). It therefore uses the same
+    // checkbox picker as outbound flows, fed by facility_placed units.
+    const isAmbilGedung = subTipe === 'Ambil dari Gedung';
 
     const filteredRooms = roomData?.data?.filter(r => r.building_id === buildingId) || [];
 
@@ -191,7 +204,7 @@ const TransaksiFormPage = () => {
         const seenSerials = new Map<string, string>(); // serial -> "code - nama"
         for (const d of details) {
             const produk = produkData?.data?.find(p => p.id === d.produk_id);
-            if (produk?.has_serial_number && tipe === 'Masuk') {
+            if (produk?.has_serial_number && tipe === 'Masuk' && !isAmbilGedung) {
                 const sns = (d.serial_numbers || []).map(s => s.trim()).filter(Boolean);
                 if (sns.length !== d.jumlah) {
                     toast.error(`${produk.code} - ${produk.nama}: jumlah serial number (${sns.length}) harus sama dengan kuantitas (${d.jumlah})`);
@@ -478,7 +491,7 @@ const TransaksiFormPage = () => {
                                         </div>
                                     </div>
 
-                                    {selectedProduk?.has_serial_number && tipe === 'Masuk' && (
+                                    {selectedProduk?.has_serial_number && tipe === 'Masuk' && !isAmbilGedung && (
                                         <div className="flex flex-col gap-1.5">
                                             <label className="text-xs font-medium text-gray-500">
                                                 Serial Numbers (satu per baris)
@@ -496,7 +509,7 @@ const TransaksiFormPage = () => {
                                         </div>
                                     )}
 
-                                    {(selectedProduk?.has_serial_number || selectedProduk?.has_tag_number) && tipe !== 'Masuk' && gudangId > 0 && (
+                                    {(selectedProduk?.has_serial_number || selectedProduk?.has_tag_number) && ((tipe !== 'Masuk' && gudangId > 0) || isAmbilGedung) && (
                                         <div className="flex flex-col gap-1.5">
                                             <label className="text-xs font-medium text-gray-500">
                                                 Pilih {selectedProduk.has_serial_number ? 'Serial Number' : 'Tag Number'}

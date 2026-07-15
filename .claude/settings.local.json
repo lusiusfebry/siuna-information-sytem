@@ -127,7 +127,8 @@
       "Bash(break)",
       "mcp__chrome-devtools__navigate_page",
       "mcp__chrome-devtools__evaluate_script",
-      "Bash(grep -rlnE \"updateEmployee|employees/\\\\$\\\\{|\\\\.put\\\\\\(.*employee\" src/)"
+      "Bash(grep -rlnE \"updateEmployee|employees/\\\\$\\\\{|\\\\.put\\\\\\(.*employee\" src/)",
+      "Bash(grep -viE \"JWT_SECRET|^$\")"
     ]
   }
 }

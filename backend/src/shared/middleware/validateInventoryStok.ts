@@ -12,7 +12,7 @@ const transaksiDetailAdjustmentSchema = z.object({
 
 const transaksiSchema = z.object({
     tipe: z.enum(['Masuk', 'Keluar', 'Adjustment'], { message: 'Tipe transaksi tidak valid' }),
-    sub_tipe: z.enum(['Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang'], { message: 'Sub tipe tidak valid' }),
+    sub_tipe: z.enum(['Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung'], { message: 'Sub tipe tidak valid' }),
     tanggal: z.string().min(1, 'Tanggal harus diisi'),
     gudang_id: z.number().int().positive('Gudang harus dipilih'),
     gudang_tujuan_id: z.number().int().positive().optional().nullable(),
@@ -38,6 +38,15 @@ const transaksiSchema = z.object({
     }
     if ((data.sub_tipe === 'Ke Karyawan' || data.sub_tipe === 'Retur Karyawan') && !data.karyawan_id) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Karyawan harus dipilih', path: ['karyawan_id'] });
+    }
+    // "Ambil dari Gedung" returns specific installed units to a warehouse, so the
+    // serial/tag numbers being pulled must be named. gudang_id (the return warehouse)
+    // is already required by the base schema.
+    if (data.sub_tipe === 'Ambil dari Gedung') {
+        const hasSN = data.details.some(d => (d.serial_numbers?.length ?? 0) > 0);
+        if (!hasSN) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Pilih minimal satu unit yang akan diambil dari gedung', path: ['details'] });
+        }
     }
     // Masuk/Keluar must use positive quantities; only Adjustment may be negative.
     if (data.tipe === 'Masuk' || data.tipe === 'Keluar') {

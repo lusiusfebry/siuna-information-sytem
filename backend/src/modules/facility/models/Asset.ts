@@ -9,6 +9,7 @@ export class FacilityAsset extends Model {
     public tanggal_penarikan!: string | null;
     public keterangan!: string | null;
     public status!: 'Aktif' | 'Ditarik';
+    public transaksi_id!: number | null;
     public created_by!: number | null;
 
     public room?: any;
@@ -27,6 +28,7 @@ FacilityAsset.init({
     tanggal_penarikan: { type: DataTypes.DATEONLY, allowNull: true },
     keterangan: { type: DataTypes.TEXT, allowNull: true },
     status: { type: DataTypes.ENUM('Aktif', 'Ditarik'), allowNull: false, defaultValue: 'Aktif' },
+    transaksi_id: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'inv_transaksi', key: 'id' } },
     created_by: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'users', key: 'id' } },
 }, {
     sequelize, tableName: 'facility_assets', timestamps: true,

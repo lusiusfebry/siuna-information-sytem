@@ -59,7 +59,8 @@ class FacilityAssetController {
 
     async withdraw(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await assetService.withdraw(Number(req.params.id), req.body);
+            const userId = (req as any).user?.id || null;
+            const data = await assetService.withdraw(Number(req.params.id), req.body, userId);
             if (!data) return res.status(404).json({ message: 'Asset tidak ditemukan' });
             res.json({ status: 'success', data });
         } catch (error) {

@@ -52,7 +52,7 @@ export interface InvStok {
 }
 
 export type TransaksiTipe = 'Masuk' | 'Keluar' | 'Adjustment';
-export type TransaksiSubTipe = 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang';
+export type TransaksiSubTipe = 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung';
 export type SerialNumberStatus = 'Tersedia' | 'Digunakan' | 'Rusak' | 'Disposed';
 
 export interface TransaksiDokumen {
@@ -171,6 +171,9 @@ export interface SerialNumberFilter {
     karyawan_id?: number;
     status?: SerialNumberStatus;
     search?: string;
+    // Units currently installed in a building/mess (in use, not in a warehouse,
+    // not held by an employee) — used by the "Ambil dari Gedung" picker.
+    facility_placed?: boolean;
     page?: number;
     limit?: number;
 }

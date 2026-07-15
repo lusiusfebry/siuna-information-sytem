@@ -5,7 +5,7 @@ export class InvTransaksi extends Model {
     public id!: number;
     public code!: string;
     public tipe!: 'Masuk' | 'Keluar' | 'Adjustment';
-    public sub_tipe!: 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang';
+    public sub_tipe!: 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung';
     public tanggal!: string;
     public gudang_id!: number;
     public gudang_tujuan_id!: number | null;
@@ -46,7 +46,7 @@ InvTransaksi.init({
         allowNull: false,
     },
     sub_tipe: {
-        type: DataTypes.ENUM('Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang'),
+        type: DataTypes.ENUM('Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung'),
         allowNull: false,
     },
     tanggal: {
