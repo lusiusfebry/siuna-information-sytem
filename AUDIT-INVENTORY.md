@@ -118,8 +118,7 @@ Referensi kode: `stok.service.ts` (Ke/Retur Karyawan), `employee-asset.service.t
 - [ ] **A-1** Assign aset ke karyawan ("Ke Karyawan") mengubah serial: `karyawan_id` diset, `status='Digunakan'`, `gudang_id=null`, stok berkurang. → uji end-to-end (§8-T4).
 - [ ] **A-2** Retur karyawan ("Retur Karyawan") mengembalikan serial: `karyawan_id=null`, `status='Tersedia'`, stok bertambah; scoping per-karyawan benar (tak me-reset unit milik karyawan lain).
 - [x] **A-3** **[INV-M01]** Produk *tag-only* (`has_tag_number && !has_serial_number`) yang di-assign ke karyawan **tidak punya jalur retur** → aset nyangkut `Digunakan` selamanya. Verifikasi & rencanakan simetri.
-- [ ] **A-4** **[INV-M02]** Hapus (soft-delete) karyawan **tidak** memeriksa/mengembalikan aset inventory yang masih dipegang. FK `SET NULL` tak pernah aktif pada soft-delete → aset tetap `Digunakan` milik karyawan terhapus (orphan custody). Bandingkan: HR memblokir hapus bila masih jadi penghuni facility (`FacilityOccupant`), tapi tak ada guard serupa untuk aset inventory.
-- [ ] **A-5** Nonaktif karyawan (status≠'Aktif'): tak ada penanganan aset; karyawan hilang dari pencarian assign tapi aset lama tetap tercatat. Tentukan apakah perlu peringatan.
+- [x] **A-4/A-5** **[INV-M02 — FIXED]** Karyawan keluar diproses lewat **nonaktif** (bukan hapus). `updateEmployeeComplete` kini memblokir transisi ke status `Tidak Aktif` selama karyawan masih memegang aset (`InvSerialNumber` `status='Digunakan'`) → **409** dengan pesan arah retur (meniru pola guard penghuni mess). Deteksi "keluar" berbasis kolom master `status_karyawan.status='Tidak Aktif'` (migration 63 menandai 'Resign'; future-proof untuk status keluar lain). Guard hanya menyala pada transisi masuk-ke-nonaktif, jadi edit karyawan yang sudah nonaktif & transisi antar-status aktif (Aktif↔Cuti) tak terpengaruh. Jalur `deleteEmployee` sengaja tak diubah (di luar scope; workflow pakai nonaktif). Lihat `.claude/PLAN-INV-M02.md`.
 - [ ] **A-6** Pencarian karyawan untuk assign hanya menampilkan `status='Aktif'` & non-deleted — verifikasi benar & diinginkan.
 - [ ] **A-7** Join karyawan di semua read inventory memakai `paranoid:false` (karyawan terhapus tetap tampil di histori/Berita Acara) — verifikasi konsisten & benar.
 - [ ] **A-8** `penanggung_jawab_id` gudang → `employees` (FK `SET NULL`). Verifikasi perilaku saat penanggung jawab dihapus.
@@ -245,7 +244,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-B01** | Filter `tipe` LaporanPage mismatch enum → hasil selalu kosong | F-1 | **Major** | Bug | FIXED |
 | **INV-C01** | Dua mekanisme penempatan facility terputus (transaksi vs facility_assets) — bertentangan spesifikasi | B-2 | **Major** | Integritas/Struktural | OPEN |
 | **INV-M01** | Produk tag-only tak punya jalur Retur Karyawan → aset nyangkut Digunakan | A-3 | Major | Bug/Integritas | FIXED |
-| **INV-M02** | Hapus karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4 | Major | Integritas | OPEN |
+| **INV-M02** | Nonaktif karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4/A-5 | Major | Integritas | FIXED |
 | **INV-M03** | Lokasi serial pasca Ke-Gedung/Mess tak tersimpan di record serial | B-3 | Minor | Desain | OPEN |
 | **INV-M04** | facility_assets non-paranoid & tak terikat siklus transaksi → placement basi | B-4 | Minor | Integritas | OPEN |
 | **INV-M05** | RBAC kasar: IMPORT/EXPORT action tak dipakai | C-3 | Minor | RBAC | ACCEPTED (by design) |
@@ -313,7 +312,7 @@ Ketiga keputusan kebijakan bisnis di bawah **sudah disetujui pemilik** dan menja
 
 1. **INV-C01 (penempatan facility): AUTO-SINKRON.** Transaksi "Ke Gedung/Mess" harus otomatis membuat/menutup baris `facility_assets`. `facility_assets` menjadi turunan dari transaksi inventory — satu sumber kebenaran. Aset tak boleh timpang (Tersedia di gudang tapi Aktif di kamar).
 2. **INV-M07 (department/site scoping): SCOPING PER DEPARTMENT/SITE.** User non-admin hanya melihat gudang & transaksi milik department/site-nya (pola sama seperti HR `checkDepartmentAccess`). Role privileged tetap melihat semua.
-3. **INV-M02 (aset saat karyawan keluar): BLOKIR + ARAHKAN RETUR.** Penghapusan/penonaktifan karyawan diblokir selama masih memegang aset inventory, dengan pesan agar melakukan retur/serah-terima dulu (pola sama seperti HR memblokir hapus penghuni mess aktif).
+3. **INV-M02 (aset saat karyawan keluar): BLOKIR + ARAHKAN RETUR. — DIIMPLEMENTASI (FIXED).** Penonaktifan karyawan (transisi status → `Tidak Aktif`) diblokir 409 selama masih memegang aset inventory, dengan pesan agar melakukan Retur Karyawan dulu (pola sama seperti HR memblokir hapus penghuni mess aktif). Selain guard, ditambahkan indikator turunan `outstanding_assets_count` (satu query COUNT GROUP BY, tanpa N+1) di response daftar & detail karyawan — dirender sebagai lencana peringatan merah di list (`VirtualEmployeeTable`/`EmployeeCard`) dan header profil (`EmployeeDetailPage`, klik → tab Aset). Deteksi "keluar" berbasis kolom master `status_karyawan.status` (migration 63 set 'Resign' → 'Tidak Aktif'), bukan flag manual. Detail: `.claude/PLAN-INV-M02.md`.
 
 ---
 

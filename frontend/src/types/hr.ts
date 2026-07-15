@@ -256,6 +256,10 @@ export interface Employee {
     // Draft status
     is_draft?: boolean;
 
+    // INV-M02: derived count of inventory assets still held by this employee
+    // (serial numbers with status 'Digunakan'). Not stored — computed by backend.
+    outstanding_assets_count?: number;
+
     createdAt: string;
     updatedAt: string;
 }

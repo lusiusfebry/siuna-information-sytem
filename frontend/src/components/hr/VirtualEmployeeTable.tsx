@@ -11,6 +11,7 @@ interface Employee {
     posisi_jabatan?: { nama: string };
     department?: { nama: string };
     is_draft?: boolean;
+    outstanding_assets_count?: number;
 }
 
 interface VirtualEmployeeTableProps {
@@ -63,6 +64,15 @@ const Row = ({ index, style, data }: ListChildComponentProps) => {
                         {showDraftBadge && employee.is_draft && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
                                 Draft
+                            </span>
+                        )}
+                        {(employee.outstanding_assets_count ?? 0) > 0 && (
+                            <span
+                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700"
+                                title={`Masih memegang ${employee.outstanding_assets_count} aset yang belum dikembalikan`}
+                            >
+                                <span className="material-symbols-outlined text-[14px]">warning</span>
+                                {employee.outstanding_assets_count}
                             </span>
                         )}
                     </div>

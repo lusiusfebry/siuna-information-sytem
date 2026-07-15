@@ -18,6 +18,7 @@ import SubGolongan from '../models/SubGolongan';
 import { qrcodeService } from './qrcode.service';
 import { validateManagerPosition, validateAtasanLangsungActive, validateDepartmentBelongsToDivisi, validatePosisiJabatanBelongsToDepartment, validateContractDates } from '../validators/business-rules.validator';
 import { ERROR_MESSAGES } from '../../../shared/constants/error-messages';
+import { AppError } from '../../../shared/utils/errorHandler';
 
 class EmployeeService {
     async getEmployeeQRCode(id: number) {
@@ -156,12 +157,45 @@ class EmployeeService {
             subQuery: false // Optimize for large datasets with includes
         });
 
+        // INV-M02: attach outstanding held-asset count as a derived value so the UI
+        // can flag employees who still hold inventory. Single batched COUNT GROUP BY
+        // over just the ids on this page — no N+1, no stored flag to go stale.
+        const employeeIds = rows.map((r: any) => r.id);
+        const heldByEmployee = await this.getOutstandingAssetCounts(employeeIds);
+        const data = rows.map((r: any) => {
+            const plain = r.toJSON();
+            plain.outstanding_assets_count = heldByEmployee[r.id] || 0;
+            return plain;
+        });
+
         return {
-            data: rows,
+            data,
             total: count,
             page: parseInt(page),
             totalPages: Math.ceil(count / limit)
         };
+    }
+
+    // INV-M02: derive how many inventory assets each employee still holds
+    // (InvSerialNumber rows with status 'Digunakan'). Returns a map keyed by
+    // employee id. Empty input -> empty map (avoids an IN () query).
+    async getOutstandingAssetCounts(employeeIds: number[]): Promise<Record<number, number>> {
+        if (!employeeIds.length) return {};
+        const { default: InvSerialNumber } = await import('../../inventory/models/SerialNumber');
+        const rows = await InvSerialNumber.findAll({
+            attributes: [
+                'karyawan_id',
+                [sequelize.fn('COUNT', sequelize.col('id')), 'cnt'],
+            ],
+            where: { karyawan_id: { [Op.in]: employeeIds }, status: 'Digunakan' },
+            group: ['karyawan_id'],
+            raw: true,
+        });
+        const map: Record<number, number> = {};
+        for (const row of rows as any[]) {
+            map[row.karyawan_id] = parseInt(row.cnt, 10);
+        }
+        return map;
     }
 
     async getEmployeeById(id: number) {
@@ -195,7 +229,7 @@ class EmployeeService {
 
     // Lazy Loading Methods
     async getEmployeeBase(id: number) {
-        return await Employee.findByPk(id, {
+        const employee = await Employee.findByPk(id, {
             include: [
                 { model: Divisi, as: 'divisi' },
                 { model: Department, as: 'department' },
@@ -207,6 +241,12 @@ class EmployeeService {
                 { model: Employee, as: 'atasan_langsung' }
             ]
         });
+        if (!employee) return employee;
+        // INV-M02: attach derived held-asset count for the profile header badge.
+        const counts = await this.getOutstandingAssetCounts([id]);
+        const plain: any = employee.toJSON();
+        plain.outstanding_assets_count = counts[id] || 0;
+        return plain;
     }
 
     async getEmployeePersonalInfo(id: number) {
@@ -394,6 +434,33 @@ class EmployeeService {
         try {
             const employee = await Employee.findByPk(id, { transaction: t });
             if (!employee) throw new Error('Employee not found');
+
+            // INV-M02 guard: an employee transitioning INTO an inactive state
+            // (status_karyawan.status = 'Tidak Aktif', e.g. Resign) must not still
+            // be holding inventory assets. Custody = InvSerialNumber rows with this
+            // karyawan_id and status 'Digunakan'. Force asset return first.
+            // Only fires on the transition (was active -> now inactive), so editing
+            // an already-inactive employee isn't blocked.
+            const newStatusId = (employeeData as any).status_karyawan_id;
+            if (newStatusId != null && newStatusId !== (employee as any).status_karyawan_id) {
+                const newStatus = await StatusKaryawan.findByPk(newStatusId, { transaction: t });
+                const prevStatus = (employee as any).status_karyawan_id != null
+                    ? await StatusKaryawan.findByPk((employee as any).status_karyawan_id, { transaction: t })
+                    : null;
+                const becomingInactive = newStatus?.status === 'Tidak Aktif'
+                    && prevStatus?.status !== 'Tidak Aktif';
+                if (becomingInactive) {
+                    // Dynamic import keeps the hr->inventory dependency out of module load.
+                    const { default: InvSerialNumber } = await import('../../inventory/models/SerialNumber');
+                    const heldAssets = await InvSerialNumber.count({
+                        where: { karyawan_id: id, status: 'Digunakan' },
+                        transaction: t,
+                    });
+                    if (heldAssets > 0) {
+                        throw new AppError(`Karyawan masih memegang ${heldAssets} aset yang belum dikembalikan. Lakukan Retur Karyawan terlebih dahulu sebelum menonaktifkan karyawan.`, 409);
+                    }
+                }
+            }
 
             if (photoPath) {
                 employeeData.foto_karyawan = photoPath;

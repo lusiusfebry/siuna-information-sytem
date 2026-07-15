@@ -126,7 +126,8 @@
       "PowerShell(try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/auth/login\" -Method POST -ContentType \"application/json\" -Body '{\"nik\":\"111111\",\"password\":\"password123\"}' -ErrorAction Stop; Write-Host \"Login SUCCESS - User: $\\($r.data.user.nik\\), Role: $\\($r.data.user.roleDetails.name\\)\" } catch { Write-Host \"Login FAILED: $\\($_.Exception.Message\\)\" })",
       "Bash(break)",
       "mcp__chrome-devtools__navigate_page",
-      "mcp__chrome-devtools__evaluate_script"
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(grep -rlnE \"updateEmployee|employees/\\\\$\\\\{|\\\\.put\\\\\\(.*employee\" src/)"
     ]
   }
 }

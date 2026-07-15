@@ -214,6 +214,19 @@ const EmployeeDetailPage: React.FC = () => {
                                     }`}>
                                     {employee.status_karyawan?.nama || '-'}
                                 </span>
+                                {/* INV-M02: warn when the employee still holds inventory assets.
+                                    Clicking jumps to the Aset tab to review/return them. */}
+                                {(employee.outstanding_assets_count ?? 0) > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setActiveTab('assets')}
+                                        title="Karyawan masih memegang aset yang belum dikembalikan. Klik untuk melihat daftar aset."
+                                        className="px-3 py-1.5 text-[11px] font-extrabold rounded-lg uppercase tracking-[0.15em] border shadow-sm bg-red-500/10 text-red-600 border-red-500/20 flex items-center gap-1.5 hover:bg-red-500/20 transition-all active:scale-95"
+                                    >
+                                        <span className="material-symbols-outlined text-sm">warning</span>
+                                        {employee.outstanding_assets_count} aset belum dikembalikan
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

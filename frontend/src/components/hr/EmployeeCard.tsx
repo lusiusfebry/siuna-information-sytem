@@ -46,8 +46,17 @@ const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, onClick, onDelete
                         }}
                     />
                     <div>
-                        <h4 className="font-semibold text-sm text-[#0d121b] dark:text-white">
+                        <h4 className="font-semibold text-sm text-[#0d121b] dark:text-white flex items-center gap-1.5">
                             {employee.nama_lengkap}
+                            {(employee.outstanding_assets_count ?? 0) > 0 && (
+                                <span
+                                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-700"
+                                    title={`Masih memegang ${employee.outstanding_assets_count} aset yang belum dikembalikan`}
+                                >
+                                    <span className="material-symbols-outlined text-[12px]">warning</span>
+                                    {employee.outstanding_assets_count}
+                                </span>
+                            )}
                         </h4>
                         <p className="text-xs text-[#4c669a]">
                             NIK: {employee.nomor_induk_karyawan}
