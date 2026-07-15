@@ -79,6 +79,10 @@ export interface InvTransaksi {
     catatan?: string | null;
     dokumen?: TransaksiDokumen[] | null;
     created_by: number;
+    approval_status: ApprovalStatus;
+    approved_by?: number | null;
+    approved_at?: string | null;
+    rejection_reason?: string | null;
     created_at: string;
     updated_at: string;
     gudang?: { id: number; code: string; nama: string };
@@ -87,8 +91,11 @@ export interface InvTransaksi {
     facility_room?: { id: number; code: string; nama: string } | null;
     karyawan?: { id: number; nama_lengkap: string; nomor_induk_karyawan?: string } | null;
     creator?: { id: number; nama: string };
+    approver?: { id: number; nama: string } | null;
     details?: InvTransaksiDetail[];
 }
+
+export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface InvTransaksiDetail {
     id: number;
@@ -102,7 +109,10 @@ export interface InvTransaksiDetail {
     produk?: { id: number; code: string; nama: string; has_serial_number: boolean };
     uom?: { id: number; nama: string };
     transaksi?: InvTransaksi;
-    serial_numbers?: { id: number; produk_id: number; serial_number: string | null; tag_number: string | null; status: string }[];
+    // id/produk_id/tag_number are absent for Pending transactions, where the backend
+    // surfaces the submitter's serial selection as {serial_number, status:'Pending'}
+    // placeholders (no serial row exists yet). INV-N07.
+    serial_numbers?: { id?: number; produk_id?: number; serial_number: string | null; tag_number?: string | null; status: string }[];
 }
 
 export interface InvSerialNumber {
@@ -158,6 +168,7 @@ export interface TransaksiFilter {
     sub_tipe?: TransaksiSubTipe;
     gudang_id?: number;
     facility_building_id?: number;
+    approval_status?: ApprovalStatus;
     tanggal_dari?: string;
     tanggal_sampai?: string;
     search?: string;

@@ -57,6 +57,16 @@ const getFacilityInventory = async (buildingId: number): Promise<{ status: strin
     return response.data;
 };
 
+const approveTransaksi = async (id: number): Promise<{ status: string; data: InvTransaksi }> => {
+    const response = await client.post<{ status: string; data: InvTransaksi }>(`/inventory/transaksi/${id}/approve`);
+    return response.data;
+};
+
+const rejectTransaksi = async (id: number, reason?: string): Promise<{ status: string; data: InvTransaksi }> => {
+    const response = await client.post<{ status: string; data: InvTransaksi }>(`/inventory/transaksi/${id}/reject`, { reason });
+    return response.data;
+};
+
 const inventoryStokService = {
     getStok,
     getSerialNumbers,
@@ -66,6 +76,8 @@ const inventoryStokService = {
     getKartuStok,
     uploadDokumen,
     getFacilityInventory,
+    approveTransaksi,
+    rejectTransaksi,
 };
 
 export default inventoryStokService;

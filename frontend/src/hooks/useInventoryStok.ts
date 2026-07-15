@@ -40,6 +40,33 @@ export const useCreateTransaksi = () => {
     });
 };
 
+const invalidateTransaksiCaches = (queryClient: ReturnType<typeof useQueryClient>) => {
+    queryClient.invalidateQueries({ queryKey: ['inventoryStok'] });
+    queryClient.invalidateQueries({ queryKey: ['inventoryTransaksi'] });
+    queryClient.invalidateQueries({ queryKey: ['inventorySerialNumbers'] });
+    queryClient.invalidateQueries({ queryKey: ['inventoryKartuStok'] });
+    queryClient.invalidateQueries({ queryKey: ['facilityInventory'] });
+};
+
+// INV-N07: approving replays the deferred stock/serial effects, so it must
+// invalidate the same caches as create.
+export const useApproveTransaksi = () => {
+    const queryClient = useQueryClient();
+    return useMutation<{ status: string; data: InvTransaksi }, AxiosError<{ message: string }>, number>({
+        mutationFn: (id: number) => inventoryStokService.approveTransaksi(id),
+        onSuccess: () => invalidateTransaksiCaches(queryClient),
+    });
+};
+
+// Rejecting applies no stock effects, so only the transaction lists need refreshing.
+export const useRejectTransaksi = () => {
+    const queryClient = useQueryClient();
+    return useMutation<{ status: string; data: InvTransaksi }, AxiosError<{ message: string }>, { id: number; reason?: string }>({
+        mutationFn: ({ id, reason }) => inventoryStokService.rejectTransaksi(id, reason),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['inventoryTransaksi'] }),
+    });
+};
+
 export const useTransaksiList = (filters?: TransaksiFilter) => {
     return useQuery({
         queryKey: ['inventoryTransaksi', filters],

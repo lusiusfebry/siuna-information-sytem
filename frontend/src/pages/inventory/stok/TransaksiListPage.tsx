@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransaksiList, useTransaksiDetail } from '../../../hooks/useInventoryStok';
+import { useTransaksiList, useTransaksiDetail, useApproveTransaksi, useRejectTransaksi } from '../../../hooks/useInventoryStok';
 import { useInvGudangList } from '../../../hooks/useInventoryMasterData';
-import { InvTransaksi, TransaksiTipe } from '../../../types/inventory';
+import { usePermission } from '../../../hooks/usePermission';
+import { InvTransaksi, TransaksiTipe, ApprovalStatus } from '../../../types/inventory';
 import Button from '../../../components/common/Button';
 
 const TIPE_COLORS: Record<string, string> = {
@@ -11,11 +12,18 @@ const TIPE_COLORS: Record<string, string> = {
     'Adjustment': 'bg-yellow-100 text-yellow-800',
 };
 
+const APPROVAL_COLORS: Record<ApprovalStatus, string> = {
+    'Pending': 'bg-amber-100 text-amber-800',
+    'Approved': 'bg-green-100 text-green-800',
+    'Rejected': 'bg-red-100 text-red-800',
+};
+
 const TransaksiListPage = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [tipe, setTipe] = useState<TransaksiTipe | ''>('');
+    const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus | ''>('');
     const [gudangId, setGudangId] = useState<number | undefined>();
     const [tanggalDari, setTanggalDari] = useState('');
     const [tanggalSampai, setTanggalSampai] = useState('');
@@ -25,13 +33,34 @@ const TransaksiListPage = () => {
         limit: 15,
         search,
         tipe: tipe || undefined,
+        approval_status: approvalStatus || undefined,
         gudang_id: gudangId,
         tanggal_dari: tanggalDari || undefined,
         tanggal_sampai: tanggalSampai || undefined,
     });
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
+    const { can } = usePermission();
+    const canApprove = can('inventory_stock', 'approve');
+
+    const approveMutation = useApproveTransaksi();
+    const rejectMutation = useRejectTransaksi();
 
     const [detailModal, setDetailModal] = useState<InvTransaksi | null>(null);
+
+    const handleApprove = (item: InvTransaksi) => {
+        if (!window.confirm(`Setujui transaksi ${item.code}? Efek stok akan diterapkan.`)) return;
+        approveMutation.mutate(item.id, {
+            onError: (err) => window.alert(err.response?.data?.message || 'Gagal menyetujui transaksi'),
+        });
+    };
+
+    const handleReject = (item: InvTransaksi) => {
+        const reason = window.prompt(`Tolak transaksi ${item.code}? Masukkan alasan (opsional):`, '');
+        if (reason === null) return;
+        rejectMutation.mutate({ id: item.id, reason: reason || undefined }, {
+            onError: (err) => window.alert(err.response?.data?.message || 'Gagal menolak transaksi'),
+        });
+    };
 
     return (
         <div className="p-6 space-y-6">
@@ -63,6 +92,16 @@ const TransaksiListPage = () => {
                     <option value="Masuk">Masuk</option>
                     <option value="Keluar">Keluar</option>
                     <option value="Adjustment">Adjustment</option>
+                </select>
+                <select
+                    value={approvalStatus}
+                    onChange={(e) => { setApprovalStatus(e.target.value as ApprovalStatus | ''); setPage(1); }}
+                    className="flex h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
+                >
+                    <option value="">Semua Status</option>
+                    <option value="Pending">Menunggu</option>
+                    <option value="Approved">Disetujui</option>
+                    <option value="Rejected">Ditolak</option>
                 </select>
                 <select
                     value={gudangId || ''}
@@ -102,6 +141,7 @@ const TransaksiListPage = () => {
                                 <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Sub Tipe</th>
                                 <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Gudang</th>
                                 <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Keterangan</th>
+                                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
                                 <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Dibuat Oleh</th>
                                 <th className="text-center px-4 py-3 font-medium text-gray-500 dark:text-gray-400 w-20">Aksi</th>
                             </tr>
@@ -110,14 +150,14 @@ const TransaksiListPage = () => {
                             {isLoading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="border-b border-gray-50 dark:border-gray-800">
-                                        {Array.from({ length: 9 }).map((_, j) => (
+                                        {Array.from({ length: 10 }).map((_, j) => (
                                             <td key={j} className="px-4 py-3"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" /></td>
                                         ))}
                                     </tr>
                                 ))
                             ) : data?.data?.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="px-4 py-12 text-center text-gray-400">Tidak ada transaksi</td>
+                                    <td colSpan={10} className="px-4 py-12 text-center text-gray-400">Tidak ada transaksi</td>
                                 </tr>
                             ) : (
                                 data?.data?.map((item: InvTransaksi, index: number) => {
@@ -144,14 +184,39 @@ const TransaksiListPage = () => {
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.sub_tipe}</td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.gudang?.nama}</td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300 max-w-[200px] truncate">{keterangan}</td>
+                                            <td className="px-4 py-3">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[item.approval_status] || ''}`}>
+                                                    {item.approval_status === 'Pending' ? 'Menunggu' : item.approval_status === 'Approved' ? 'Disetujui' : 'Ditolak'}
+                                                </span>
+                                            </td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.creator?.nama}</td>
-                                            <td className="px-4 py-3 text-center">
-                                                <button
-                                                    onClick={() => setDetailModal(item)}
-                                                    className="text-primary hover:text-blue-700 text-xs font-medium"
-                                                >
-                                                    Detail
-                                                </button>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
+                                                        onClick={() => setDetailModal(item)}
+                                                        className="text-primary hover:text-blue-700 text-xs font-medium"
+                                                    >
+                                                        Detail
+                                                    </button>
+                                                    {canApprove && item.approval_status === 'Pending' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleApprove(item)}
+                                                                disabled={approveMutation.isPending}
+                                                                className="text-green-600 hover:text-green-700 text-xs font-medium disabled:opacity-50"
+                                                            >
+                                                                Setujui
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleReject(item)}
+                                                                disabled={rejectMutation.isPending}
+                                                                className="text-red-600 hover:text-red-700 text-xs font-medium disabled:opacity-50"
+                                                            >
+                                                                Tolak
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -188,10 +253,18 @@ const TransaksiDetailModal = ({ transaksi, onClose }: { transaksi: InvTransaksi;
             <div className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Detail Transaksi {transaksi.code}</h3>
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold text-gray-900">Detail Transaksi {transaksi.code}</h3>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[transaksi.approval_status] || ''}`}>
+                                {transaksi.approval_status === 'Pending' ? 'Menunggu' : transaksi.approval_status === 'Approved' ? 'Disetujui' : 'Ditolak'}
+                            </span>
+                        </div>
                         <p className="text-sm text-gray-500 mt-0.5">
                             {transaksi.tipe} - {transaksi.sub_tipe} | {new Date(transaksi.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}
                         </p>
+                        {detail?.approval_status === 'Rejected' && detail.rejection_reason && (
+                            <p className="text-sm text-red-600 mt-1">Alasan ditolak: {detail.rejection_reason}</p>
+                        )}
                     </div>
                     <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100">
                         <span className="material-symbols-outlined">close</span>
@@ -235,8 +308,8 @@ const TransaksiDetailModal = ({ transaksi, onClose }: { transaksi: InvTransaksi;
                                                     <td colSpan={4} className="px-3 py-2">
                                                         <div className="text-xs text-gray-500 mb-1 font-medium">Serial Number ({d.serial_numbers.length}):</div>
                                                         <div className="flex flex-wrap gap-1.5">
-                                                            {d.serial_numbers.map((sn) => (
-                                                                <span key={sn.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-xs bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                                                            {d.serial_numbers.map((sn, i) => (
+                                                                <span key={sn.id ?? `${sn.serial_number}-${i}`} className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-xs bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                                                                     {sn.serial_number || sn.tag_number || '—'}
                                                                 </span>
                                                             ))}
