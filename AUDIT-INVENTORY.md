@@ -103,7 +103,7 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Facility Inv. | Inventaris per gedung | `/inventory/facility/:id/inventory` | ⚠️ CEK | Berbasis log transaksi |
 | Foto Produk | Upload/preview | `PUT /master/produk/:id/photo` | ⚠️ CEK | |
 | PWA/Offline | Mobile offline sync | — | 🔴 BELUM ADA | Diminta spek §7/§11 (INV-N06) |
-| Approval | Alur persetujuan transaksi | — | 🔴 BELUM ADA | Diminta spek §8 (INV-N07) |
+| Approval | Alur persetujuan transaksi | `POST /transaksi/:id/approve`·`/reject` | ✅ OK | Transaksi kurang-stok dibuat `Pending`, efek ditunda sampai disetujui (INV-N07 FIXED) |
 | Notifikasi | Reminder retur aset / barang rusak | scheduler + Notification | ✅ OK | Low-stock + reminder rusak/custody/facility (INV-N08 FIXED) |
 
 ---
@@ -262,7 +262,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-N04** | Akses response-shape defensif keliru di LaporanPage | F-5 | Info | Kualitas | FIXED |
 | **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | FIXED |
 | **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | OPEN |
-| **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | OPEN |
+| **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | FIXED — transaksi berkurang-stok (Keluar/Adjustment/Transfer Masuk) dibuat `Pending` & menunda seluruh efek sampai disetujui; approve/reject di-gate permission `inventory_stock:approve`; 8 unit test lolos |
 | **INV-N08** | Reminder pengembalian aset/barang rusak belum ada (spek §6) | G-24 | Info (gap fitur) | Fitur | FIXED — reminder rusak/custody/facility via scheduler harian + notif center; ambang configurable (ENV) |
 
 **Sudah diperbaiki di sesi sebelumnya (verifikasi ulang di audit):** serial global-unique (D-6), validasi jumlah serial=kuantitas (D-5), tampilan serial di detail transaksi, dropdown SearchableSelect number-vs-string, UX Gudang (department/PJ/lokasi).
@@ -363,6 +363,23 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
+## 9d. RESOLUSI INV-N07 (approval system transaksi) — FIXED
+
+**Masalah:** tak ada alur persetujuan (spek §8). Setiap transaksi langsung menerapkan efek stok/serial/facility begitu dibuat — tak ada kontrol untuk gerakan yang mengurangi/merekonsiliasi stok.
+
+**Perbaikan (defer-then-replay, satu sumber kebenaran):**
+- **Gerbang persetujuan** (`requiresApproval`): transaksi yang **mengurangi atau merekonsiliasi** stok wajib disetujui dulu — `Keluar`, `Adjustment`, dan `Transfer Masuk`. `Transfer Masuk` ikut di-gate meski header-nya `Masuk`, karena ia menghasilkan kaki OUTBOUND berpasangan yang mengurangi gudang sumber (kalau tidak, kontrol bisa dielakkan dari sisi tujuan). Inbound murni (`Masuk`/`Supplier`) tetap auto-approve.
+- **Pending tidak pernah menyentuh stok.** Transaksi `Pending` hanya menyimpan header + baris detail, plus **snapshot pilihan serial/tag** pada detail agar efek bisa **diputar-ulang** persis saat disetujui. Auto-approve menerapkan efek seketika (snapshot tak disimpan).
+- **`approveTransaksi`** memutar-ulang efek yang tertunda dalam satu transaksi DB dan menstempel penyetuju (`approved_by`/`approved_at`). Validasi kecukupan stok & eksistensi serial berjalan **saat approval** — jika stok habis antara submit dan approval, seluruhnya di-rollback dan transaksi tetap `Pending`.
+- **`rejectTransaksi`** hanya menandai `Rejected` + alasan opsional; tak ada efek untuk dibatalkan.
+- **RBAC:** aksi baru `inventory_stock:approve` (migration 67), rute `POST /transaksi/:id/approve` & `/reject` dengan audit logging.
+- **Notifikasi:** transaksi `Pending` memicu `notifyPendingApproval`; low-stock hanya dicek setelah efek benar-benar diterapkan (create auto-approve atau saat approval).
+- **Frontend:** `TransaksiListPage` menambah lencana status + filter status; tombol Setujui/Tolak hanya tampil bagi pemegang permission approve pada baris `Pending`; modal detail menampilkan status & alasan penolakan.
+
+**Verifikasi:** typecheck backend & frontend bersih; 8 unit test `stok.approval.test.ts` lolos (gating create, replay approve, rollback non-Pending, reject).
+
+---
+
 ## 10. CARA MENGGUNAKAN DOKUMEN INI
 
 1. Audit dijalankan per-area (§6.A → §6.F). Tandai checkbox saat item diverifikasi.
@@ -373,4 +390,4 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
-*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-N08 reminder aset (rusak/custody/facility) dibangun (FIXED — scheduler harian + notif center, 11 unit test lolos); sebelumnya INV-M03 (lokasi terpasang di lookup QR) & INV-M04 (paranoid by-design) menuntaskan kategori integritas, INV-M11 scan kamera/barcode (FIXED), INV-C01 (VERIFIED-FIXED).*
+*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-N07 approval system dibangun (FIXED — defer-then-replay, gate `inventory_stock:approve`, 8 unit test lolos; lihat §9d); sebelumnya INV-N08 reminder aset (rusak/custody/facility) via scheduler harian + notif center, INV-M03/M04 integritas, INV-M11 scan kamera/barcode, INV-C01 (VERIFIED-FIXED). **Satu-satunya temuan tersisa: INV-N06 (PWA/offline sync) — OPEN, gap fitur non-blocking.***
