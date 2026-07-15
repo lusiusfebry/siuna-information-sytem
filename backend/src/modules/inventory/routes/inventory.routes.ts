@@ -277,25 +277,25 @@ router.get(
 );
 
 router.get(
-    '/employee/:employeeId/assets',
+    '/employees/:employeeId/assets',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.getAssets(req, res, next)
 );
 
 router.get(
-    '/employee/:employeeId/asset-history',
+    '/employees/:employeeId/asset-history',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.getHistory(req, res, next)
 );
 
 router.get(
-    '/employee/:employeeId/berita-acara',
+    '/employees/:employeeId/berita-acara',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.downloadBeritaAcara(req, res, next)
 );
 
 router.get(
-    '/employee/:employeeId/berita-acara/:transaksiId',
+    '/employees/:employeeId/berita-acara/:transaksiId',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.downloadBeritaAcara(req, res, next)
 );

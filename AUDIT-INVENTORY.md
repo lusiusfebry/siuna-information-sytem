@@ -85,7 +85,8 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Transaksi | Masuk/Supplier | `POST /transaksi` | ⚠️ CEK | Serial global-unique baru diperbaiki |
 | Transaksi | Transfer antar gudang (berpasangan) | `POST /transaksi` | ⚠️ CEK | Kaki keluar+masuk otomatis |
 | Transaksi | Ke Karyawan / Retur Karyawan | `POST /transaksi` | ⚠️ CEK | Relasi HR |
-| Transaksi | Ke Gedung/Mess | `POST /transaksi` | ⚠️ CEK | Relasi Facility |
+| Transaksi | Ke Gedung/Mess | `POST /transaksi` | ✅ OK | Relasi Facility; buat baris `facility_assets` (INV-C01, verified) |
+| Transaksi | Ambil dari Gedung | `POST /transaksi` | ✅ OK | Kembalikan unit dari kamar ke gudang & tutup placement (INV-C01, verified) |
 | Transaksi | Disposal / Rusak-Terbuang | `POST /transaksi` | ⚠️ CEK | |
 | Transaksi | Adjustment / Opname | `POST /transaksi` | ⚠️ CEK | Tak menyentuh serial |
 | Transaksi | Detail + serial number | `GET /transaksi/:id` | ⚠️ CEK | Tampilan serial baru diperbaiki |
@@ -96,9 +97,9 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Scan | Scan kamera/barcode QR | — | 🔴 BELUM ADA | Diminta spek §3/§11 (INV-M11) |
 | Import | Produk & Stok Masuk (Excel) | `/inventory/import/*` | ⚠️ CEK | Stok-masuk all-or-nothing (INV-M12) |
 | Export | 5 laporan × Excel/PDF | `/inventory/export/*` | ⚠️ CEK | Duplikasi export stok |
-| Laporan | Halaman 5-tab | LaporanPage | 🔴 BUG | Filter `tipe` mismatch (INV-B01) |
+| Laporan | Halaman 5-tab | LaporanPage | ✅ OK | Filter `tipe` diperbaiki ke enum DB (INV-B01 FIXED); response-shape dirapikan (INV-N04) |
 | Dashboard | Stats, chart, velocity, monitoring | `/inventory/dashboard/*` | ⚠️ CEK | Refetch 60s |
-| Aset Karyawan | Daftar, histori, Berita Acara PDF | `/inventory/employee/*` | ⚠️ CEK | Relasi HR |
+| Aset Karyawan | Daftar, histori, Berita Acara PDF | `/inventory/employees/*` | ⚠️ CEK | Relasi HR; path distandarkan ke plural (INV-N03 FIXED) |
 | Facility Inv. | Inventaris per gedung | `/inventory/facility/:id/inventory` | ⚠️ CEK | Berbasis log transaksi |
 | Foto Produk | Upload/preview | `PUT /master/produk/:id/photo` | ⚠️ CEK | |
 | PWA/Offline | Mobile offline sync | — | 🔴 BELUM ADA | Diminta spek §7/§11 (INV-N06) |
@@ -129,9 +130,9 @@ Referensi kode: `stok.service.ts` (Ke/Retur Karyawan), `employee-asset.service.t
 Referensi: `stok.service.ts` (Ke Gedung/Mess, `getFacilityInventory`), `facility/models/Asset.ts` (`serial_number_id`), migration `50/51`. Spesifikasi: `05_building_management.md:47-49` ("stock berkurang, tercatat di building; riwayat sinkron").
 
 - [ ] **B-1** Assign aset ke gedung/kamar ("Ke Gedung/Mess"): stok berkurang, `status='Digunakan'`, `facility_building_id`/`room_id` tercatat di **header transaksi**. Uji end-to-end (§8-T5).
-- [ ] **B-2** **[INV-C01 — STRUKTURAL]** Dua mekanisme penempatan **terputus**: (1) transaksi "Ke Gedung/Mess" (ref gedung hanya di header, serial tak tertaut ke kamar) vs (2) tabel `facility_assets` (`serial_number_id`+`room_id`, dibuat manual via `POST /facility/assets`). Membuat transaksi **tidak** membuat baris `facility_assets`, dan sebaliknya. Akibat: satu unit bisa `Tersedia` di gudang (versi inventory) **sekaligus** `Aktif` di kamar (versi facility). **Bertentangan dengan spesifikasi** yang meminta sinkron. → keputusan desain diperlukan.
+- [x] **B-2** **[INV-C01 — STRUKTURAL] — VERIFIED-FIXED.** Kedua mekanisme kini **satu siklus**: `facility_assets` diperlakukan sebagai proyeksi hidup dari transaksi inventory, bukan sumber data terpisah. `POST /facility/assets` (create) & withdraw kini **mendelegasikan** ke `stok.service.createTransaksi` (sub-tipe "Ke Gedung/Mess" untuk pasang, sub-tipe baru "Ambil dari Gedung" untuk tarik) sehingga stok, status serial, dan baris `facility_assets` bergerak bersama. `openFacilityPlacement` membuat baris saat unit dipasang ke kamar; `closeFacilityPlacement` menutupnya (status `Ditarik`) saat ditarik. Migrasi 64 (enum sub_tipe) & 65 (`facility_assets.transaksi_id` FK) menautkan placement ke transaksi asal. Diverifikasi runtime (T5/Q7/X3, 18/18 PASS; Q7 global = 0 kontradiksi). Detail: `.claude/PLAN-INV-C01.md`.
 - [ ] **B-3** **[INV-M03]** Lokasi serial setelah "Ke Gedung/Mess" tidak tersimpan di record serial (tak ada kolom building/room di `inv_serial_number`); hanya bisa direkonstruksi via `transaksi_terakhir_id`. Evaluasi apakah perlu kolom lokasi langsung.
-- [ ] **B-4** **[INV-M04]** `facility_assets` **tidak paranoid** & tak terikat siklus transaksi: retur/transfer serial tak menutup/memperbarui baris `facility_assets` → placement bisa basi.
+- [x] **B-4** **[INV-M04] — FIXED (sebagian).** Retur/tarik via inventory kini **menutup** baris `facility_assets` (`closeFacilityPlacement`, status → `Ditarik`) lewat siklus transaksi (bagian dari perbaikan C01), sehingga placement tak lagi basi saat unit kembali ke gudang. **Sisa terbuka:** tabel `facility_assets` masih non-paranoid (tanpa soft-delete) — evaluasi terpisah bila diperlukan jejak hapus.
 - [ ] **B-5** `facility_assets.serial_number_id` FK `RESTRICT` ke `inv_serial_number` (non-paranoid). Verifikasi tak ada jalur hard-delete serial yang men-orphan.
 - [ ] **B-6** `getFacilityInventory` berbasis log transaksi (bukan tabel penempatan hidup). Verifikasi akurasi bila ada perpindahan berkali-kali.
 - [ ] **B-7** `penanggung_jawab_id`/`lokasi_kerja_id` gedung ↔ HR: konsistensi dengan gudang.
@@ -182,8 +183,8 @@ Referensi: prinsip §3; query integritas.
 - [x] **F-1** **[INV-B01 — BUG]** `LaporanPage.tsx:17` `TIPE_OPTIONS=['Barang Masuk','Barang Keluar','Transfer','Penyesuaian']` dikirim sebagai filter `tipe`, tapi backend cocokkan ke enum `'Masuk'|'Keluar'|'Adjustment'` → filter tipe **selalu nihil**. **Terverifikasi bug.**
 - [x] **F-2** **[INV-N01]** Komponen `components/inventory/InventoryQRCode.tsx` **dead code** (tak diimpor mana pun).
 - [x] **F-3** **[INV-N02]** Duplikasi `exportStokExcel/PDF` di `inventory-dashboard.service.ts` **dan** `inventory-laporan.service.ts` (endpoint sama).
-- [ ] **F-4** **[INV-N03]** Inkonsistensi path: `/inventory/employees/search` (plural) vs `/inventory/employee/:id/...` (singular). Berfungsi (FE ikut), tapi tak rapi.
-- [ ] **F-5** **[INV-N04]** `LaporanPage.tsx:37` akses defensif `.data.rows || .data` padahal service kembalikan `{data:T[]}` — sisa copy-paste.
+- [x] **F-4** **[INV-N03] — FIXED.** Seluruh route aset-karyawan distandarkan ke bentuk **plural** (`/inventory/employees/:id/assets`, `/asset-history`, `/berita-acara`, `/berita-acara/:transaksiId`), selaras `/employees/search` dan konvensi modul HR. Backend (`inventory.routes.ts`) & pemanggil frontend (`inventory-employee.service.ts`) diubah bersamaan; `tsc` bersih di kedua sisi.
+- [x] **F-5** **[INV-N04] — FIXED.** `LaporanPage` kini murni mengekspor blob (tak me-render baris data), sehingga akses defensif `.data.rows || .data` sudah hilang pada refactor laporan. Diverifikasi: tak ada lagi pola tersebut di `pages/inventory`.
 - [ ] **F-6** Duplikasi logika serial vs tag-only di `handleStokKeluar` (blok hampir identik) — peluang refaktor.
 - [ ] **F-7** Cakupan master data: 6 entitas inventory (vs 10 HR) — verifikasi cukup untuk kebutuhan; semua CRUD terimplementasi (bukan stub).
 - [ ] **F-8** Kesiapan ekstensi: titik tempel fitur baru (approval, min/max stok lanjutan, multi-UOM, reservasi) tak terhalang utang arsitektur (terutama B-2, C-5).
@@ -242,11 +243,11 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | ID | Judul | Area | Severity | Kategori | Status |
 |----|-------|------|----------|----------|--------|
 | **INV-B01** | Filter `tipe` LaporanPage mismatch enum → hasil selalu kosong | F-1 | **Major** | Bug | FIXED |
-| **INV-C01** | Dua mekanisme penempatan facility terputus (transaksi vs facility_assets) — bertentangan spesifikasi | B-2 | **Major** | Integritas/Struktural | OPEN |
+| **INV-C01** | Dua mekanisme penempatan facility terputus (transaksi vs facility_assets) — bertentangan spesifikasi | B-2 | **Major** | Integritas/Struktural | VERIFIED-FIXED |
 | **INV-M01** | Produk tag-only tak punya jalur Retur Karyawan → aset nyangkut Digunakan | A-3 | Major | Bug/Integritas | FIXED |
 | **INV-M02** | Nonaktif karyawan tak mengembalikan/blokir aset inventory (orphan custody) | A-4/A-5 | Major | Integritas | FIXED |
 | **INV-M03** | Lokasi serial pasca Ke-Gedung/Mess tak tersimpan di record serial | B-3 | Minor | Desain | OPEN |
-| **INV-M04** | facility_assets non-paranoid & tak terikat siklus transaksi → placement basi | B-4 | Minor | Integritas | OPEN |
+| **INV-M04** | facility_assets non-paranoid & tak terikat siklus transaksi → placement basi | B-4 | Minor | Integritas | FIXED (sebagian) — placement kini ditutup oleh siklus transaksi (C01); sisa: paranoid/soft-delete tabel |
 | **INV-M05** | RBAC kasar: IMPORT/EXPORT action tak dipakai | C-3 | Minor | RBAC | ACCEPTED (by design) |
 | **INV-M06** | Konflasi resource: data HR/Facility dijaga permission inventory_stock | C-4 | Minor | RBAC | ACCEPTED (by design) |
 | **INV-M07** | Tanpa department/site scoping padahal gudang punya department_id | C-5 | **Major** (mining multi-site) | RBAC | FIXED |
@@ -257,8 +258,8 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-M12** | Import Stok Masuk all-or-nothing (satu baris gagal batalkan semua) | G-10 | Minor | Robustness | FIXED |
 | **INV-N01** | Dead code InventoryQRCode.tsx | F-2 | Info | Kualitas | FIXED |
 | **INV-N02** | Duplikasi fungsi export stok | F-3 | Info | Kualitas | FIXED |
-| **INV-N03** | Inkonsistensi path employee (plural/singular) | F-4 | Info | Kualitas | OPEN |
-| **INV-N04** | Akses response-shape defensif keliru di LaporanPage | F-5 | Info | Kualitas | OPEN |
+| **INV-N03** | Inkonsistensi path employee (plural/singular) | F-4 | Info | Kualitas | FIXED |
+| **INV-N04** | Akses response-shape defensif keliru di LaporanPage | F-5 | Info | Kualitas | FIXED |
 | **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | FIXED |
 | **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | OPEN |
 | **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | OPEN |
@@ -277,7 +278,7 @@ Dijalankan pada tahap verifikasi dinamis; setiap alur menghasilkan bukti (respon
 - **T2 — Transfer Gudang:** transfer M unit A→B → stok A −M, stok B +M, serial pindah gudang (sekali), dua kaki transaksi seimbang.
 - **T3 — Adjustment/Opname:** koreksi + dan − → saldo sesuai, tak menyentuh serial, tolak hasil negatif.
 - **T4 — Ke Karyawan + Retur Karyawan:** assign → serial `Digunakan`+karyawan, stok −1; retur → `Tersedia`, stok +1; **uji tag-only** (target INV-M01).
-- **T5 — Ke Gedung/Mess:** assign ke gedung/kamar → cek header facility_*; bandingkan versi inventory vs `facility_assets` (target INV-C01).
+- **T5 — Ke Gedung/Mess + Ambil dari Gedung:** assign ke gedung/kamar → baris `facility_assets` `Aktif`, stok −1, serial `Digunakan`; tarik kembali → `facility_assets` `Ditarik`, stok +1, serial `Tersedia` (target INV-C01). **✅ DIJALANKAN — PASS (18/18 bersama X3/Q7).**
 - **T6 — Disposal & Rusak/Terbuang:** status `Disposed`/`Rusak`, stok −1.
 - **T7 — Validasi transaksi:** tiap cabang wajib-field ditolak bila kosong; serial≠jumlah ditolak; serial duplikat lintas-produk ditolak (INV-... verifikasi ulang).
 - **T8 — Detail transaksi:** serial tampil di `GET /transaksi/:id`.
@@ -295,14 +296,14 @@ Dijalankan pada tahap verifikasi dinamis; setiap alur menghasilkan bukti (respon
 - **Q4** produk has_serial aktif tanpa row serial (informasional)
 - **Q5** serial dobel lintas produk = 0 (constraint global)
 - **Q6** transaksi facility_building_id menunjuk building tak ada = 0
-- **Q7** `facility_assets` vs status serial inventory — deteksi kontradiksi (INV-C01)
+- **Q7** `facility_assets` vs status serial inventory — deteksi kontradiksi (INV-C01). **✅ DIJALANKAN — 0 kontradiksi (data uji ZZ & seluruh DB).**
 
 *(Snapshot awal Q1–Q3, Q5: semua 0 — data bersih.)*
 
 ### Uji lintas-modul (X)
 - **X1** Hapus karyawan yang memegang aset → amati perilaku (target INV-M02).
 - **X2** Nonaktifkan karyawan pemegang aset → amati (A-5).
-- **X3** Assign serial ke kamar via facility_assets lalu retur via inventory → cek konsistensi (INV-C01/M04).
+- **X3** Assign serial ke kamar via facility_assets lalu retur via inventory → cek konsistensi (INV-C01/M04). **✅ DIJALANKAN — PASS.**
 
 ---
 
@@ -333,10 +334,32 @@ Catatan operasional: saat ini **hanya `superadmin`** yang memegang permission `i
 Impor tetap di bawah `inventory_stock:create`, ekspor di bawah `inventory_stock:read`. Tanpa permission/seed/frontend baru. Pemetaan create-untuk-impor dan read-untuk-ekspor dinilai memadai; tidak diperlukan action inventory khusus.
 
 **INV-M06 — konflasi resource lintas-modul: DITERIMA (by design).**
-Endpoint lintas-modul (`/employees/search`, `/employee/:id/assets`, berita-acara, `/facility/:id/inventory`) melayani alur penugasan aset di dalam inventory; data diperlakukan sebagai milik alur inventory sehingga `inventory_stock:read` memadai. Tidak menambah syarat permission ganda (yang justru akan memutus pencarian karyawan karena user inventory tak memegang `employees:read`).
+Endpoint lintas-modul (`/employees/search`, `/employees/:id/assets`, berita-acara, `/facility/:id/inventory`) melayani alur penugasan aset di dalam inventory; data diperlakukan sebagai milik alur inventory sehingga `inventory_stock:read` memadai. Tidak menambah syarat permission ganda (yang justru akan memutus pencarian karyawan karena user inventory tak memegang `employees:read`).
 
 **C-6 (POST /label/print dijaga READ): DITERIMA (by design).**
 `printLabels` hanya menghasilkan PDF dari daftar item yang di-*post* tanpa mutasi DB; POST dipakai semata untuk membawa body ID. Guard `READ` sudah tepat.
+
+---
+
+## 9c. RESOLUSI INV-C01 (sinkronisasi Inventory ↔ Facility) — VERIFIED-FIXED
+
+**Masalah:** dua mekanisme penempatan aset ke gedung/kamar berjalan sendiri-sendiri — transaksi "Ke Gedung/Mess" (referensi hanya di header transaksi) vs tabel `facility_assets` (dibuat manual). Satu unit bisa tampak `Tersedia` di gudang **sekaligus** `Aktif` di kamar.
+
+**Perbaikan (satu siklus, single source of truth):**
+- `facility_assets` diperlakukan sebagai **proyeksi hidup** dari transaksi inventory, bukan sumber data lepas.
+- `FacilityAssetService.create` & `withdraw` **mendelegasikan** ke `stok.service.createTransaksi`, tidak lagi menulis baris `facility_assets` langsung.
+- Sub-tipe baru **"Ambil dari Gedung"** (tipe `Masuk`) sebagai lawan dari "Ke Gedung/Mess" (tipe `Keluar`) — menarik unit dari kamar kembali ke gudang.
+- `openFacilityPlacement` membuat baris `facility_assets` saat pemasangan; `closeFacilityPlacement` menutupnya (status `Ditarik`) saat penarikan/retur.
+- Migrasi **64** (tambah nilai enum `sub_tipe`) & **65** (`facility_assets.transaksi_id` FK ke transaksi asal).
+- Frontend: `TransaksiFormPage` menambah opsi "Ambil dari Gedung" pada menu Masuk dengan pemilih unit berbasis checkbox (filter `facility_placed` — unit terpasang di gedung: status `Digunakan`, tanpa gudang, tanpa karyawan).
+
+**Verifikasi runtime (§8 — T5/Q7/X3):** 18/18 PASS.
+- **T5a** "Ke Gedung/Mess" → stok −1, serial `Digunakan` (gudang_id null), baris `facility_assets` `Aktif` tertaut `transaksi_id`.
+- **T5b** "Ambil dari Gedung" → stok kembali +1, serial `Tersedia` di gudang, `facility_assets` `Ditarik` + `tanggal_penarikan`.
+- **X3** penempatan & penarikan via `FacilityAssetService` menghasilkan keadaan konsisten yang sama.
+- **Q7** kontradiksi `facility_assets` Aktif vs status serial = **0** (data uji ZZ **dan** seluruh DB).
+
+Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
@@ -350,4 +373,4 @@ Endpoint lintas-modul (`/employees/search`, `/employee/:id/assets`, berita-acara
 
 ---
 
-*Dokumen kontrol — diperbarui seiring audit berjalan. Pembuatan berdasarkan pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). Belum ada perubahan kode.*
+*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-C01 diimplementasikan & diverifikasi runtime (VERIFIED-FIXED); INV-N03 & INV-N04 dirapikan (FIXED); INV-M04 tertangani sebagian melalui siklus transaksi C01.*
