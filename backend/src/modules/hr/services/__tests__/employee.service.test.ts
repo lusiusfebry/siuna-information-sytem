@@ -35,6 +35,11 @@ jest.mock('../../models/SubGolongan', () => ({ __esModule: true, default: {} }))
 // deleting an employee who still actively occupies a room. Mock it with a
 // count() so the guard is exercised without a DB.
 jest.mock('../../../facility/models/Occupant', () => ({ __esModule: true, default: { count: jest.fn().mockResolvedValue(0) } }));
+// getAllEmployees dynamically imports the inventory SerialNumber model (INV-M02) to
+// count held assets per employee. Mock it so the real model file — whose module body
+// calls InvSerialNumber.init() against sequelize — is never loaded. Default: no held
+// assets, so outstanding_assets_count resolves to 0.
+jest.mock('../../../inventory/models/SerialNumber', () => ({ __esModule: true, default: { findAll: jest.fn().mockResolvedValue([]) } }));
 
 jest.mock('../../validators/business-rules.validator', () => ({
     validateManagerPosition: jest.fn().mockResolvedValue({ valid: true }),
@@ -51,6 +56,9 @@ jest.mock('../../../../config/database', () => ({
             commit: jest.fn(),
             rollback: jest.fn(),
         }),
+        // getOutstandingAssetCounts builds a COUNT aggregate via sequelize.fn/col.
+        fn: jest.fn((...args: any[]) => ({ fn: args })),
+        col: jest.fn((c: string) => ({ col: c })),
     },
 }));
 
@@ -72,18 +80,22 @@ describe('EmployeeService', () => {
 
     describe('getAllEmployees', () => {
         it('should return paginated employees', async () => {
-            const mockRows = [{ id: 1, nama_lengkap: 'John' }];
+            // Rows are Sequelize instances: getAllEmployees calls r.toJSON() and
+            // attaches outstanding_assets_count (INV-M02) to the plain object.
+            const plain = { id: 1, nama_lengkap: 'John' };
+            const mockRows = [{ id: 1, toJSON: () => ({ ...plain }) }];
             (Employee.count as jest.Mock).mockResolvedValue(1);
             (Employee.findAll as jest.Mock).mockResolvedValue(mockRows);
 
             const result = await EmployeeService.getAllEmployees({ page: 1, limit: 10 });
 
-            expect(result.data).toEqual(mockRows);
+            expect(result.data).toEqual([{ ...plain, outstanding_assets_count: 0 }]);
             expect(result.total).toBe(1);
             expect(Employee.findAll).toHaveBeenCalled();
         });
 
         it('should apply search filter', async () => {
+            (Employee.findAll as jest.Mock).mockResolvedValue([]);
             await EmployeeService.getAllEmployees({ search: 'John' });
             expect(Employee.count).toHaveBeenCalledWith(expect.objectContaining({
                 where: expect.objectContaining({
