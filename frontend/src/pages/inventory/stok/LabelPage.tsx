@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import inventoryLabelService from '../../../services/api/inventory-label.service';
 import { useLookupQR } from '../../../hooks/useInventoryLabel';
+import QrCameraScanner from '../../../components/inventory/QrCameraScanner';
 import { useSerialNumberList } from '../../../hooks/useInventoryStok';
 import { useInvGudangList, useInvProdukList } from '../../../hooks/useInventoryMasterData';
 
@@ -32,6 +33,7 @@ const LabelPage = () => {
     // QR Lookup state
     const [lookupCode, setLookupCode] = useState('');
     const [lookupQuery, setLookupQuery] = useState('');
+    const [scannerOpen, setScannerOpen] = useState(false);
 
     const limit = 15;
     const { data: snData, isLoading } = useSerialNumberList({
@@ -115,6 +117,13 @@ const LabelPage = () => {
         if (!lookupCode.trim()) return;
         setLookupQuery(lookupCode.trim());
     };
+
+    const handleScanned = useCallback((code: string) => {
+        const trimmed = code.trim();
+        setScannerOpen(false);
+        setLookupCode(trimmed);
+        setLookupQuery(trimmed); // langsung cari tanpa klik tombol
+    }, []);
 
     const selectCls = 'border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary';
 
@@ -358,12 +367,21 @@ const LabelPage = () => {
                             <div className="flex gap-2">
                                 <input
                                     type="text"
+                                    autoFocus
                                     value={lookupCode}
                                     onChange={(e) => setLookupCode(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleLookup()}
-                                    placeholder="Masukkan atau scan kode QR"
+                                    placeholder="Ketik, tempel, atau scan (alat scanner otomatis)"
                                     className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary"
                                 />
+                                <button
+                                    onClick={() => setScannerOpen(true)}
+                                    className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
+                                    title="Scan dengan kamera HP/perangkat"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+                                    Scan Kamera
+                                </button>
                                 <button
                                     onClick={handleLookup}
                                     disabled={lookupLoading}
@@ -373,6 +391,9 @@ const LabelPage = () => {
                                     Cari
                                 </button>
                             </div>
+                            <p className="mt-1.5 text-xs text-gray-400">
+                                Alat scanner fisik bekerja seperti keyboard: cukup fokuskan kolom ini lalu pindai. Untuk kamera HP, gunakan tombol Scan Kamera.
+                            </p>
                         </div>
 
                         {lookupLoading && (
@@ -477,6 +498,12 @@ const LabelPage = () => {
                     </div>
                 </div>
             </div>
+
+            <QrCameraScanner
+                isOpen={scannerOpen}
+                onClose={() => setScannerOpen(false)}
+                onScan={handleScanned}
+            />
         </div>
     );
 };

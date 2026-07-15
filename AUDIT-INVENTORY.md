@@ -94,7 +94,7 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Serial/Tag | Daftar & pelacakan | `/inventory/serial-numbers` | ⚠️ CEK | |
 | Tagging | Auto asset-tag (`prefix_tag_kode-site_urut`) | `stok.service.generateTagNumber` | ⚠️ CEK | Null diam bila prefix/kode_site kosong (INV-M10) |
 | Label/QR | Generate QR, cetak label A4/thermal, lookup | `/inventory/label/*` | ⚠️ CEK | QR FE dead code |
-| Scan | Scan kamera/barcode QR | — | 🔴 BELUM ADA | Diminta spek §3/§11 (INV-M11) |
+| Scan | Scan kamera/barcode QR | LabelPage (lookup) | ✅ OK | Kamera HP via html5-qrcode + alat scanner HID + input manual (INV-M11 FIXED) |
 | Import | Produk & Stok Masuk (Excel) | `/inventory/import/*` | ⚠️ CEK | Stok-masuk all-or-nothing (INV-M12) |
 | Export | 5 laporan × Excel/PDF | `/inventory/export/*` | ⚠️ CEK | Duplikasi export stok |
 | Laporan | Halaman 5-tab | LaporanPage | ✅ OK | Filter `tipe` diperbaiki ke enum DB (INV-B01 FIXED); response-shape dirapikan (INV-N04) |
@@ -202,7 +202,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 **G.2 — QR Code, Label & Scan** — ref `label.service.ts`, `useInventoryLabel.ts`, `LabelPage.tsx`, `SerialNumberModal`.
 - [ ] **G-5** Generate QR produk/serial/tag (payload `INV:PRODUK|SN|TAG:<kode>`) benar; `lookupQR` membalik payload ke record; format tak dikenal → 400.
 - [ ] **G-6** Cetak label PDF: A4 (kolom) & thermal (50x30/70x40/100x50) render benar; asset-tag pakai `company_legal_name`.
-- [ ] **G-7** **[INV-M11 — GAP SPESIFIKASI]** **Scan kamera/barcode TIDAK ADA.** Spek §3/§11 minta "scan kamera/scanner". Tak ada lib scan, `getUserMedia`, atau `BarcodeDetector` di kode. `lookupQR` ada di backend tapi tak ada antarmuka scan di frontend. → fitur belum dibangun; putuskan prioritas.
+- [x] **G-7** **[INV-M11 — GAP SPESIFIKASI] — FIXED.** Scan kamera/barcode dibangun di panel lookup `LabelPage`. Komponen `QrCameraScanner` (`components/inventory/QrCameraScanner.tsx`) memakai **html5-qrcode** untuk membuka kamera HP/browser (`facingMode: environment`, dukung QR + barcode 1D/2D) dengan penanganan izin-ditolak/kamera-tak-ada dan pembersihan stream saat modal ditutup. Tiga jalur input dilayani satu panel: (1) kamera HP lewat tombol **Scan Kamera**, (2) **alat scanner fisik** (HID keyboard-wedge — otomatis via field input + Enter), (3) ketik/tempel manual. Backend `lookupQR` & route `/label/lookup` sudah ada, tak berubah. Diverifikasi: `tsc` + `vite build` bersih.
 - [x] **G-8** **[INV-N05]** QR frontend inventory (`InventoryQRCode.tsx`) dead code (duplikasi F-2); QR nyata via backend PDF. Rapikan.
 
 **G.3 — Import Excel** — ref `import.service.ts`, `ImportPage.tsx`.
@@ -226,7 +226,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 - [ ] **G-20** Upload/preview foto produk (`PUT /master/produk/:id/photo`) — tipe/ukuran file tervalidasi; path tersimpan benar.
 
 **G.7 — Fitur spek yang BELUM ADA (gap, untuk kelengkapan kontrol)** — spek `03_modul_inventory.md`.
-- [ ] **G-21** **[INV-M11]** Scan kamera/barcode (§3, §11) — belum ada (lihat G-7).
+- [x] **G-21** **[INV-M11]** Scan kamera/barcode (§3, §11) — **FIXED** (lihat G-7).
 - [ ] **G-22** **[INV-N06]** PWA / offline sync (§7, §11) — tak ada service worker/manifest PWA. Belum ada.
 - [ ] **G-23** **[INV-N07]** Approval system (§8 "approval system") — tak ada alur approval transaksi. Belum ada.
 - [ ] **G-24** **[INV-N08]** Notifikasi/reminder pengembalian aset & barang rusak/kadaluarsa (§6) — hanya low-stock yang ada. Reminder lain belum.
@@ -254,7 +254,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-M08** | Validasi master-data fail-open untuk slug tak dikenal | D-2 | Minor | Validasi | FIXED |
 | **INV-M09** | facility_room_id tak divalidasi milik building terpilih | D-4 | Minor | Validasi | FIXED |
 | **INV-M10** | generateTagNumber return null diam-diam → produk bisa masuk tanpa tag | G-2 | Major | Bug/Integritas | FIXED |
-| **INV-M11** | Scan kamera/barcode belum ada (diminta spesifikasi §3/§11) | G-7 | Major (gap fitur) | Fitur | OPEN |
+| **INV-M11** | Scan kamera/barcode belum ada (diminta spesifikasi §3/§11) | G-7 | Major (gap fitur) | Fitur | FIXED |
 | **INV-M12** | Import Stok Masuk all-or-nothing (satu baris gagal batalkan semua) | G-10 | Minor | Robustness | FIXED |
 | **INV-N01** | Dead code InventoryQRCode.tsx | F-2 | Info | Kualitas | FIXED |
 | **INV-N02** | Duplikasi fungsi export stok | F-3 | Info | Kualitas | FIXED |
@@ -373,4 +373,4 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
-*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-C01 diimplementasikan & diverifikasi runtime (VERIFIED-FIXED); INV-N03 & INV-N04 dirapikan (FIXED); INV-M04 tertangani sebagian melalui siklus transaksi C01.*
+*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-M11 scan kamera/barcode dibangun (FIXED — html5-qrcode + alat scanner HID + input manual); sebelumnya INV-C01 diverifikasi runtime (VERIFIED-FIXED), INV-N03 & INV-N04 dirapikan (FIXED), INV-M04 tertangani sebagian via siklus transaksi C01.*
