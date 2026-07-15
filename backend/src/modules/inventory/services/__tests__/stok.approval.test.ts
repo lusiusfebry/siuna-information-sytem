@@ -1,11 +1,11 @@
 import stokService from '../stok.service';
-import sequelize from '../../../config/database';
-import InvTransaksi from '../models/Transaksi';
-import InvTransaksiDetail from '../models/TransaksiDetail';
-import InvProduk from '../models/Produk';
-import InvStok from '../models/Stok';
-import InvSerialNumber from '../models/SerialNumber';
-import notificationService from '../../../shared/services/notification.service';
+import sequelize from '../../../../config/database';
+import InvTransaksi from '../../models/Transaksi';
+import InvTransaksiDetail from '../../models/TransaksiDetail';
+import InvProduk from '../../models/Produk';
+import InvStok from '../../models/Stok';
+import InvSerialNumber from '../../models/SerialNumber';
+import notificationService from '../../../../shared/services/notification.service';
 
 // INV-N07: locks the approval gate on stock transactions.
 //  - Outbound ('Keluar'), 'Adjustment', and 'Transfer Masuk' are created Pending and
@@ -15,26 +15,26 @@ import notificationService from '../../../shared/services/notification.service';
 //    (e.g. insufficient stock) runs at approval time and rolls back on failure.
 //  - rejectTransaksi marks the row and applies nothing.
 
-jest.mock('../../../config/database', () => ({
+jest.mock('../../../../config/database', () => ({
     __esModule: true,
     default: { transaction: jest.fn(), query: jest.fn() },
 }));
-jest.mock('../models/Transaksi', () => ({ __esModule: true, default: { create: jest.fn(), findOne: jest.fn(), findByPk: jest.fn(), findAndCountAll: jest.fn() } }));
-jest.mock('../models/TransaksiDetail', () => ({ __esModule: true, default: { create: jest.fn(), findAll: jest.fn() } }));
-jest.mock('../models/Produk', () => ({ __esModule: true, default: { findByPk: jest.fn() } }));
-jest.mock('../models/Stok', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn() } }));
-jest.mock('../models/SerialNumber', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn(), update: jest.fn(), findAll: jest.fn() } }));
-jest.mock('../models/Gudang', () => ({ __esModule: true, default: {} }));
-jest.mock('../models/Uom', () => ({ __esModule: true, default: {} }));
-jest.mock('../models/Brand', () => ({ __esModule: true, default: {} }));
-jest.mock('../models/SubKategori', () => ({ __esModule: true, default: {} }));
-jest.mock('../../hr/models/Employee', () => ({ __esModule: true, default: {} }));
-jest.mock('../../hr/models/LokasiKerja', () => ({ __esModule: true, default: {} }));
-jest.mock('../../auth/models/User', () => ({ __esModule: true, default: {} }));
-jest.mock('../../facility/models/Building', () => ({ __esModule: true, default: {} }));
-jest.mock('../../facility/models/Room', () => ({ __esModule: true, default: { findByPk: jest.fn() } }));
-jest.mock('../../facility/models/Asset', () => ({ __esModule: true, default: { update: jest.fn(), create: jest.fn(), count: jest.fn() } }));
-jest.mock('../../../shared/services/notification.service', () => ({
+jest.mock('../../models/Transaksi', () => ({ __esModule: true, default: { create: jest.fn(), findOne: jest.fn(), findByPk: jest.fn(), findAndCountAll: jest.fn() } }));
+jest.mock('../../models/TransaksiDetail', () => ({ __esModule: true, default: { create: jest.fn(), findAll: jest.fn() } }));
+jest.mock('../../models/Produk', () => ({ __esModule: true, default: { findByPk: jest.fn() } }));
+jest.mock('../../models/Stok', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn() } }));
+jest.mock('../../models/SerialNumber', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn(), update: jest.fn(), findAll: jest.fn() } }));
+jest.mock('../../models/Gudang', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Uom', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/Brand', () => ({ __esModule: true, default: {} }));
+jest.mock('../../models/SubKategori', () => ({ __esModule: true, default: {} }));
+jest.mock('../../../hr/models/Employee', () => ({ __esModule: true, default: {} }));
+jest.mock('../../../hr/models/LokasiKerja', () => ({ __esModule: true, default: {} }));
+jest.mock('../../../auth/models/User', () => ({ __esModule: true, default: {} }));
+jest.mock('../../../facility/models/Building', () => ({ __esModule: true, default: {} }));
+jest.mock('../../../facility/models/Room', () => ({ __esModule: true, default: { findByPk: jest.fn() } }));
+jest.mock('../../../facility/models/Asset', () => ({ __esModule: true, default: { update: jest.fn(), create: jest.fn(), count: jest.fn() } }));
+jest.mock('../../../../shared/services/notification.service', () => ({
     __esModule: true,
     default: { checkLowStockAndNotify: jest.fn().mockResolvedValue(undefined), notifyPendingApproval: jest.fn().mockResolvedValue(undefined) },
 }));
