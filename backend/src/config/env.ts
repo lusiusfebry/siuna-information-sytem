@@ -50,6 +50,13 @@ export const env = {
     uploadDir: process.env.UPLOAD_DIR || './uploads',
     corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     auditLogRetentionDays: parseInt(process.env.AUDIT_LOG_RETENTION_DAYS || '365', 10),
+    // INV-N08 asset reminders. Days a unit may sit in a state before admins are nudged.
+    assetReminder: {
+        damagedDays: parseInt(process.env.ASSET_REMINDER_DAMAGED_DAYS || '30', 10),
+        custodyDays: parseInt(process.env.ASSET_REMINDER_CUSTODY_DAYS || '365', 10),
+        facilityDays: parseInt(process.env.ASSET_REMINDER_FACILITY_DAYS || '365', 10),
+        cron: process.env.ASSET_REMINDER_CRON || '0 7 * * *', // daily 07:00
+    },
     redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),

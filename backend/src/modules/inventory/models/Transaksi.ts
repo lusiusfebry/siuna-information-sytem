@@ -17,6 +17,10 @@ export class InvTransaksi extends Model {
     public catatan!: string | null;
     public dokumen!: any[] | null;
     public created_by!: number | null;
+    public approval_status!: 'Pending' | 'Approved' | 'Rejected';
+    public approved_by!: number | null;
+    public approved_at!: Date | null;
+    public rejection_reason!: string | null;
 
     public gudang?: any;
     public gudang_tujuan?: any;
@@ -24,6 +28,7 @@ export class InvTransaksi extends Model {
     public facility_room?: any;
     public karyawan?: any;
     public creator?: any;
+    public approver?: any;
     public details?: any[];
 
     public readonly created_at!: Date;
@@ -98,6 +103,24 @@ InvTransaksi.init({
         type: DataTypes.INTEGER,
         allowNull: true,
         references: { model: 'users', key: 'id' },
+    },
+    approval_status: {
+        type: DataTypes.ENUM('Pending', 'Approved', 'Rejected'),
+        allowNull: false,
+        defaultValue: 'Approved',
+    },
+    approved_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'users', key: 'id' },
+    },
+    approved_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
+    rejection_reason: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
 }, {
     sequelize,

@@ -54,6 +54,7 @@ InvTransaksi.belongsTo(InvGudang, { foreignKey: 'gudang_id', as: 'gudang' });
 InvTransaksi.belongsTo(InvGudang, { foreignKey: 'gudang_tujuan_id', as: 'gudang_tujuan' });
 InvTransaksi.belongsTo(Employee, { foreignKey: 'karyawan_id', as: 'karyawan' });
 InvTransaksi.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+InvTransaksi.belongsTo(User, { foreignKey: 'approved_by', as: 'approver' });
 InvTransaksi.belongsTo(FacilityBuilding, { foreignKey: 'facility_building_id', as: 'facility_building' });
 InvTransaksi.belongsTo(FacilityRoom, { foreignKey: 'facility_room_id', as: 'facility_room' });
 InvTransaksi.hasMany(InvTransaksiDetail, { foreignKey: 'transaksi_id', as: 'details' });

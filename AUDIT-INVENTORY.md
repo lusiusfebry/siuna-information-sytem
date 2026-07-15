@@ -104,7 +104,7 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Foto Produk | Upload/preview | `PUT /master/produk/:id/photo` | ⚠️ CEK | |
 | PWA/Offline | Mobile offline sync | — | 🔴 BELUM ADA | Diminta spek §7/§11 (INV-N06) |
 | Approval | Alur persetujuan transaksi | — | 🔴 BELUM ADA | Diminta spek §8 (INV-N07) |
-| Notifikasi | Reminder retur aset / barang rusak | — | ⚠️ SEBAGIAN | Hanya low-stock; sisanya belum (INV-N08) |
+| Notifikasi | Reminder retur aset / barang rusak | scheduler + Notification | ✅ OK | Low-stock + reminder rusak/custody/facility (INV-N08 FIXED) |
 
 ---
 
@@ -229,7 +229,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 - [x] **G-21** **[INV-M11]** Scan kamera/barcode (§3, §11) — **FIXED** (lihat G-7).
 - [ ] **G-22** **[INV-N06]** PWA / offline sync (§7, §11) — tak ada service worker/manifest PWA. Belum ada.
 - [ ] **G-23** **[INV-N07]** Approval system (§8 "approval system") — tak ada alur approval transaksi. Belum ada.
-- [ ] **G-24** **[INV-N08]** Notifikasi/reminder pengembalian aset & barang rusak/kadaluarsa (§6) — hanya low-stock yang ada. Reminder lain belum.
+- [x] **G-24** **[INV-N08] — FIXED.** Reminder aset dibangun di atas infrastruktur notifikasi & scheduler yang sudah ada. `notificationService.checkAssetRemindersAndNotify()` men-scan tiga kondisi basi dan mengirim notifikasi ke stakeholder inventory (dedup unread agar tak spam): (1) serial **Rusak** belum di-disposal > `ASSET_REMINDER_DAMAGED_DAYS` (default **30h**), (2) aset **Digunakan** karyawan > `ASSET_REMINDER_CUSTODY_DAYS` (default **365h**), (3) placement `facility_assets` **Aktif** > `ASSET_REMINDER_FACILITY_DAYS` (default **365h**). Ambang "sejak" diturunkan dari `transaksi_terakhir.tanggal` (serial) / `tanggal_penempatan` (facility) karena skema tak punya field due-date. Cron harian `0 7 * * *` (`ASSET_REMINDER_CRON`) via `scheduler.ts`. Frontend notif center (Header) merender generik dari `title/message/type` → tampil otomatis. Diverifikasi: 11 unit test lolos (4 baru), `tsc` backend bersih. Catatan: "kadaluarsa" di §6 tak punya field skema — di luar cakupan hingga field ditambahkan.
 - [ ] **G-25** Multi-language (§11) — UI Indonesia saja; evaluasi apakah dibutuhkan.
 
 > **Catatan cakupan:** §6.G memastikan audit ini menilai **seluruh fitur** modul inventory (bukan hanya relasi HR/Facility/RBAC/validasi). Item **G-21..G-25** adalah *fitur spesifikasi yang belum dibangun* — dicatat agar kontrol audit lengkap; ini **bukan bug**, melainkan pekerjaan fitur yang menunggu prioritas.
@@ -263,7 +263,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | FIXED |
 | **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | OPEN |
 | **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | OPEN |
-| **INV-N08** | Reminder pengembalian aset/barang rusak belum ada (spek §6) | G-24 | Info (gap fitur) | Fitur | OPEN |
+| **INV-N08** | Reminder pengembalian aset/barang rusak belum ada (spek §6) | G-24 | Info (gap fitur) | Fitur | FIXED — reminder rusak/custody/facility via scheduler harian + notif center; ambang configurable (ENV) |
 
 **Sudah diperbaiki di sesi sebelumnya (verifikasi ulang di audit):** serial global-unique (D-6), validasi jumlah serial=kuantitas (D-5), tampilan serial di detail transaksi, dropdown SearchableSelect number-vs-string, UX Gudang (department/PJ/lokasi).
 
@@ -373,4 +373,4 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
-*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-M03 (lokasi terpasang ditampilkan di lookup QR) & INV-M04 (paranoid ditutup by-design) — kategori integritas tuntas; sebelumnya INV-M11 scan kamera/barcode (FIXED), INV-C01 diverifikasi runtime (VERIFIED-FIXED), INV-N03 & INV-N04 dirapikan (FIXED).*
+*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-N08 reminder aset (rusak/custody/facility) dibangun (FIXED — scheduler harian + notif center, 11 unit test lolos); sebelumnya INV-M03 (lokasi terpasang di lookup QR) & INV-M04 (paranoid by-design) menuntaskan kategori integritas, INV-M11 scan kamera/barcode (FIXED), INV-C01 (VERIFIED-FIXED).*

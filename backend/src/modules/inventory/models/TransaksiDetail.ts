@@ -8,10 +8,13 @@ export class InvTransaksiDetail extends Model {
     public uom_id!: number;
     public jumlah!: number;
     public catatan!: string | null;
+    // Snapshot of the serial/tag selection at submit time, used to replay effects
+    // when a Pending transaction is approved (INV-N07). Null once effects have run
+    // or for details that never carried serials.
+    public serial_numbers!: string[] | null;
 
     public produk?: any;
     public uom?: any;
-    public serial_numbers?: any[];
 
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
@@ -44,6 +47,10 @@ InvTransaksiDetail.init({
     },
     catatan: {
         type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    serial_numbers: {
+        type: DataTypes.JSONB,
         allowNull: true,
     },
 }, {
