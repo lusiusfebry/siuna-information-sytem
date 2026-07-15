@@ -131,6 +131,26 @@ class NotificationService {
         }
     }
 
+    // INV-N07: alert approvers that a transaction is awaiting approval. Targets users
+    // with inventory_stock approve/read (getInventoryStockUsers covers the stakeholders);
+    // best-effort, fired after commit.
+    async notifyPendingApproval(transaksiId: number, code: string) {
+        try {
+            const targetUsers = await this.getInventoryStockUsers();
+            if (targetUsers.length === 0) return;
+            await Notification.bulkCreate(targetUsers.map((u: any) => ({
+                user_id: u.id,
+                title: 'Transaksi Menunggu Persetujuan',
+                message: `Transaksi ${code} menunggu persetujuan Anda`,
+                type: 'info',
+                entity_type: 'inv_transaksi_approval',
+                entity_id: transaksiId,
+            })));
+        } catch (error) {
+            console.error('Failed to send pending-approval notification:', error);
+        }
+    }
+
     // Fan a set of reminders out to every stock stakeholder, skipping (user, entity)
     // pairs that already have an UNREAD notification of the same entity_type — so a
     // daily scan nudges once and stops spamming until the admin reads/acts on it.

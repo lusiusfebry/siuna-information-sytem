@@ -260,6 +260,13 @@ class StokService {
 
             payload.created_by = userId;
 
+            // INV-N07: does this movement need approval before its stock/serial effects
+            // apply? Outbound ('Keluar') and reconciliation ('Adjustment') do. 'Transfer
+            // Masuk' has a 'Masuk' header but generates a paired OUTBOUND leg that reduces
+            // the source warehouse — so it is gated too, otherwise the control could be
+            // bypassed simply by recording a transfer from the destination side.
+            const requiresApproval = this.requiresApproval(payload);
+
             const code = await this.generateCode(payload.tipe, t);
 
             const transaksi = await InvTransaksi.create({
@@ -276,8 +283,12 @@ class StokService {
                 no_referensi: payload.no_referensi || null,
                 catatan: payload.catatan || null,
                 created_by: userId,
+                approval_status: requiresApproval ? 'Pending' : 'Approved',
             }, { transaction: t });
 
+            // Always persist the detail lines. For a Pending transaction we also snapshot
+            // the serial/tag selection so effects can be replayed faithfully on approval;
+            // for an auto-approved one the selection is consumed now, so no snapshot.
             for (const detail of payload.details) {
                 const produk = await InvProduk.findByPk(detail.produk_id, { transaction: t });
                 if (!produk) throw new AppError(`Produk dengan ID ${detail.produk_id} tidak ditemukan`, 404);
@@ -288,34 +299,154 @@ class StokService {
                     uom_id: detail.uom_id,
                     jumlah: detail.jumlah,
                     catatan: detail.catatan || null,
+                    serial_numbers: requiresApproval ? (detail.serial_numbers ?? null) : null,
                 }, { transaction: t });
-
-                if (payload.tipe === 'Masuk') {
-                    await this.handleStokMasuk(payload, detail, produk, transaksi, t);
-                } else if (payload.tipe === 'Keluar') {
-                    await this.handleStokKeluar(payload, detail, produk, transaksi, t);
-                } else if (payload.tipe === 'Adjustment') {
-                    await this.handleAdjustment(payload, detail, produk, transaksi, t);
-                }
             }
 
-            // For transfer: create paired transaction
-            if (payload.sub_tipe === 'Transfer Masuk' && payload.gudang_tujuan_id) {
-                await this.createPairedTransferKeluar(payload, transaksi, userId, t);
-            } else if (payload.sub_tipe === 'Transfer Gudang' && payload.gudang_tujuan_id) {
-                await this.createPairedTransferMasuk(payload, transaksi, userId, t);
+            // Auto-approved transactions apply their effects immediately. Pending ones
+            // defer everything (stock, serials, facility placements, paired legs) until
+            // approveTransaksi replays them — so a Pending row never touches stock.
+            if (!requiresApproval) {
+                await this.applyTransaksiEffects(transaksi, payload, userId, t);
             }
 
             await t.commit();
 
-            const affectedProdukIds = payload.details.map(d => d.produk_id);
-            notificationService.checkLowStockAndNotify(affectedProdukIds).catch(() => {});
+            if (!requiresApproval) {
+                const affectedProdukIds = payload.details.map(d => d.produk_id);
+                notificationService.checkLowStockAndNotify(affectedProdukIds).catch(() => {});
+            } else {
+                notificationService.notifyPendingApproval(transaksi.id, transaksi.code).catch(() => {});
+            }
 
             return this.getTransaksiDetail(transaksi.id);
         } catch (error) {
             await t.rollback();
             throw error;
         }
+    }
+
+    // Movements that reduce or reconcile stock require approval (INV-N07). See the
+    // caller for why 'Transfer Masuk' is included despite its 'Masuk' header.
+    private requiresApproval(payload: { tipe: string; sub_tipe: string }): boolean {
+        return payload.tipe === 'Keluar'
+            || payload.tipe === 'Adjustment'
+            || payload.sub_tipe === 'Transfer Masuk';
+    }
+
+    // Apply a transaction's stock/serial/facility effects and any paired transfer leg.
+    // Shared by the auto-approve path (createTransaksi) and the approval replay path
+    // (approveTransaksi). `payload` is the original request for the former and a
+    // reconstruction from the persisted rows for the latter — the handlers only read
+    // header fields + per-detail (produk_id, uom_id, jumlah, serial_numbers), all of
+    // which are captured on the transaksi row and detail snapshot.
+    private async applyTransaksiEffects(
+        transaksi: InvTransaksi,
+        payload: TransaksiPayload,
+        userId: number | null,
+        t: Transaction
+    ) {
+        for (const detail of payload.details) {
+            const produk = await InvProduk.findByPk(detail.produk_id, { transaction: t });
+            if (!produk) throw new AppError(`Produk dengan ID ${detail.produk_id} tidak ditemukan`, 404);
+
+            if (payload.tipe === 'Masuk') {
+                await this.handleStokMasuk(payload, detail, produk, transaksi, t);
+            } else if (payload.tipe === 'Keluar') {
+                await this.handleStokKeluar(payload, detail, produk, transaksi, t);
+            } else if (payload.tipe === 'Adjustment') {
+                await this.handleAdjustment(payload, detail, produk, transaksi, t);
+            }
+        }
+
+        // For transfer: create paired transaction (auto-approved — it is part of an
+        // action that has itself already been approved / auto-approved).
+        if (payload.sub_tipe === 'Transfer Masuk' && payload.gudang_tujuan_id) {
+            await this.createPairedTransferKeluar(payload, transaksi, userId, t);
+        } else if (payload.sub_tipe === 'Transfer Gudang' && payload.gudang_tujuan_id) {
+            await this.createPairedTransferMasuk(payload, transaksi, userId, t);
+        }
+    }
+
+    // Rebuild a TransaksiPayload from a persisted (Pending) transaksi + its detail rows,
+    // so applyTransaksiEffects can replay it at approval time.
+    private buildPayloadFromTransaksi(transaksi: InvTransaksi, details: InvTransaksiDetail[]): TransaksiPayload {
+        return {
+            tipe: transaksi.tipe,
+            sub_tipe: transaksi.sub_tipe,
+            tanggal: transaksi.tanggal,
+            gudang_id: transaksi.gudang_id,
+            gudang_tujuan_id: transaksi.gudang_tujuan_id ?? undefined,
+            facility_building_id: transaksi.facility_building_id ?? undefined,
+            facility_room_id: transaksi.facility_room_id ?? undefined,
+            karyawan_id: transaksi.karyawan_id ?? undefined,
+            supplier_nama: transaksi.supplier_nama ?? undefined,
+            no_referensi: transaksi.no_referensi ?? undefined,
+            catatan: transaksi.catatan ?? undefined,
+            created_by: transaksi.created_by,
+            details: details.map((d) => ({
+                produk_id: d.produk_id,
+                uom_id: d.uom_id,
+                jumlah: d.jumlah,
+                catatan: d.catatan ?? undefined,
+                serial_numbers: d.serial_numbers ?? undefined,
+            })),
+        };
+    }
+
+    // INV-N07: approve a Pending transaction — replay its deferred effects inside one
+    // transaction and stamp the approver. Stock sufficiency and serial existence are
+    // validated HERE (by the replayed handlers), so if stock ran out between submit and
+    // approval the whole thing rolls back and the transaction stays Pending.
+    async approveTransaksi(id: number, userId: number) {
+        const t = await sequelize.transaction();
+        try {
+            const transaksi = await InvTransaksi.findByPk(id, { transaction: t, lock: t.LOCK.UPDATE });
+            if (!transaksi) throw new AppError('Transaksi tidak ditemukan', 404);
+            if (transaksi.approval_status !== 'Pending') {
+                throw new AppError(`Transaksi tidak dapat disetujui karena berstatus ${transaksi.approval_status}`, 400);
+            }
+
+            const details = await InvTransaksiDetail.findAll({ where: { transaksi_id: id }, transaction: t });
+            const payload = this.buildPayloadFromTransaksi(transaksi, details);
+
+            // Replay effects under the original submitter for created_by stamping.
+            await this.applyTransaksiEffects(transaksi, payload, transaksi.created_by ?? userId, t);
+
+            await transaksi.update({
+                approval_status: 'Approved',
+                approved_by: userId,
+                approved_at: new Date(),
+            }, { transaction: t });
+
+            await t.commit();
+
+            notificationService.checkLowStockAndNotify(details.map((d) => d.produk_id)).catch(() => {});
+
+            return this.getTransaksiDetail(id);
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
+    // INV-N07: reject a Pending transaction. No effects were ever applied, so this only
+    // marks the row — there is nothing to reverse.
+    async rejectTransaksi(id: number, userId: number, reason?: string) {
+        const transaksi = await InvTransaksi.findByPk(id);
+        if (!transaksi) throw new AppError('Transaksi tidak ditemukan', 404);
+        if (transaksi.approval_status !== 'Pending') {
+            throw new AppError(`Transaksi tidak dapat ditolak karena berstatus ${transaksi.approval_status}`, 400);
+        }
+
+        await transaksi.update({
+            approval_status: 'Rejected',
+            approved_by: userId,
+            approved_at: new Date(),
+            rejection_reason: reason?.trim() || null,
+        });
+
+        return this.getTransaksiDetail(id);
     }
 
     private async handleStokMasuk(
@@ -722,13 +853,14 @@ class StokService {
     }
 
     async getTransaksiList(filters: any) {
-        const { tipe, sub_tipe, gudang_id, facility_building_id, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
         if (tipe) where.tipe = tipe;
         if (sub_tipe) where.sub_tipe = sub_tipe;
         if (gudang_id) where.gudang_id = gudang_id;
+        if (approval_status) where.approval_status = approval_status;
         if (facility_building_id) where.facility_building_id = facility_building_id;
         if (tanggal_dari && tanggal_sampai) {
             where.tanggal = { [Op.between]: [tanggal_dari, tanggal_sampai] };
@@ -756,6 +888,7 @@ class StokService {
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
+                { model: User, as: 'approver', attributes: ['id', 'nama'] },
             ],
             limit: Number(limit),
             offset,
@@ -781,6 +914,7 @@ class StokService {
                 { model: FacilityRoom, as: 'facility_room', attributes: ['id', 'code', 'nama'] },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'] , paranoid: false },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
+                { model: User, as: 'approver', attributes: ['id', 'nama'] },
                 {
                     model: InvTransaksiDetail,
                     as: 'details',
@@ -824,10 +958,19 @@ class StokService {
         }
 
         const result: any = transaksi.toJSON();
-        result.details = (result.details || []).map((d: any) => ({
-            ...d,
-            serial_numbers: serialsByProduk.get(d.produk_id) || [],
-        }));
+        result.details = (result.details || []).map((d: any) => {
+            // Approved/legacy: show the actual serial rows tied to this transaksi.
+            // Pending: no serial rows exist yet (effects deferred), so surface the
+            // snapshot the submitter chose (strings) as {serial_number} placeholders
+            // so the reviewer can see what will move on approval.
+            const linked = serialsByProduk.get(d.produk_id) || [];
+            const serial_numbers = linked.length > 0
+                ? linked
+                : (Array.isArray(d.serial_numbers)
+                    ? d.serial_numbers.map((s: string) => ({ serial_number: s, status: 'Pending' }))
+                    : []);
+            return { ...d, serial_numbers };
+        });
 
         return result;
     }

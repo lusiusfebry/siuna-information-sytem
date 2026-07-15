@@ -51,6 +51,26 @@ class StokController {
         }
     }
 
+    async approveTransaksi(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = (req as any).user?.id;
+            const result = await stokService.approveTransaksi(Number(req.params.id), userId);
+            res.json({ status: 'success', data: result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async rejectTransaksi(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = (req as any).user?.id;
+            const result = await stokService.rejectTransaksi(Number(req.params.id), userId, req.body?.reason);
+            res.json({ status: 'success', data: result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getKartuStok(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await stokService.getKartuStok({ ...req.query, departmentFilter: req.departmentFilter });

@@ -22,5 +22,6 @@ export const ACTIONS = {
     IMPORT: 'import',
     EXPORT: 'export',
     VIEW_ALL: 'view_all',
-    VIEW_DEPARTMENT: 'view_department'
+    VIEW_DEPARTMENT: 'view_department',
+    APPROVE: 'approve',
 } as const;

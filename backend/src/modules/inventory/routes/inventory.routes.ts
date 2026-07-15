@@ -113,6 +113,22 @@ router.get(
     (req, res, next) => stokController.getTransaksiDetail(req, res, next)
 );
 
+// INV-N07: approve / reject a Pending transaction. Guarded by the dedicated
+// inventory_stock:approve permission so approval authority is separable from create.
+router.post(
+    '/transaksi/:id/approve',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    auditLogger('inv_transaksi'),
+    (req, res, next) => stokController.approveTransaksi(req, res, next)
+);
+
+router.post(
+    '/transaksi/:id/reject',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    auditLogger('inv_transaksi'),
+    (req, res, next) => stokController.rejectTransaksi(req, res, next)
+);
+
 router.get(
     '/kartu-stok',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
