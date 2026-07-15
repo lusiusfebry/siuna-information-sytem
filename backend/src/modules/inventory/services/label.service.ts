@@ -6,6 +6,7 @@ import InvSerialNumber from '../models/SerialNumber';
 import InvGudang from '../models/Gudang';
 import InvBrand from '../models/Brand';
 import Employee from '../../hr/models/Employee';
+import FacilityAsset from '../../facility/models/Asset';
 import { AppError } from '../../../shared/utils/errorHandler';
 import companySettingsService from '../../auth/services/company-settings.service';
 
@@ -229,6 +230,28 @@ ${pages}
         }
     }
 
+    // A unit sent to a building/mess ("Ke Gedung/Mess") has gudang_id/karyawan_id set to
+    // null, so the serial row alone cannot say where it physically is (INV-M03). The
+    // authoritative location lives on the active facility_assets placement — read it back
+    // rather than denormalizing a location column onto the serial (which would drift).
+    private async getActiveFacilityPlacement(serialNumberId: number) {
+        const placement = await FacilityAsset.findOne({
+            where: { serial_number_id: serialNumberId, status: 'Aktif' },
+            include: [{ association: 'room', include: [{ association: 'building' }] }],
+            order: [['id', 'DESC']],
+        });
+        if (!placement) return null;
+        const room: any = (placement as any).room;
+        return {
+            room_id: placement.room_id,
+            room: room ? { id: room.id, nama: room.nama, code: room.code } : null,
+            building: room?.building
+                ? { id: room.building.id, nama: room.building.nama, code: room.building.code }
+                : null,
+            tanggal_penempatan: placement.tanggal_penempatan,
+        };
+    }
+
     async lookupQR(code: string) {
         if (code.startsWith('INV:PRODUK:')) {
             const produkCode = code.replace('INV:PRODUK:', '');
@@ -250,7 +273,8 @@ ${pages}
                 ],
             });
             if (!sn) throw new AppError('Serial number tidak ditemukan', 404);
-            return { type: 'serial_number', data: sn };
+            const placement = await this.getActiveFacilityPlacement(sn.id);
+            return { type: 'serial_number', data: { ...sn.toJSON(), facility_placement: placement } };
         }
 
         if (code.startsWith('INV:TAG:')) {
@@ -264,7 +288,8 @@ ${pages}
                 ],
             });
             if (!tag) throw new AppError('Asset tag tidak ditemukan', 404);
-            return { type: 'asset_tag', data: tag };
+            const placement = await this.getActiveFacilityPlacement(tag.id);
+            return { type: 'asset_tag', data: { ...tag.toJSON(), facility_placement: placement } };
         }
 
         throw new AppError('Format QR code tidak dikenali', 400);

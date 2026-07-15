@@ -479,6 +479,28 @@ const LabelPage = () => {
                                         </>
                                     )}
                                 </div>
+
+                                {lookupResult.data.data?.facility_placement && (
+                                    <div className="pt-3 border-t border-green-200 dark:border-green-800">
+                                        <div className="flex items-start gap-2">
+                                            <span className="material-symbols-outlined text-green-600 text-[18px]">apartment</span>
+                                            <div className="min-w-0">
+                                                <p className="text-gray-500 text-xs">Lokasi Terpasang (Gedung/Mess)</p>
+                                                <p className="font-medium text-gray-900 dark:text-white">
+                                                    {lookupResult.data.data.facility_placement.building?.nama || '-'}
+                                                    {lookupResult.data.data.facility_placement.room?.nama && (
+                                                        <span className="text-gray-500 font-normal"> · Ruang {lookupResult.data.data.facility_placement.room.nama}</span>
+                                                    )}
+                                                </p>
+                                                {lookupResult.data.data.facility_placement.tanggal_penempatan && (
+                                                    <p className="text-xs text-gray-400 mt-0.5">
+                                                        Ditempatkan sejak {lookupResult.data.data.facility_placement.tanggal_penempatan}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
