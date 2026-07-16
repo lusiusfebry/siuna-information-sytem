@@ -102,7 +102,7 @@ Tahapan (setiap tahap menghasilkan entri di register §7):
 | Aset Karyawan | Daftar, histori, Berita Acara PDF | `/inventory/employees/*` | ⚠️ CEK | Relasi HR; path distandarkan ke plural (INV-N03 FIXED) |
 | Facility Inv. | Inventaris per gedung | `/inventory/facility/:id/inventory` | ⚠️ CEK | Berbasis log transaksi |
 | Foto Produk | Upload/preview | `PUT /master/produk/:id/photo` | ⚠️ CEK | |
-| PWA/Offline | Mobile offline sync | — | 🔴 BELUM ADA | Diminta spek §7/§11 (INV-N06) |
+| PWA/Offline | Mobile offline (read-only) | manifest + service worker | ✅ OK | Installable PWA; lookup QR/aset ter-cache utk lapangan offline (INV-N06 FIXED, scope read-only; lihat §9e) |
 | Approval | Alur persetujuan transaksi | `POST /transaksi/:id/approve`·`/reject` | ✅ OK | Transaksi kurang-stok dibuat `Pending`, efek ditunda sampai disetujui (INV-N07 FIXED) |
 | Notifikasi | Reminder retur aset / barang rusak | scheduler + Notification | ✅ OK | Low-stock + reminder rusak/custody/facility (INV-N08 FIXED) |
 
@@ -227,7 +227,7 @@ Area ini mengaudit fitur inventory *sebagai fitur* (bukan hanya relasinya), diba
 
 **G.7 — Fitur spek yang BELUM ADA (gap, untuk kelengkapan kontrol)** — spek `03_modul_inventory.md`.
 - [x] **G-21** **[INV-M11]** Scan kamera/barcode (§3, §11) — **FIXED** (lihat G-7).
-- [ ] **G-22** **[INV-N06]** PWA / offline sync (§7, §11) — tak ada service worker/manifest PWA. Belum ada.
+- [x] **G-22** **[INV-N06]** PWA / offline (§7, §11) — **FIXED** (scope read-only lapangan). Installable PWA (manifest + ikon) via `vite-plugin-pwa`; app shell di-precache & lookup QR/aset-tag/produk ter-cache (NetworkFirst) agar hasil scan yang pernah dibuka tetap tampil offline; banner offline + badge "data dari cache". Pembuatan transaksi offline **tidak** termasuk (menghindari risiko integritas stok + gating approval INV-N07). Lihat §9e.
 - [ ] **G-23** **[INV-N07]** Approval system (§8 "approval system") — tak ada alur approval transaksi. Belum ada.
 - [x] **G-24** **[INV-N08] — FIXED.** Reminder aset dibangun di atas infrastruktur notifikasi & scheduler yang sudah ada. `notificationService.checkAssetRemindersAndNotify()` men-scan tiga kondisi basi dan mengirim notifikasi ke stakeholder inventory (dedup unread agar tak spam): (1) serial **Rusak** belum di-disposal > `ASSET_REMINDER_DAMAGED_DAYS` (default **30h**), (2) aset **Digunakan** karyawan > `ASSET_REMINDER_CUSTODY_DAYS` (default **365h**), (3) placement `facility_assets` **Aktif** > `ASSET_REMINDER_FACILITY_DAYS` (default **365h**). Ambang "sejak" diturunkan dari `transaksi_terakhir.tanggal` (serial) / `tanggal_penempatan` (facility) karena skema tak punya field due-date. Cron harian `0 7 * * *` (`ASSET_REMINDER_CRON`) via `scheduler.ts`. Frontend notif center (Header) merender generik dari `title/message/type` → tampil otomatis. Diverifikasi: 11 unit test lolos (4 baru), `tsc` backend bersih. Catatan: "kadaluarsa" di §6 tak punya field skema — di luar cakupan hingga field ditambahkan.
 - [ ] **G-25** Multi-language (§11) — UI Indonesia saja; evaluasi apakah dibutuhkan.
@@ -261,7 +261,7 @@ Temuan dari pemetaan (statis). Severity akan dikonfirmasi pada verifikasi dinami
 | **INV-N03** | Inkonsistensi path employee (plural/singular) | F-4 | Info | Kualitas | FIXED |
 | **INV-N04** | Akses response-shape defensif keliru di LaporanPage | F-5 | Info | Kualitas | FIXED |
 | **INV-N05** | QR frontend inventory tak terpakai (duplikat INV-N01) | G-8 | Info | Kualitas | FIXED |
-| **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | OPEN |
+| **INV-N06** | PWA/offline sync belum ada (spek §7/§11) | G-22 | Info (gap fitur) | Fitur | FIXED — PWA installable + offline read-only (app shell precache + cache lookup QR/aset NetworkFirst); banner/badge offline; build hasilkan `sw.js`+`manifest.webmanifest`; scope tulis-offline sengaja dikecualikan; lihat §9e |
 | **INV-N07** | Approval system belum ada (spek §8) | G-23 | Info (gap fitur) | Fitur | FIXED — transaksi berkurang-stok (Keluar/Adjustment/Transfer Masuk) dibuat `Pending` & menunda seluruh efek sampai disetujui; approve/reject di-gate permission `inventory_stock:approve`; 8 unit test lolos |
 | **INV-N08** | Reminder pengembalian aset/barang rusak belum ada (spek §6) | G-24 | Info (gap fitur) | Fitur | FIXED — reminder rusak/custody/facility via scheduler harian + notif center; ambang configurable (ENV) |
 
@@ -380,6 +380,25 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
+## 9e. RESOLUSI INV-N06 (PWA / offline) — FIXED (scope read-only lapangan)
+
+**Masalah:** spek §7/§11 meminta "mobile-friendly, offline mode, offline sync". Tak ada service worker/manifest — app tidak installable dan tak berfungsi tanpa jaringan. Scan kamera QR sudah ada (INV-M11), tapi use-case lapangan tambang (sinyal buruk) tak tertangani.
+
+**Keputusan scope:** disepakati **read-only lapangan**. Offline write/queue transaksi **sengaja dikecualikan** — menyimpan-lalu-sync transaksi stok saat offline berisiko integritas (stok bisa berubah di server saat perangkat offline) dan berbenturan dengan gating approval INV-N07. Read-only memenuhi kebutuhan utama: cek stok/lokasi aset di lapangan.
+
+**Perbaikan (`vite-plugin-pwa` / Workbox):**
+- **Installable PWA:** `manifest.webmanifest` (nama, theme `#135bec`, `display: standalone`) + ikon 192/512/maskable digenerate dari `logo-bmi.jpg` (`scripts/gen-pwa-icons.mjs`, sharp). Meta `apple-touch-icon`/`theme-color` di `index.html`.
+- **App shell offline:** Workbox precache seluruh aset build (`registerType: autoUpdate`) → app tetap kebuka offline. `navigateFallback` hormati SPA routing, `denylist /api`.
+- **Cache lookup lapangan:** rute `GET /api/inventory/label/lookup*` dan `.../qr` pakai **NetworkFirst** (timeout 3s, cache `inventory-lookup`, 100 entri / 7 hari). Hasil scan yang pernah dibuka saat online tetap tampil offline; tak ada bypass permission (data hanya ter-cache bila sebelumnya berhasil di-fetch terautentikasi).
+- **Indikator:** `useOnlineStatus` + `OfflineBanner` global (di `MainLayout`); di `LabelPage`, badge "Data dari cache" saat hasil disajikan offline + pesan ramah bila code belum ter-cache.
+- **Update flow:** `virtual:pwa-register` di `main.tsx` menampilkan toast "Versi baru tersedia — Muat ulang" (opt-in, tak refresh mendadak). SW nonaktif di `vite dev`.
+
+**Verifikasi:** `npm run build` sukses — `dist/sw.js`, `dist/workbox-*.js`, `dist/manifest.webmanifest` (71 entri precache) tergenerate; `npm run preview` menyajikan sw.js (200), manifest (200, `application/manifest+json`), ikon (200), link manifest + theme-color ter-inject di index.html; 13 unit test lolos; tak ada warning lint baru (baseline pre-existing tak berubah).
+
+**Catatan operasional:** service worker & `getUserMedia` (kamera scan) **butuh HTTPS** di produksi. `nginx.conf` saat ini `listen 80` — TLS adalah prasyarat deployment (di luar cakupan kode app), perlu disiapkan sebelum fitur PWA/kamera aktif di produksi.
+
+---
+
 ## 10. CARA MENGGUNAKAN DOKUMEN INI
 
 1. Audit dijalankan per-area (§6.A → §6.F). Tandai checkbox saat item diverifikasi.
@@ -390,4 +409,4 @@ Detail implementasi: `.claude/PLAN-INV-C01.md`.
 
 ---
 
-*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-N07 approval system dibangun (FIXED — defer-then-replay, gate `inventory_stock:approve`, 8 unit test lolos; lihat §9d); sebelumnya INV-N08 reminder aset (rusak/custody/facility) via scheduler harian + notif center, INV-M03/M04 integritas, INV-M11 scan kamera/barcode, INV-C01 (VERIFIED-FIXED). **Satu-satunya temuan tersisa: INV-N06 (PWA/offline sync) — OPEN, gap fitur non-blocking.***
+*Dokumen kontrol — diperbarui seiring audit berjalan. Dibuat dari pemetaan faktual backend, frontend, dan relasi lintas-modul (15 Juli 2026). **Pembaruan terakhir:** INV-N06 PWA/offline dibangun (FIXED — scope read-only lapangan: PWA installable + app-shell precache + cache lookup QR/aset NetworkFirst, banner/badge offline; write-offline sengaja dikecualikan; lihat §9e); sebelumnya INV-N07 approval system (defer-then-replay, gate `inventory_stock:approve`, 8 unit test; §9d), INV-N08 reminder aset via scheduler harian + notif center, INV-M03/M04 integritas, INV-M11 scan kamera/barcode, INV-C01 (VERIFIED-FIXED). **Seluruh 22 temuan tertangani; catatan operasional: PWA/kamera butuh HTTPS di produksi (nginx `listen 80`).***

@@ -5,6 +5,7 @@ import { useLookupQR } from '../../../hooks/useInventoryLabel';
 import QrCameraScanner from '../../../components/inventory/QrCameraScanner';
 import { useSerialNumberList } from '../../../hooks/useInventoryStok';
 import { useInvGudangList, useInvProdukList } from '../../../hooks/useInventoryMasterData';
+import { useOnlineStatus } from '../../../hooks/useOnlineStatus';
 
 const STATUS_COLORS: Record<string, string> = {
     'Tersedia': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
@@ -47,6 +48,7 @@ const LabelPage = () => {
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
     const { data: produkData } = useInvProdukList({ page: 1, limit: 200, search: '' });
     const { data: lookupResult, isLoading: lookupLoading } = useLookupQR(lookupQuery);
+    const isOnline = useOnlineStatus();
 
     const items = snData?.data || [];
     const totalItems = snData?.pagination?.total || 0;
@@ -405,11 +407,17 @@ const LabelPage = () => {
 
                         {lookupQuery && !lookupLoading && lookupResult?.data && (
                             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 space-y-3">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                     <span className="material-symbols-outlined text-green-600">check_circle</span>
                                     <span className="text-sm font-semibold text-green-800 dark:text-green-300">
                                         {lookupResult.data.type === 'produk' ? 'Produk Ditemukan' : lookupResult.data.type === 'asset_tag' ? 'Asset Tag Ditemukan' : 'Serial Number Ditemukan'}
                                     </span>
+                                    {!isOnline && (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                                            <span className="material-symbols-outlined text-[14px]">cloud_off</span>
+                                            Data dari cache
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                     {lookupResult.data.type === 'produk' ? (
@@ -505,10 +513,18 @@ const LabelPage = () => {
                         )}
 
                         {lookupQuery && !lookupLoading && !lookupResult?.data && (
-                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center">
-                                <span className="material-symbols-outlined text-red-400 text-3xl mb-1 block">error</span>
-                                <p className="text-sm text-red-700 dark:text-red-300">Kode QR tidak ditemukan</p>
-                            </div>
+                            isOnline ? (
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center">
+                                    <span className="material-symbols-outlined text-red-400 text-3xl mb-1 block">error</span>
+                                    <p className="text-sm text-red-700 dark:text-red-300">Kode QR tidak ditemukan</p>
+                                </div>
+                            ) : (
+                                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-center">
+                                    <span className="material-symbols-outlined text-amber-500 text-3xl mb-1 block">cloud_off</span>
+                                    <p className="text-sm text-amber-800 dark:text-amber-300">Anda sedang offline dan kode ini belum tersimpan di cache.</p>
+                                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Sambungkan ke internet untuk mencari kode baru.</p>
+                                </div>
+                            )
                         )}
 
                         {!lookupQuery && !lookupLoading && (

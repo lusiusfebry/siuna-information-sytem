@@ -3,13 +3,17 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { LayoutProvider, useLayout } from '../../context/LayoutContext';
 import { ErrorBoundary } from '../common/ErrorBoundary';
+import OfflineBanner from '../common/OfflineBanner';
 
 const MainLayoutContent = () => {
     const { sidebarCollapsed } = useLayout();
     const location = useLocation();
 
     return (
-        <div className="flex h-screen bg-[#f6f6f8] dark:bg-[#101622] overflow-hidden transition-colors duration-300">
+        <div className="flex flex-col h-screen bg-[#f6f6f8] dark:bg-[#101622] overflow-hidden transition-colors duration-300">
+            {/* Offline indicator (INV-N06) — spans full width above the app chrome. */}
+            <OfflineBanner />
+            <div className="flex flex-1 min-h-0">
             {/* Sidebar */}
             <div className={`flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
                 <Sidebar collapsed={sidebarCollapsed} />
@@ -28,6 +32,7 @@ const MainLayoutContent = () => {
                         </ErrorBoundary>
                     </div>
                 </main>
+            </div>
             </div>
         </div>
     );

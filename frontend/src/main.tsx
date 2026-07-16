@@ -9,6 +9,7 @@ import { useAuthStore } from './stores/authStore'
 import ErrorBoundary from './components/common/ErrorBoundary'
 
 import { Toaster } from 'react-hot-toast'
+import { setupPWA } from './pwa'
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -48,3 +49,6 @@ const Root = () => {
 };
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<Root />);
+
+// Register the PWA service worker (INV-N06). Disabled in dev via devOptions.
+setupPWA();

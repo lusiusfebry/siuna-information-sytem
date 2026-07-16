@@ -1,10 +1,65 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        react(),
+        // INV-N06: installable PWA + offline read support for field use.
+        VitePWA({
+            registerType: 'autoUpdate',
+            includeAssets: ['favicon.ico', 'icons/apple-touch-icon.png'],
+            manifest: {
+                name: 'Bebang Sistem Informasi',
+                short_name: 'Bebang SI',
+                description: 'Sistem informasi HR, Inventory, dan Facility Management',
+                lang: 'id',
+                theme_color: '#135bec',
+                background_color: '#f6f6f8',
+                display: 'standalone',
+                start_url: '/',
+                scope: '/',
+                icons: [
+                    { src: 'icons/pwa-192.png', sizes: '192x192', type: 'image/png' },
+                    { src: 'icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
+                    { src: 'icons/pwa-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+                ],
+            },
+            workbox: {
+                // Precache the built app shell so the app opens offline.
+                globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],
+                // SPA client-side routing: serve index.html for navigations,
+                // but never shadow the API — those must hit the network/cache rule.
+                navigateFallback: '/index.html',
+                navigateFallbackDenylist: [/^\/api/],
+                cleanupOutdatedCaches: true,
+                runtimeCaching: [
+                    {
+                        // QR / asset-tag / product lookups (INV-N06 read-only offline):
+                        // serve fresh when online, fall back to the last cached
+                        // response when the network is unavailable or slow.
+                        urlPattern: ({ url }) =>
+                            url.pathname.startsWith('/api/inventory/label/lookup') ||
+                            /^\/api\/inventory\/label\/.+\/qr$/.test(url.pathname),
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'inventory-lookup',
+                            networkTimeoutSeconds: 3,
+                            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 },
+                            cacheableResponse: { statuses: [0, 200] },
+                        },
+                    },
+                ],
+            },
+            devOptions: {
+                // Keep the SW off in `vite dev` to avoid stale-cache surprises
+                // during development; it activates in preview/production builds.
+                enabled: false,
+            },
+        }),
+    ],
     resolve: {
         alias: {
             '@components': path.resolve(__dirname, './src/components'),
