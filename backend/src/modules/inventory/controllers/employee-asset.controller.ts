@@ -36,6 +36,16 @@ class EmployeeAssetController {
         }
     }
 
+    async getEmployeesWithAssets(req: Request, res: Response, next: NextFunction) {
+        try {
+            const q = (req.query.q as string) || '';
+            const data = await employeeAssetService.getEmployeesWithAssets(q);
+            res.json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAssets(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await employeeAssetService.getEmployeeAssets(Number(req.params.employeeId));

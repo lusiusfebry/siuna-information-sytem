@@ -293,6 +293,12 @@ router.get(
 );
 
 router.get(
+    '/employees/with-assets',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => employeeAssetController.getEmployeesWithAssets(req, res, next)
+);
+
+router.get(
     '/employees/:employeeId/assets',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.getAssets(req, res, next)

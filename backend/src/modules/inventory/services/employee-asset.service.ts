@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { Op, literal } from 'sequelize';
 import InvSerialNumber from '../models/SerialNumber';
 import InvTransaksi from '../models/Transaksi';
 import InvTransaksiDetail from '../models/TransaksiDetail';
@@ -7,9 +8,53 @@ import InvGudang from '../models/Gudang';
 import InvUom from '../models/Uom';
 import InvBrand from '../models/Brand';
 import Employee from '../../hr/models/Employee';
+import StatusKaryawan from '../../hr/models/StatusKaryawan';
 import { AppError } from '../../../shared/utils/errorHandler';
 
 class EmployeeAssetService {
+    async getEmployeesWithAssets(q?: string) {
+        const query = (q || '').trim();
+        const where: any = {
+            // Only employees currently holding at least one serial/tag asset.
+            id: {
+                [Op.in]: literal(
+                    '(SELECT DISTINCT karyawan_id FROM inv_serial_numbers WHERE karyawan_id IS NOT NULL)'
+                ),
+            },
+        };
+        if (query) {
+            where[Op.or] = [
+                { nama_lengkap: { [Op.iLike]: `%${query}%` } },
+                { nomor_induk_karyawan: { [Op.iLike]: `%${query}%` } },
+            ];
+        }
+
+        const employees = await Employee.findAll({
+            where,
+            include: [{ model: StatusKaryawan, as: 'status_karyawan', where: { nama: 'Aktif' }, attributes: [] }],
+            attributes: [
+                'id',
+                'nama_lengkap',
+                'nomor_induk_karyawan',
+                [
+                    literal(
+                        '(SELECT COUNT(*) FROM inv_serial_numbers sn WHERE sn.karyawan_id = "Employee".id)'
+                    ),
+                    'asset_count',
+                ],
+            ],
+            limit: 20,
+            order: [['nama_lengkap', 'ASC']],
+        });
+
+        return employees.map((e: any) => ({
+            id: e.id,
+            nama_lengkap: e.nama_lengkap,
+            nomor_induk_karyawan: e.nomor_induk_karyawan,
+            asset_count: Number(e.get('asset_count')) || 0,
+        }));
+    }
+
     async getEmployeeAssets(employeeId: number) {
         const assets = await InvSerialNumber.findAll({
             where: { karyawan_id: employeeId },
