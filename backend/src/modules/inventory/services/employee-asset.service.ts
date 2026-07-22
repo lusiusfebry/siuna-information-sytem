@@ -72,6 +72,25 @@ class EmployeeAssetService {
         return assets;
     }
 
+    async lookupAssetByIdentifier(identifier: string) {
+        const id = (identifier || '').trim();
+        if (!id) return null;
+        const unit = await InvSerialNumber.findOne({
+            where: {
+                [Op.or]: [{ serial_number: id }, { tag_number: id }],
+            },
+            include: [
+                {
+                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'],
+                    include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }],
+                },
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'], paranoid: false },
+            ],
+        });
+        return unit;
+    }
+
     async getEmployeeAssetHistory(employeeId: number) {
         const transaksi = await InvTransaksi.findAll({
             where: { karyawan_id: employeeId },

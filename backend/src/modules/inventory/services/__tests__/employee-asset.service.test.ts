@@ -62,3 +62,42 @@ describe('getEmployeesWithAssets', () => {
     });
 });
 
+const SN = require('../../models/SerialNumber').default as any;
+
+describe('lookupAssetByIdentifier', () => {
+    beforeEach(() => jest.clearAllMocks());
+
+    it('matches serial OR tag and includes the current holder', async () => {
+        SN.findOne.mockResolvedValue({ id: 9, serial_number: 'SN-1', tag_number: null, karyawan_id: 5 });
+        const res = await employeeAssetService.lookupAssetByIdentifier('SN-1');
+        const opts = SN.findOne.mock.calls[0][0];
+        // where must OR-match serial_number and tag_number with the given identifier.
+        const orClause = opts.where[Object.getOwnPropertySymbols(opts.where)[0]];
+        expect(orClause).toEqual([{ serial_number: 'SN-1' }, { tag_number: 'SN-1' }]);
+        // holder (karyawan) included with paranoid:false so historical names resolve.
+        const karyawanInc = opts.include.find((i: any) => i.as === 'karyawan');
+        expect(karyawanInc).toMatchObject({ paranoid: false });
+        expect(res).toMatchObject({ id: 9, karyawan_id: 5 });
+    });
+
+    it('trims the identifier before querying', async () => {
+        SN.findOne.mockResolvedValue(null);
+        await employeeAssetService.lookupAssetByIdentifier('  TAG-7  ');
+        const opts = SN.findOne.mock.calls[0][0];
+        const orClause = opts.where[Object.getOwnPropertySymbols(opts.where)[0]];
+        expect(orClause).toEqual([{ serial_number: 'TAG-7' }, { tag_number: 'TAG-7' }]);
+    });
+
+    it('returns null for an empty identifier without querying', async () => {
+        const res = await employeeAssetService.lookupAssetByIdentifier('   ');
+        expect(res).toBeNull();
+        expect(SN.findOne).not.toHaveBeenCalled();
+    });
+
+    it('returns null when nothing matches', async () => {
+        SN.findOne.mockResolvedValue(null);
+        const res = await employeeAssetService.lookupAssetByIdentifier('NOPE');
+        expect(res).toBeNull();
+    });
+});
+

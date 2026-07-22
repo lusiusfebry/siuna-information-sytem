@@ -299,6 +299,12 @@ router.get(
 );
 
 router.get(
+    '/assets/lookup',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => employeeAssetController.lookupAsset(req, res, next)
+);
+
+router.get(
     '/employees/:employeeId/assets',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
     (req, res, next) => employeeAssetController.getAssets(req, res, next)

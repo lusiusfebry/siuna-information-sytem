@@ -46,6 +46,16 @@ class EmployeeAssetController {
         }
     }
 
+    async lookupAsset(req: Request, res: Response, next: NextFunction) {
+        try {
+            const identifier = (req.query.identifier as string) || '';
+            const data = await employeeAssetService.lookupAssetByIdentifier(identifier);
+            res.json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAssets(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await employeeAssetService.getEmployeeAssets(Number(req.params.employeeId));
