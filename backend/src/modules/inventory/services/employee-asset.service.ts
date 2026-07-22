@@ -18,7 +18,7 @@ class EmployeeAssetService {
             // Only employees currently holding at least one serial/tag asset.
             id: {
                 [Op.in]: literal(
-                    '(SELECT DISTINCT karyawan_id FROM inv_serial_numbers WHERE karyawan_id IS NOT NULL)'
+                    '(SELECT DISTINCT karyawan_id FROM inv_serial_number WHERE karyawan_id IS NOT NULL)'
                 ),
             },
         };
@@ -38,7 +38,7 @@ class EmployeeAssetService {
                 'nomor_induk_karyawan',
                 [
                     literal(
-                        '(SELECT COUNT(*) FROM inv_serial_numbers sn WHERE sn.karyawan_id = "Employee".id)'
+                        '(SELECT COUNT(*) FROM inv_serial_number sn WHERE sn.karyawan_id = "Employee".id)'
                     ),
                     'asset_count',
                 ],
