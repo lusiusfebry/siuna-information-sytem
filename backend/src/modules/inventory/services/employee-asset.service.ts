@@ -15,7 +15,7 @@ class EmployeeAssetService {
             where: { karyawan_id: employeeId },
             include: [
                 {
-                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'],
+                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama', 'uom_id'],
                     include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }],
                 },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
