@@ -77,7 +77,8 @@ class EmployeeAssetController {
     async downloadBeritaAcara(req: Request, res: Response, next: NextFunction) {
         try {
             const transaksiId = req.params.transaksiId ? Number(req.params.transaksiId) : undefined;
-            const buffer = await employeeAssetService.generateBeritaAcara(Number(req.params.employeeId), transaksiId);
+            const arah = req.path.includes('berita-acara-retur') ? 'kembali' : 'serah';
+            const buffer = await employeeAssetService.generateBeritaAcara(Number(req.params.employeeId), transaksiId, arah);
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename=Berita-Acara-${req.params.employeeId}.pdf`);
             res.send(buffer);

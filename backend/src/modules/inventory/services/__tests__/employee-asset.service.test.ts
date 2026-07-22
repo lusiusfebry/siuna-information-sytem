@@ -1,7 +1,21 @@
 import employeeAssetService from '../employee-asset.service';
 import Employee from '../../../hr/models/Employee';
 
-jest.mock('puppeteer', () => ({ __esModule: true, default: { launch: jest.fn() } }));
+// Capture the HTML handed to puppeteer's page.setContent so we can assert the
+// rendered berita-acara copy without launching a real browser.
+const setContentMock = jest.fn();
+jest.mock('puppeteer', () => ({
+    __esModule: true,
+    default: {
+        launch: jest.fn().mockResolvedValue({
+            newPage: jest.fn().mockResolvedValue({
+                setContent: (...args: any[]) => { setContentMock(...args); return Promise.resolve(); },
+                pdf: jest.fn().mockResolvedValue(Buffer.from('pdf')),
+            }),
+            close: jest.fn().mockResolvedValue(undefined),
+        }),
+    },
+}));
 jest.mock('../../models/SerialNumber', () => ({ __esModule: true, default: { findAll: jest.fn(), findOne: jest.fn() } }));
 jest.mock('../../models/Transaksi', () => ({ __esModule: true, default: { findAll: jest.fn(), findByPk: jest.fn() } }));
 jest.mock('../../models/TransaksiDetail', () => ({ __esModule: true, default: {} }));
@@ -9,7 +23,7 @@ jest.mock('../../models/Produk', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Gudang', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Uom', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Brand', () => ({ __esModule: true, default: {} }));
-jest.mock('../../../hr/models/Employee', () => ({ __esModule: true, default: { findAll: jest.fn() } }));
+jest.mock('../../../hr/models/Employee', () => ({ __esModule: true, default: { findAll: jest.fn(), findByPk: jest.fn() } }));
 jest.mock('../../../hr/models/StatusKaryawan', () => ({ __esModule: true, default: {} }));
 
 const Emp = Employee as any;
@@ -98,6 +112,33 @@ describe('lookupAssetByIdentifier', () => {
         SN.findOne.mockResolvedValue(null);
         const res = await employeeAssetService.lookupAssetByIdentifier('NOPE');
         expect(res).toBeNull();
+    });
+});
+
+describe('generateBeritaAcara direction', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        Emp.findByPk.mockResolvedValue({ nama_lengkap: 'Triyanto', nomor_induk_karyawan: 'EMP-005' });
+        SN.findAll.mockResolvedValue([]);
+    });
+
+    it('renders handover copy by default (serah)', async () => {
+        await employeeAssetService.generateBeritaAcara(5);
+        const html = setContentMock.mock.calls[0][0] as string;
+        expect(html).toContain('BERITA ACARA SERAH TERIMA BARANG');
+        expect(html).toContain('telah dilaksanakan serah terima barang inventaris kepada:');
+        expect(html).toContain('Yang Menyerahkan,');
+        expect(html).toContain('Yang Menerima,');
+    });
+
+    it('renders return copy with reversed roles when arah=kembali', async () => {
+        await employeeAssetService.generateBeritaAcara(5, undefined, 'kembali');
+        const html = setContentMock.mock.calls[0][0] as string;
+        expect(html).toContain('BERITA ACARA PENGEMBALIAN BARANG');
+        expect(html).toContain('telah dilaksanakan pengembalian barang inventaris dari:');
+        expect(html).toContain('Yang Mengembalikan,');
+        // employee signs as the one returning (right block)
+        expect(html).toContain('(Triyanto)');
     });
 });
 

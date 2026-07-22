@@ -110,7 +110,7 @@ class EmployeeAssetService {
         return transaksi;
     }
 
-    async generateBeritaAcara(employeeId: number, transaksiId?: number): Promise<Buffer> {
+    async generateBeritaAcara(employeeId: number, transaksiId?: number, arah: 'serah' | 'kembali' = 'serah'): Promise<Buffer> {
         // paranoid:false — a berita acara is a historical handover document and
         // must still be printable after the employee is soft-deleted.
         const employee = await Employee.findByPk(employeeId, { paranoid: false });
@@ -145,6 +145,15 @@ class EmployeeAssetService {
 
         const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
+        // Direction-dependent copy. 'serah' = handover to employee (default);
+        // 'kembali' = employee returns goods to the warehouse (reverse roles).
+        const judul = arah === 'kembali' ? 'BERITA ACARA PENGEMBALIAN BARANG' : 'BERITA ACARA SERAH TERIMA BARANG';
+        const kalimatPembuka = arah === 'kembali'
+            ? `Pada hari ini, ${tanggal}, telah dilaksanakan pengembalian barang inventaris dari:`
+            : `Pada hari ini, ${tanggal}, telah dilaksanakan serah terima barang inventaris kepada:`;
+        const labelKiri = arah === 'kembali' ? 'Yang Menerima,' : 'Yang Menyerahkan,';
+        const labelKanan = arah === 'kembali' ? 'Yang Mengembalikan,' : 'Yang Menerima,';
+
         const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 body { font-family: 'Times New Roman', serif; font-size: 12px; margin: 30px 40px; line-height: 1.6; }
@@ -160,10 +169,10 @@ table.items th { background: #f0f0f0; font-weight: bold; }
 .sig-block { text-align: center; width: 200px; }
 .sig-line { border-top: 1px solid #333; margin-top: 60px; padding-top: 4px; }
 </style></head><body>
-<h1>BERITA ACARA SERAH TERIMA BARANG</h1>
+<h1>${judul}</h1>
 <h2>${transaksiInfo ? `No: ${transaksiInfo.code}` : `Daftar Aset Aktif`}</h2>
 
-<p>Pada hari ini, ${tanggal}, telah dilaksanakan serah terima barang inventaris kepada:</p>
+<p>${kalimatPembuka}</p>
 
 <table class="info-table">
 <tr><td>Nama</td><td>: <strong>${(employee as any).nama_lengkap}</strong></td></tr>
@@ -186,8 +195,8 @@ ${items.map((item: any, idx: number) => {
 <p>Demikian berita acara ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
 
 <div class="signatures">
-<div class="sig-block"><p>Yang Menyerahkan,</p><div class="sig-line">(_________________)</div></div>
-<div class="sig-block"><p>Yang Menerima,</p><div class="sig-line">(${(employee as any).nama_lengkap})</div></div>
+<div class="sig-block"><p>${labelKiri}</p><div class="sig-line">(_________________)</div></div>
+<div class="sig-block"><p>${labelKanan}</p><div class="sig-line">(${(employee as any).nama_lengkap})</div></div>
 </div>
 </body></html>`;
 

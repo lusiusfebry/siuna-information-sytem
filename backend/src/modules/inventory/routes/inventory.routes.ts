@@ -328,6 +328,17 @@ router.get(
     (req, res, next) => employeeAssetController.downloadBeritaAcara(req, res, next)
 );
 
+router.get(
+    '/employees/:employeeId/berita-acara-retur',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => employeeAssetController.downloadBeritaAcara(req, res, next)
+);
+router.get(
+    '/employees/:employeeId/berita-acara-retur/:transaksiId',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => employeeAssetController.downloadBeritaAcara(req, res, next)
+);
+
 // === Facility Inventory Routes ===
 
 router.get(
