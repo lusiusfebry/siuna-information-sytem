@@ -6,6 +6,14 @@ export const useReturKaryawan = () => {
     const createMutation = useCreateTransaksi();
 
     const submitRetur = async (sel: ReturSelection, tanggal: string, catatan?: string): Promise<{ id: number } | null> => {
+        // Every unit must carry its product's uom_id (the Masuk path writes it into
+        // inv_stok). A product without a UOM would send 0 → reject early with a clear
+        // message instead of a generic backend validation error.
+        const tanpaUom = sel.items.find(i => !i.uom_id || i.uom_id <= 0);
+        if (tanpaUom) {
+            throw new Error(`Produk pada unit "${tanpaUom.identifier}" belum memiliki satuan (UOM). Lengkapi UOM produk sebelum retur.`);
+        }
+
         // Group selected units by product → one detail line per product.
         // uom_id is taken from the unit (its product's uom) — REQUIRED positive value.
         const byProduct = new Map<number, { uom_id: number; ids: string[] }>();

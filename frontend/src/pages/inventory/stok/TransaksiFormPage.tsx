@@ -304,7 +304,7 @@ const TransaksiFormPage = () => {
             toast.success('Retur berhasil dicatat');
             navigate('/inventory/transaksi');
         } catch (e: any) {
-            toast.error(e?.response?.data?.message || 'Gagal memproses retur');
+            toast.error(e?.response?.data?.message || e?.message || 'Gagal memproses retur');
         }
     };
 
