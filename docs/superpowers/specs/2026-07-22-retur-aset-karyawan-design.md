@@ -117,7 +117,7 @@ Prinsip: **logika inti dipusatkan** (satu hook + satu komponen picker) dan dikon
 - `/assets/lookup` identifier tidak ditemukan → 404 "Serial/Tag number tidak ditemukan" (frontend tampilkan pesan, tanpa kartu).
 - Aset ditemukan tetapi tidak dipegang karyawan → kartu info, tanpa tombol retur.
 - Submit tanpa gudang tujuan / tanpa aset tercentang → validasi frontend (toast Indonesia), tidak kirim request.
-- Serial/tag yang diretur ternyata sudah bukan milik karyawan (race) → service menolak dgn pesan existing; frontend tampilkan pesan error.
+- Serial/tag yang diretur ternyata sudah bukan milik karyawan (race) → **keterbatasan diketahui:** jalur `Retur Karyawan` yang di-reuse (`stok.service.ts` `handleStokMasuk`) menambah stok gudang lebih dulu, lalu meng-`update` baris serial dengan filter `karyawan_id`. Bila unit sudah tidak dipegang karyawan itu, update mengenai 0 baris (no-op) **tetapi stok terlanjur bertambah** — bukan penolakan. Risiko dipersempit di sisi frontend: picker hanya memuat aset yang benar-benar dipegang (data live) dan lookup (opsi C) mengecek `karyawan.id` sebelum retur. Perbaikan tuntas (verifikasi rows-affected sebelum commit stok) berada di luar lingkup karena jalur ini sengaja tidak diubah; dicatat sebagai kandidat hardening.
 - Semua pesan berbahasa Indonesia (konvensi proyek).
 
 ## 8. Testing
@@ -156,3 +156,4 @@ Prinsip: **logika inti dipusatkan** (satu hook + satu komponen picker) dan dikon
 - Tidak mengubah alur "Ke Karyawan", approval, atau titik kopling lintas-modul (HR↔Inventory tetap via `karyawan_id`).
 - Endpoint baru dilindungi permission inventory yang sudah ada; tidak menambah permission baru.
 - Data produk milik user tidak disentuh (user input manual).
+- **Keterbatasan diketahui (kandidat hardening):** jalur `Retur Karyawan` yang di-reuse tidak memverifikasi rows-affected saat melepas serial, sehingga retur atas unit yang sudah bukan milik karyawan bisa menambah stok tanpa baris serial pendukung (lihat §7). Di luar lingkup karena jalur ini sengaja tidak diubah.
