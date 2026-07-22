@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useEmployeeAssets, useEmployeeAssetHistory } from '../../hooks/useEmployeeAssets';
 import inventoryEmployeeService from '../../services/api/inventory-employee.service';
@@ -33,6 +34,7 @@ const triggerPdfDownload = (blob: Blob, filename: string) => {
 };
 
 const EmployeeAssetsTab: React.FC<Props> = ({ employeeId }) => {
+    const navigate = useNavigate();
     const { data, isLoading } = useEmployeeAssets(employeeId);
     const { data: historyData, isLoading: historyLoading } = useEmployeeAssetHistory(employeeId);
     const [downloading, setDownloading] = useState(false);
@@ -105,14 +107,23 @@ const EmployeeAssetsTab: React.FC<Props> = ({ employeeId }) => {
                     </p>
                 </div>
                 {hasAssets && (
-                    <button
-                        onClick={handleDownloadBeritaAcara}
-                        disabled={downloading}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 shadow-sm"
-                    >
-                        <span className="material-symbols-outlined text-[18px]">description</span>
-                        {downloading ? 'Mengunduh...' : 'Cetak Berita Acara'}
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => navigate(`/inventory/retur?karyawan=${employeeId}`)}
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-primary border border-primary/30 rounded-xl hover:bg-primary/5 transition-all"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">assignment_return</span>
+                            Retur Aset
+                        </button>
+                        <button
+                            onClick={handleDownloadBeritaAcara}
+                            disabled={downloading}
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 shadow-sm"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">description</span>
+                            {downloading ? 'Mengunduh...' : 'Cetak Berita Acara'}
+                        </button>
+                    </div>
                 )}
             </div>
 
