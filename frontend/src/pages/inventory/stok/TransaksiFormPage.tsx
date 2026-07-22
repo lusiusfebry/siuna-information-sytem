@@ -10,6 +10,8 @@ import Button from '../../../components/common/Button';
 import { SearchableSelect } from '../../../components/common/SearchableSelect';
 import inventoryStokService from '../../../services/api/inventory-stok.service';
 import inventoryEmployeeService from '../../../services/api/inventory-employee.service';
+import ReturAssetPicker, { ReturSelection } from '../../../components/inventory/ReturAssetPicker';
+import { useReturKaryawan } from '../../../hooks/useReturKaryawan';
 
 const SUB_TIPE_MAP: Record<TransaksiTipe, { value: TransaksiSubTipe; label: string }[]> = {
     'Masuk': [
@@ -55,6 +57,8 @@ const TransaksiFormPage = () => {
     const [supplierNama, setSupplierNama] = useState('');
     const [noReferensi, setNoReferensi] = useState('');
     const [catatan, setCatatan] = useState('');
+    const [returSel, setReturSel] = useState<ReturSelection | null>(null);
+    const { submitRetur, isPending: returPending } = useReturKaryawan();
     const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
     const dokumenInputRef = useRef<HTMLInputElement>(null);
 
@@ -177,17 +181,22 @@ const TransaksiFormPage = () => {
 
     const showGudangTujuan = subTipe === 'Transfer Masuk' || subTipe === 'Transfer Gudang';
     const showBuilding = subTipe === 'Ke Gedung/Mess';
-    const showKaryawan = subTipe === 'Ke Karyawan' || subTipe === 'Retur Karyawan';
+    const showKaryawan = subTipe === 'Ke Karyawan';
     const showSupplier = subTipe === 'Supplier';
     // "Ambil dari Gedung" is a Masuk transaction, but the user must PICK units already
     // installed in a building (not free-type new serials). It therefore uses the same
     // checkbox picker as outbound flows, fed by facility_placed units.
     const isAmbilGedung = subTipe === 'Ambil dari Gedung';
+    // Retur Karyawan uses the dedicated ReturAssetPicker (asset-holder search +
+    // checklist) instead of the generic manual karyawan input + serial textarea.
+    const isReturKaryawan = subTipe === 'Retur Karyawan';
 
     const filteredRooms = roomData?.data?.filter(r => r.building_id === buildingId) || [];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Retur Karyawan submits via its own handler (handleReturSubmit), not this one.
+        if (isReturKaryawan) return;
 
         if (!gudangId) { toast.error('Pilih gudang'); return; }
         if (showGudangTujuan && !gudangTujuanId) { toast.error('Pilih gudang tujuan'); return; }
@@ -278,6 +287,27 @@ const TransaksiFormPage = () => {
         });
     };
 
+    const handleReturSubmit = async () => {
+        if (!returSel?.karyawan_id) { toast.error('Pilih karyawan'); return; }
+        if (!returSel.gudang_id) { toast.error('Pilih gudang tujuan'); return; }
+        if (returSel.items.length === 0) { toast.error('Pilih minimal satu aset'); return; }
+        try {
+            const result = await submitRetur(returSel, tanggal, catatan);
+            if (result?.id) {
+                const blob = await inventoryEmployeeService.downloadBeritaAcara(returSel.karyawan_id, result.id, 'kembali');
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `Berita-Acara-Pengembalian-${result.id}.pdf`;
+                document.body.appendChild(a); a.click();
+                setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 2000);
+            }
+            toast.success('Retur berhasil dicatat');
+            navigate('/inventory/transaksi');
+        } catch (e: any) {
+            toast.error(e?.response?.data?.message || 'Gagal memproses retur');
+        }
+    };
+
     return (
         <div className="p-6 max-w-4xl">
             <div className="mb-6">
@@ -288,6 +318,27 @@ const TransaksiFormPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+                {isReturKaryawan ? (
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+                        <h2 className="text-base font-semibold text-gray-900 dark:text-white">Retur Aset dari Karyawan</h2>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Tanggal *</label>
+                            <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)}
+                                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100" />
+                        </div>
+                        <ReturAssetPicker onChange={setReturSel} />
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Catatan</label>
+                            <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} rows={2}
+                                className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100" placeholder="Catatan tambahan..." />
+                        </div>
+                        <div className="flex gap-3 justify-end">
+                            <Button type="button" variant="outline" onClick={() => navigate('/inventory/transaksi')}>Batal</Button>
+                            <Button type="button" isLoading={returPending} onClick={handleReturSubmit}>Proses Retur</Button>
+                        </div>
+                    </div>
+                ) : (
+                <>
                 {/* Header */}
                 <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 space-y-4">
                     <h2 className="text-base font-semibold text-gray-900 dark:text-white">Informasi Transaksi</h2>
@@ -623,6 +674,8 @@ const TransaksiFormPage = () => {
                     <Button type="button" variant="outline" onClick={() => navigate('/inventory/transaksi')}>Batal</Button>
                     <Button type="submit" isLoading={createMutation.isPending}>Simpan Transaksi</Button>
                 </div>
+                </>
+                )}
             </form>
 
             {/* Berita Acara Confirmation Modal */}
