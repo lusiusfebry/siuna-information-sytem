@@ -36,6 +36,26 @@ class EmployeeAssetController {
         }
     }
 
+    async getEmployeesWithAssets(req: Request, res: Response, next: NextFunction) {
+        try {
+            const q = (req.query.q as string) || '';
+            const data = await employeeAssetService.getEmployeesWithAssets(q);
+            res.json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async lookupAsset(req: Request, res: Response, next: NextFunction) {
+        try {
+            const identifier = (req.query.identifier as string) || '';
+            const data = await employeeAssetService.lookupAssetByIdentifier(identifier);
+            res.json({ status: 'success', data });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAssets(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await employeeAssetService.getEmployeeAssets(Number(req.params.employeeId));
@@ -57,7 +77,8 @@ class EmployeeAssetController {
     async downloadBeritaAcara(req: Request, res: Response, next: NextFunction) {
         try {
             const transaksiId = req.params.transaksiId ? Number(req.params.transaksiId) : undefined;
-            const buffer = await employeeAssetService.generateBeritaAcara(Number(req.params.employeeId), transaksiId);
+            const arah = req.path.includes('berita-acara-retur') ? 'kembali' : 'serah';
+            const buffer = await employeeAssetService.generateBeritaAcara(Number(req.params.employeeId), transaksiId, arah);
             res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', `attachment; filename=Berita-Acara-${req.params.employeeId}.pdf`);
             res.send(buffer);

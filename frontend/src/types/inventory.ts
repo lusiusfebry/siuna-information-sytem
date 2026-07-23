@@ -127,7 +127,7 @@ export interface InvSerialNumber {
     transaksi_terakhir_id: number;
     created_at: string;
     updated_at: string;
-    produk?: { id: number; code: string; nama: string };
+    produk?: { id: number; code: string; nama: string; uom_id?: number };
     gudang?: { id: number; code: string; nama: string } | null;
     karyawan?: { id: number; nama_lengkap: string; nomor_induk_karyawan?: string } | null;
 }

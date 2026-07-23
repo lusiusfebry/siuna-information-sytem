@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { Op, literal } from 'sequelize';
 import InvSerialNumber from '../models/SerialNumber';
 import InvTransaksi from '../models/Transaksi';
 import InvTransaksiDetail from '../models/TransaksiDetail';
@@ -7,15 +8,59 @@ import InvGudang from '../models/Gudang';
 import InvUom from '../models/Uom';
 import InvBrand from '../models/Brand';
 import Employee from '../../hr/models/Employee';
+import StatusKaryawan from '../../hr/models/StatusKaryawan';
 import { AppError } from '../../../shared/utils/errorHandler';
 
 class EmployeeAssetService {
+    async getEmployeesWithAssets(q?: string) {
+        const query = (q || '').trim();
+        const where: any = {
+            // Only employees currently holding at least one serial/tag asset.
+            id: {
+                [Op.in]: literal(
+                    '(SELECT DISTINCT karyawan_id FROM inv_serial_number WHERE karyawan_id IS NOT NULL)'
+                ),
+            },
+        };
+        if (query) {
+            where[Op.or] = [
+                { nama_lengkap: { [Op.iLike]: `%${query}%` } },
+                { nomor_induk_karyawan: { [Op.iLike]: `%${query}%` } },
+            ];
+        }
+
+        const employees = await Employee.findAll({
+            where,
+            include: [{ model: StatusKaryawan, as: 'status_karyawan', where: { nama: 'Aktif' }, attributes: [] }],
+            attributes: [
+                'id',
+                'nama_lengkap',
+                'nomor_induk_karyawan',
+                [
+                    literal(
+                        '(SELECT COUNT(*) FROM inv_serial_number sn WHERE sn.karyawan_id = "Employee".id)'
+                    ),
+                    'asset_count',
+                ],
+            ],
+            limit: 20,
+            order: [['nama_lengkap', 'ASC']],
+        });
+
+        return employees.map((e: any) => ({
+            id: e.id,
+            nama_lengkap: e.nama_lengkap,
+            nomor_induk_karyawan: e.nomor_induk_karyawan,
+            asset_count: Number(e.get('asset_count')) || 0,
+        }));
+    }
+
     async getEmployeeAssets(employeeId: number) {
         const assets = await InvSerialNumber.findAll({
             where: { karyawan_id: employeeId },
             include: [
                 {
-                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'],
+                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama', 'uom_id'],
                     include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }],
                 },
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
@@ -25,6 +70,25 @@ class EmployeeAssetService {
         });
 
         return assets;
+    }
+
+    async lookupAssetByIdentifier(identifier: string) {
+        const id = (identifier || '').trim();
+        if (!id) return null;
+        const unit = await InvSerialNumber.findOne({
+            where: {
+                [Op.or]: [{ serial_number: id }, { tag_number: id }],
+            },
+            include: [
+                {
+                    model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'],
+                    include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }],
+                },
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'] },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'], paranoid: false },
+            ],
+        });
+        return unit;
     }
 
     async getEmployeeAssetHistory(employeeId: number) {
@@ -46,7 +110,7 @@ class EmployeeAssetService {
         return transaksi;
     }
 
-    async generateBeritaAcara(employeeId: number, transaksiId?: number): Promise<Buffer> {
+    async generateBeritaAcara(employeeId: number, transaksiId?: number, arah: 'serah' | 'kembali' = 'serah'): Promise<Buffer> {
         // paranoid:false — a berita acara is a historical handover document and
         // must still be printable after the employee is soft-deleted.
         const employee = await Employee.findByPk(employeeId, { paranoid: false });
@@ -81,6 +145,15 @@ class EmployeeAssetService {
 
         const tanggal = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
 
+        // Direction-dependent copy. 'serah' = handover to employee (default);
+        // 'kembali' = employee returns goods to the warehouse (reverse roles).
+        const judul = arah === 'kembali' ? 'BERITA ACARA PENGEMBALIAN BARANG' : 'BERITA ACARA SERAH TERIMA BARANG';
+        const kalimatPembuka = arah === 'kembali'
+            ? `Pada hari ini, ${tanggal}, telah dilaksanakan pengembalian barang inventaris dari:`
+            : `Pada hari ini, ${tanggal}, telah dilaksanakan serah terima barang inventaris kepada:`;
+        const labelKiri = arah === 'kembali' ? 'Yang Menerima,' : 'Yang Menyerahkan,';
+        const labelKanan = arah === 'kembali' ? 'Yang Mengembalikan,' : 'Yang Menerima,';
+
         const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
 body { font-family: 'Times New Roman', serif; font-size: 12px; margin: 30px 40px; line-height: 1.6; }
@@ -96,10 +169,10 @@ table.items th { background: #f0f0f0; font-weight: bold; }
 .sig-block { text-align: center; width: 200px; }
 .sig-line { border-top: 1px solid #333; margin-top: 60px; padding-top: 4px; }
 </style></head><body>
-<h1>BERITA ACARA SERAH TERIMA BARANG</h1>
+<h1>${judul}</h1>
 <h2>${transaksiInfo ? `No: ${transaksiInfo.code}` : `Daftar Aset Aktif`}</h2>
 
-<p>Pada hari ini, ${tanggal}, telah dilaksanakan serah terima barang inventaris kepada:</p>
+<p>${kalimatPembuka}</p>
 
 <table class="info-table">
 <tr><td>Nama</td><td>: <strong>${(employee as any).nama_lengkap}</strong></td></tr>
@@ -122,8 +195,8 @@ ${items.map((item: any, idx: number) => {
 <p>Demikian berita acara ini dibuat untuk dapat dipergunakan sebagaimana mestinya.</p>
 
 <div class="signatures">
-<div class="sig-block"><p>Yang Menyerahkan,</p><div class="sig-line">(_________________)</div></div>
-<div class="sig-block"><p>Yang Menerima,</p><div class="sig-line">(${(employee as any).nama_lengkap})</div></div>
+<div class="sig-block"><p>${labelKiri}</p><div class="sig-line">(_________________)</div></div>
+<div class="sig-block"><p>${labelKanan}</p><div class="sig-line">(${(employee as any).nama_lengkap})</div></div>
 </div>
 </body></html>`;
 

@@ -48,6 +48,7 @@ const InvGudangPage = lazy(() => import('./pages/inventory/masterdata/GudangPage
 // Inventory Stock Pages
 const StokPage = lazy(() => import('./pages/inventory/stok/StokPage'));
 const TransaksiFormPage = lazy(() => import('./pages/inventory/stok/TransaksiFormPage'));
+const ReturPage = lazy(() => import('./pages/inventory/stok/ReturPage'));
 const TransaksiListPage = lazy(() => import('./pages/inventory/stok/TransaksiListPage'));
 const KartuStokPage = lazy(() => import('./pages/inventory/stok/KartuStokPage'));
 
@@ -221,6 +222,9 @@ function App() {
                         } />
                         <Route path="transaksi/baru" element={
                             <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.CREATE} redirectTo="/403"><TransaksiFormPage /></PermissionGuard>
+                        } />
+                        <Route path="retur" element={
+                            <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.CREATE} redirectTo="/403"><ReturPage /></PermissionGuard>
                         } />
                         <Route path="kartu-stok" element={
                             <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.READ} redirectTo="/403"><KartuStokPage /></PermissionGuard>

@@ -132,6 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             subItems: [
                 { name: 'Stok Inventaris', path: '/inventory/stok', icon: 'shelves' },
                 { name: 'Transaksi Stok', path: '/inventory/transaksi', icon: 'swap_horiz' },
+                { name: 'Retur Aset', path: '/inventory/retur', icon: 'assignment_return' },
                 { name: 'Kartu Stok', path: '/inventory/kartu-stok', icon: 'receipt_long' },
                 { name: 'Label & QR Code', path: '/inventory/label', icon: 'qr_code_2' },
             ]
