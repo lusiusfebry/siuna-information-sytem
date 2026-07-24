@@ -136,6 +136,14 @@ router.get(
     (req, res, next) => stokController.getKartuStok(req, res, next)
 );
 
+// INV consumable: laporan pemakaian barang habis pakai (sub_tipe 'Konsumsi').
+router.get(
+    '/laporan/konsumsi',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    checkDepartmentAccess(),
+    (req, res, next) => stokController.getLaporanKonsumsi(req, res, next)
+);
+
 router.post(
     '/transaksi/:id/dokumen',
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),

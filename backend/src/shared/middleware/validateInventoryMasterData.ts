@@ -43,8 +43,26 @@ const produkSchema = baseSchema.extend({
         })
         .optional()
         .default(false),
+    is_consumable: z.union([z.boolean(), z.string()])
+        .transform(val => {
+            if (val === true || val === 'true') return true;
+            return false;
+        })
+        .optional()
+        .default(false),
     uom_id: z.number().int().positive().optional().nullable(),
     stok_minimum: z.coerce.number().int().min(0).optional().default(5),
+}).superRefine((data, ctx) => {
+    // A consumable is used the moment it leaves the warehouse, so per-unit tracking
+    // makes no sense — reject the contradictory combination here (mirrors the runtime
+    // guard in stok.service.validateKonsumsi).
+    if ((data as any).is_consumable && ((data as any).has_serial_number || (data as any).has_tag_number)) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Produk consumable tidak boleh memiliki serial number atau tag number',
+            path: ['is_consumable'],
+        });
+    }
 });
 
 const gudangSchema = baseSchema.extend({

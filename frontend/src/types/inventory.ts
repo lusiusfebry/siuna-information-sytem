@@ -20,6 +20,7 @@ export interface InvProduk extends MasterData {
     uom_id?: number | null;
     has_serial_number: boolean;
     has_tag_number: boolean;
+    is_consumable: boolean;
     stok_minimum?: number | null;
     gambar?: string | null;
     brand?: InvBrand;

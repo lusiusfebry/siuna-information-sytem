@@ -53,6 +53,7 @@ InvGudang.hasMany(InvStok, { foreignKey: 'gudang_id', as: 'stok' });
 InvTransaksi.belongsTo(InvGudang, { foreignKey: 'gudang_id', as: 'gudang' });
 InvTransaksi.belongsTo(InvGudang, { foreignKey: 'gudang_tujuan_id', as: 'gudang_tujuan' });
 InvTransaksi.belongsTo(Employee, { foreignKey: 'karyawan_id', as: 'karyawan' });
+InvTransaksi.belongsTo(Department, { foreignKey: 'department_id', as: 'department' });
 InvTransaksi.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
 InvTransaksi.belongsTo(User, { foreignKey: 'approved_by', as: 'approver' });
 InvTransaksi.belongsTo(FacilityBuilding, { foreignKey: 'facility_building_id', as: 'facility_building' });
