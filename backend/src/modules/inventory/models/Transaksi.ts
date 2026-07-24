@@ -5,13 +5,14 @@ export class InvTransaksi extends Model {
     public id!: number;
     public code!: string;
     public tipe!: 'Masuk' | 'Keluar' | 'Adjustment';
-    public sub_tipe!: 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung';
+    public sub_tipe!: 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung' | 'Konsumsi';
     public tanggal!: string;
     public gudang_id!: number;
     public gudang_tujuan_id!: number | null;
     public facility_building_id!: number | null;
     public facility_room_id!: number | null;
     public karyawan_id!: number | null;
+    public department_id!: number | null;
     public supplier_nama!: string | null;
     public no_referensi!: string | null;
     public catatan!: string | null;
@@ -27,6 +28,7 @@ export class InvTransaksi extends Model {
     public facility_building?: any;
     public facility_room?: any;
     public karyawan?: any;
+    public department?: any;
     public creator?: any;
     public approver?: any;
     public details?: any[];
@@ -51,7 +53,7 @@ InvTransaksi.init({
         allowNull: false,
     },
     sub_tipe: {
-        type: DataTypes.ENUM('Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung'),
+        type: DataTypes.ENUM('Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung', 'Konsumsi'),
         allowNull: false,
     },
     tanggal: {
@@ -82,6 +84,11 @@ InvTransaksi.init({
         type: DataTypes.INTEGER,
         allowNull: true,
         references: { model: 'employees', key: 'id' },
+    },
+    department_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'department', key: 'id' },
     },
     supplier_nama: {
         type: DataTypes.STRING(200),

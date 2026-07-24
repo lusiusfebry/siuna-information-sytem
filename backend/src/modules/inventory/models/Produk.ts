@@ -10,6 +10,7 @@ export class InvProduk extends Model {
     public uom_id!: number | null;
     public has_serial_number!: boolean;
     public has_tag_number!: boolean;
+    public is_consumable!: boolean;
     public stok_minimum!: number | null;
     public gambar!: string | null;
     public keterangan!: string | null;
@@ -63,6 +64,11 @@ InvProduk.init({
         defaultValue: false,
     },
     has_tag_number: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
+    is_consumable: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,

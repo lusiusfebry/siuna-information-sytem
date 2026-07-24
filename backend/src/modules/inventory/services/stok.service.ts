@@ -11,6 +11,7 @@ import InvUom from '../models/Uom';
 import InvBrand from '../models/Brand';
 import InvSubKategori from '../models/SubKategori';
 import Employee from '../../hr/models/Employee';
+import Department from '../../hr/models/Department';
 import LokasiKerja from '../../hr/models/LokasiKerja';
 import User from '../../auth/models/User';
 import notificationService from '../../../shared/services/notification.service';
@@ -41,6 +42,7 @@ interface TransaksiPayload {
     facility_building_id?: number;
     facility_room_id?: number;
     karyawan_id?: number;
+    department_id?: number;
     supplier_nama?: string;
     no_referensi?: string;
     catatan?: string;
@@ -260,6 +262,14 @@ class StokService {
 
             payload.created_by = userId;
 
+            // Consumable issue ('Konsumsi'): validate the recipient shape and that every
+            // line is a genuine consumable product. Consumables leave the warehouse as
+            // "used" — no serial/tag tracking, no return — so we reject serial/tag products
+            // and require exactly one recipient (an employee OR a division, not both/neither).
+            if (payload.sub_tipe === 'Konsumsi') {
+                await this.validateKonsumsi(payload, t);
+            }
+
             // INV-N07: does this movement need approval before its stock/serial effects
             // apply? Outbound ('Keluar') and reconciliation ('Adjustment') do. 'Transfer
             // Masuk' has a 'Masuk' header but generates a paired OUTBOUND leg that reduces
@@ -279,6 +289,7 @@ class StokService {
                 facility_building_id: payload.facility_building_id || null,
                 facility_room_id: payload.facility_room_id || null,
                 karyawan_id: payload.karyawan_id || null,
+                department_id: payload.department_id || null,
                 supplier_nama: payload.supplier_nama || null,
                 no_referensi: payload.no_referensi || null,
                 catatan: payload.catatan || null,
@@ -380,6 +391,7 @@ class StokService {
             facility_building_id: transaksi.facility_building_id ?? undefined,
             facility_room_id: transaksi.facility_room_id ?? undefined,
             karyawan_id: transaksi.karyawan_id ?? undefined,
+            department_id: transaksi.department_id ?? undefined,
             supplier_nama: transaksi.supplier_nama ?? undefined,
             no_referensi: transaksi.no_referensi ?? undefined,
             catatan: transaksi.catatan ?? undefined,
@@ -714,6 +726,46 @@ class StokService {
             transaksi_id: transaksiId,
             created_by: payload.created_by ?? null,
         }, { transaction: t });
+    }
+
+    // Validate a 'Konsumsi' (consumable issue) request before any stock effect runs.
+    // A consumable is used the moment it leaves the warehouse, so it must NOT be a
+    // serial/tag-tracked product, and it must have exactly ONE recipient — an employee
+    // XOR a division. On approval the effect is the same as any other 'Keluar' line:
+    // handleStokKeluar decrements warehouse stock (serial branches are skipped because
+    // consumables are non-serial), and department_id/karyawan_id on the row records the
+    // recipient for the konsumsi report.
+    private async validateKonsumsi(payload: TransaksiPayload, t: Transaction) {
+        const hasKaryawan = !!payload.karyawan_id;
+        const hasDepartment = !!payload.department_id;
+        if (hasKaryawan === hasDepartment) {
+            throw new AppError(
+                'Konsumsi harus ditujukan ke salah satu: karyawan ATAU divisi/departemen (pilih tepat satu).',
+                400
+            );
+        }
+
+        if (hasDepartment) {
+            const dept = await Department.findByPk(payload.department_id!, { transaction: t });
+            if (!dept) throw new AppError('Divisi/departemen tujuan tidak ditemukan', 400);
+        }
+
+        for (const detail of payload.details) {
+            const produk = await InvProduk.findByPk(detail.produk_id, { transaction: t });
+            if (!produk) throw new AppError(`Produk dengan ID ${detail.produk_id} tidak ditemukan`, 404);
+            if (!produk.is_consumable) {
+                throw new AppError(
+                    `Produk ${produk.code} - ${produk.nama} bukan barang consumable. Hanya produk consumable yang bisa dikeluarkan lewat Konsumsi.`,
+                    400
+                );
+            }
+            if (produk.has_serial_number || produk.has_tag_number) {
+                throw new AppError(
+                    `Produk ${produk.code} - ${produk.nama} memiliki serial/tag number sehingga tidak bisa diperlakukan sebagai consumable.`,
+                    400
+                );
+            }
+        }
     }
 
     private async handleAdjustment(
@@ -1052,6 +1104,120 @@ class StokService {
         });
 
         return transaksi;
+    }
+
+    /**
+     * Laporan pemakaian barang consumable (sub_tipe 'Konsumsi').
+     *
+     * Hanya menghitung transaksi yang sudah Approved — transaksi Konsumsi bertipe
+     * Keluar sehingga selalu melewati antrean approval; yang masih Pending/Rejected
+     * belum benar-benar mengurangi stok dan tidak boleh muncul di laporan pemakaian.
+     *
+     * Mengembalikan daftar baris (per detail) + ringkasan agregat per produk,
+     * per divisi/departemen, dan per karyawan.
+     */
+    async getLaporanKonsumsi(filters: any) {
+        const { tanggal_dari, tanggal_sampai, department_id, karyawan_id, produk_id, gudang_id, departmentFilter } = filters;
+
+        const where: any = { sub_tipe: 'Konsumsi', approval_status: 'Approved' };
+        if (department_id) where.department_id = department_id;
+        if (karyawan_id) where.karyawan_id = karyawan_id;
+        if (gudang_id) where.gudang_id = gudang_id;
+        if (tanggal_dari && tanggal_sampai) {
+            where.tanggal = { [Op.between]: [tanggal_dari, tanggal_sampai] };
+        } else if (tanggal_dari) {
+            where.tanggal = { [Op.gte]: tanggal_dari };
+        } else if (tanggal_sampai) {
+            where.tanggal = { [Op.lte]: tanggal_sampai };
+        }
+
+        // Filter by produk lives on the detail rows, so it must be applied on the
+        // included detail model (required:true) rather than the transaksi where.
+        const detailWhere: any = {};
+        if (produk_id) detailWhere.produk_id = produk_id;
+
+        const transaksi = await InvTransaksi.findAll({
+            where,
+            include: [
+                // Department scoping (INV-M07): scope by source warehouse's department.
+                { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
+                { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'], paranoid: false },
+                { model: Department, as: 'department', attributes: ['id', 'code', 'nama'] },
+                { model: User, as: 'creator', attributes: ['id', 'nama'] },
+                {
+                    model: InvTransaksiDetail,
+                    as: 'details',
+                    where: Object.keys(detailWhere).length ? detailWhere : undefined,
+                    required: !!produk_id,
+                    include: [
+                        { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
+                        { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
+                    ],
+                },
+            ],
+            order: [['tanggal', 'DESC'], ['created_at', 'DESC']],
+        });
+
+        // Flatten to one row per detail line, then build the three aggregate views.
+        const rows: any[] = [];
+        const perProduk = new Map<number, any>();
+        const perDepartment = new Map<number, any>();
+        const perKaryawan = new Map<number, any>();
+
+        for (const trx of transaksi) {
+            const t: any = trx.toJSON();
+            const target = t.department
+                ? { tipe: 'Divisi', id: t.department.id, nama: t.department.nama, code: t.department.code }
+                : t.karyawan
+                    ? { tipe: 'Karyawan', id: t.karyawan.id, nama: t.karyawan.nama_lengkap, code: t.karyawan.nomor_induk_karyawan }
+                    : { tipe: '-', id: null, nama: '-', code: null };
+
+            for (const d of (t.details || [])) {
+                rows.push({
+                    transaksi_id: t.id,
+                    code: t.code,
+                    tanggal: t.tanggal,
+                    gudang: t.gudang ? { id: t.gudang.id, code: t.gudang.code, nama: t.gudang.nama } : null,
+                    produk: d.produk ? { id: d.produk.id, code: d.produk.code, nama: d.produk.nama } : null,
+                    uom: d.uom ? { id: d.uom.id, nama: d.uom.nama } : null,
+                    jumlah: d.jumlah,
+                    catatan: d.catatan,
+                    target,
+                });
+
+                // Aggregate per produk
+                if (d.produk) {
+                    const acc = perProduk.get(d.produk.id) || { produk_id: d.produk.id, code: d.produk.code, nama: d.produk.nama, uom: d.uom?.nama ?? null, total_jumlah: 0 };
+                    acc.total_jumlah += d.jumlah;
+                    perProduk.set(d.produk.id, acc);
+                }
+
+                // Aggregate per divisi/departemen
+                if (t.department) {
+                    const acc = perDepartment.get(t.department.id) || { department_id: t.department.id, code: t.department.code, nama: t.department.nama, total_jumlah: 0 };
+                    acc.total_jumlah += d.jumlah;
+                    perDepartment.set(t.department.id, acc);
+                }
+
+                // Aggregate per karyawan
+                if (t.karyawan) {
+                    const acc = perKaryawan.get(t.karyawan.id) || { karyawan_id: t.karyawan.id, nomor_induk_karyawan: t.karyawan.nomor_induk_karyawan, nama: t.karyawan.nama_lengkap, total_jumlah: 0 };
+                    acc.total_jumlah += d.jumlah;
+                    perKaryawan.set(t.karyawan.id, acc);
+                }
+            }
+        }
+
+        return {
+            data: rows,
+            summary: {
+                per_produk: Array.from(perProduk.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
+                per_department: Array.from(perDepartment.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
+                per_karyawan: Array.from(perKaryawan.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
+                total_baris: rows.length,
+                total_transaksi: transaksi.length,
+            },
+        };
     }
 }
 

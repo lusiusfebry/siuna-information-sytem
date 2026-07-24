@@ -12,13 +12,14 @@ const transaksiDetailAdjustmentSchema = z.object({
 
 const transaksiSchema = z.object({
     tipe: z.enum(['Masuk', 'Keluar', 'Adjustment'], { message: 'Tipe transaksi tidak valid' }),
-    sub_tipe: z.enum(['Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung'], { message: 'Sub tipe tidak valid' }),
+    sub_tipe: z.enum(['Supplier', 'Transfer Masuk', 'Retur Karyawan', 'Ke Karyawan', 'Transfer Gudang', 'Disposal', 'Opname', 'Ke Gedung/Mess', 'Rusak/Terbuang', 'Ambil dari Gedung', 'Konsumsi'], { message: 'Sub tipe tidak valid' }),
     tanggal: z.string().min(1, 'Tanggal harus diisi'),
     gudang_id: z.number().int().positive('Gudang harus dipilih'),
     gudang_tujuan_id: z.number().int().positive().optional().nullable(),
     facility_building_id: z.number().int().positive().optional().nullable(),
     facility_room_id: z.number().int().positive().optional().nullable(),
     karyawan_id: z.number().int().positive().optional().nullable(),
+    department_id: z.number().int().positive().optional().nullable(),
     supplier_nama: z.string().optional().nullable(),
     no_referensi: z.string().optional().nullable(),
     catatan: z.string().optional().nullable(),
@@ -38,6 +39,15 @@ const transaksiSchema = z.object({
     }
     if ((data.sub_tipe === 'Ke Karyawan' || data.sub_tipe === 'Retur Karyawan') && !data.karyawan_id) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Karyawan harus dipilih', path: ['karyawan_id'] });
+    }
+    // Konsumsi (consumable issue) targets exactly one recipient: an employee XOR a
+    // division. Both-or-neither is rejected here so the service never has to guess.
+    if (data.sub_tipe === 'Konsumsi') {
+        const hasKaryawan = !!data.karyawan_id;
+        const hasDepartment = !!data.department_id;
+        if (hasKaryawan === hasDepartment) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Pilih tepat satu tujuan: karyawan ATAU divisi', path: ['karyawan_id'] });
+        }
     }
     // "Ambil dari Gedung" returns specific installed units to a warehouse, so the
     // serial/tag numbers being pulled must be named. gudang_id (the return warehouse)

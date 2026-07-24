@@ -80,6 +80,15 @@ class StokController {
         }
     }
 
+    async getLaporanKonsumsi(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await stokService.getLaporanKonsumsi({ ...req.query, departmentFilter: req.departmentFilter });
+            res.json({ status: 'success', ...result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getFacilityInventory(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await stokService.getFacilityInventory(Number(req.params.buildingId));
