@@ -8,6 +8,7 @@ import {
     TransaksiFilter,
     SerialNumberFilter,
     KartuStokFilter,
+    LaporanKonsumsiFilter,
 } from '../types/inventory';
 
 export const useStokList = (filters?: StokFilter) => {
@@ -36,6 +37,7 @@ export const useCreateTransaksi = () => {
             queryClient.invalidateQueries({ queryKey: ['inventorySerialNumbers'] });
             queryClient.invalidateQueries({ queryKey: ['inventoryKartuStok'] });
             queryClient.invalidateQueries({ queryKey: ['facilityInventory'] });
+            queryClient.invalidateQueries({ queryKey: ['inventoryLaporanKonsumsi'] });
         },
     });
 };
@@ -46,6 +48,7 @@ const invalidateTransaksiCaches = (queryClient: ReturnType<typeof useQueryClient
     queryClient.invalidateQueries({ queryKey: ['inventorySerialNumbers'] });
     queryClient.invalidateQueries({ queryKey: ['inventoryKartuStok'] });
     queryClient.invalidateQueries({ queryKey: ['facilityInventory'] });
+    queryClient.invalidateQueries({ queryKey: ['inventoryLaporanKonsumsi'] });
 };
 
 // INV-N07: approving replays the deferred stock/serial effects, so it must
@@ -89,6 +92,14 @@ export const useKartuStok = (filters: KartuStokFilter) => {
         queryFn: () => inventoryStokService.getKartuStok(filters),
         placeholderData: keepPreviousData,
         enabled: !!filters.produk_id,
+    });
+};
+
+export const useLaporanKonsumsi = (filters?: LaporanKonsumsiFilter) => {
+    return useQuery({
+        queryKey: ['inventoryLaporanKonsumsi', filters],
+        queryFn: () => inventoryStokService.getLaporanKonsumsi(filters),
+        placeholderData: keepPreviousData,
     });
 };
 

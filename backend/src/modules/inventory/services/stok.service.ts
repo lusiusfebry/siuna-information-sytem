@@ -1117,105 +1117,88 @@ class StokService {
      * per divisi/departemen, dan per karyawan.
      */
     async getLaporanKonsumsi(filters: any) {
-        const { tanggal_dari, tanggal_sampai, department_id, karyawan_id, produk_id, gudang_id, departmentFilter } = filters;
+        const { department_id, karyawan_id, gudang_id, produk_id, dari, sampai, departmentFilter, page = 1, limit = 20 } = filters;
 
         const where: any = { sub_tipe: 'Konsumsi', approval_status: 'Approved' };
         if (department_id) where.department_id = department_id;
         if (karyawan_id) where.karyawan_id = karyawan_id;
         if (gudang_id) where.gudang_id = gudang_id;
-        if (tanggal_dari && tanggal_sampai) {
-            where.tanggal = { [Op.between]: [tanggal_dari, tanggal_sampai] };
-        } else if (tanggal_dari) {
-            where.tanggal = { [Op.gte]: tanggal_dari };
-        } else if (tanggal_sampai) {
-            where.tanggal = { [Op.lte]: tanggal_sampai };
-        }
+        if (dari && sampai) where.tanggal = { [Op.between]: [dari, sampai] };
+        else if (dari) where.tanggal = { [Op.gte]: dari };
+        else if (sampai) where.tanggal = { [Op.lte]: sampai };
 
-        // Filter by produk lives on the detail rows, so it must be applied on the
-        // included detail model (required:true) rather than the transaksi where.
-        const detailWhere: any = {};
-        if (produk_id) detailWhere.produk_id = produk_id;
+        const detailInclude: any = {
+            model: InvTransaksiDetail,
+            as: 'details',
+            required: !!produk_id,
+            where: produk_id ? { produk_id } : undefined,
+            include: [
+                { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
+                { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
+            ],
+        };
 
-        const transaksi = await InvTransaksi.findAll({
+        const offset = (Number(page) - 1) * Number(limit);
+
+        const { rows, count } = await InvTransaksi.findAndCountAll({
             where,
             include: [
-                // Department scoping (INV-M07): scope by source warehouse's department.
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'], paranoid: false },
                 { model: Department, as: 'department', attributes: ['id', 'code', 'nama'] },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
-                {
-                    model: InvTransaksiDetail,
-                    as: 'details',
-                    where: Object.keys(detailWhere).length ? detailWhere : undefined,
-                    required: !!produk_id,
-                    include: [
-                        { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
-                        { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
-                    ],
-                },
+                detailInclude,
             ],
-            order: [['tanggal', 'DESC'], ['created_at', 'DESC']],
+            limit: Number(limit),
+            offset,
+            order: [['tanggal', 'DESC'], ['id', 'DESC']],
+            subQuery: false,
         });
 
-        // Flatten to one row per detail line, then build the three aggregate views.
-        const rows: any[] = [];
-        const perProduk = new Map<number, any>();
-        const perDepartment = new Map<number, any>();
-        const perKaryawan = new Map<number, any>();
+        // Build summary aggregates
+        const perProduk = new Map<number, { id: number; code: string; nama: string; total_jumlah: number }>();
+        const perDepartment = new Map<number, { id: number; code: string; nama: string; total_jumlah: number }>();
+        const perKaryawan = new Map<number, { id: number; nama_lengkap: string; total_jumlah: number }>();
 
-        for (const trx of transaksi) {
-            const t: any = trx.toJSON();
-            const target = t.department
-                ? { tipe: 'Divisi', id: t.department.id, nama: t.department.nama, code: t.department.code }
-                : t.karyawan
-                    ? { tipe: 'Karyawan', id: t.karyawan.id, nama: t.karyawan.nama_lengkap, code: t.karyawan.nomor_induk_karyawan }
-                    : { tipe: '-', id: null, nama: '-', code: null };
+        for (const row of rows) {
+            const r = row as any;
+            const details: any[] = r.details || [];
+            const totalRow = details.reduce((s: number, d: any) => s + Number(d.jumlah), 0);
 
-            for (const d of (t.details || [])) {
-                rows.push({
-                    transaksi_id: t.id,
-                    code: t.code,
-                    tanggal: t.tanggal,
-                    gudang: t.gudang ? { id: t.gudang.id, code: t.gudang.code, nama: t.gudang.nama } : null,
-                    produk: d.produk ? { id: d.produk.id, code: d.produk.code, nama: d.produk.nama } : null,
-                    uom: d.uom ? { id: d.uom.id, nama: d.uom.nama } : null,
-                    jumlah: d.jumlah,
-                    catatan: d.catatan,
-                    target,
-                });
-
-                // Aggregate per produk
+            for (const d of details) {
                 if (d.produk) {
-                    const acc = perProduk.get(d.produk.id) || { produk_id: d.produk.id, code: d.produk.code, nama: d.produk.nama, uom: d.uom?.nama ?? null, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perProduk.set(d.produk.id, acc);
-                }
-
-                // Aggregate per divisi/departemen
-                if (t.department) {
-                    const acc = perDepartment.get(t.department.id) || { department_id: t.department.id, code: t.department.code, nama: t.department.nama, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perDepartment.set(t.department.id, acc);
-                }
-
-                // Aggregate per karyawan
-                if (t.karyawan) {
-                    const acc = perKaryawan.get(t.karyawan.id) || { karyawan_id: t.karyawan.id, nomor_induk_karyawan: t.karyawan.nomor_induk_karyawan, nama: t.karyawan.nama_lengkap, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perKaryawan.set(t.karyawan.id, acc);
+                    const e = perProduk.get(d.produk.id) || { ...d.produk, total_jumlah: 0 };
+                    e.total_jumlah += Number(d.jumlah);
+                    perProduk.set(d.produk.id, e);
                 }
             }
+            if (r.department) {
+                const e = perDepartment.get(r.department.id) || { ...r.department, total_jumlah: 0 };
+                e.total_jumlah += totalRow;
+                perDepartment.set(r.department.id, e);
+            }
+            if (r.karyawan) {
+                const e = perKaryawan.get(r.karyawan.id) || { id: r.karyawan.id, nama_lengkap: r.karyawan.nama_lengkap, total_jumlah: 0 };
+                e.total_jumlah += totalRow;
+                perKaryawan.set(r.karyawan.id, e);
+            }
         }
+
+        const sortDesc = (arr: any[]) => arr.sort((a, b) => b.total_jumlah - a.total_jumlah);
 
         return {
             data: rows,
             summary: {
-                per_produk: Array.from(perProduk.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                per_department: Array.from(perDepartment.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                per_karyawan: Array.from(perKaryawan.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                total_baris: rows.length,
-                total_transaksi: transaksi.length,
+                per_produk: sortDesc([...perProduk.values()]),
+                per_department: sortDesc([...perDepartment.values()]),
+                per_karyawan: sortDesc([...perKaryawan.values()]),
+                total_baris: count,
+                total_transaksi: rows.length,
+            },
+            pagination: {
+                total: count,
+                page: Number(page),
+                totalPages: Math.ceil(count / Number(limit)),
             },
         };
     }

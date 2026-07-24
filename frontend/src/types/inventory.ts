@@ -53,7 +53,7 @@ export interface InvStok {
 }
 
 export type TransaksiTipe = 'Masuk' | 'Keluar' | 'Adjustment';
-export type TransaksiSubTipe = 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung';
+export type TransaksiSubTipe = 'Supplier' | 'Transfer Masuk' | 'Retur Karyawan' | 'Ke Karyawan' | 'Transfer Gudang' | 'Disposal' | 'Opname' | 'Ke Gedung/Mess' | 'Rusak/Terbuang' | 'Ambil dari Gedung' | 'Konsumsi';
 export type SerialNumberStatus = 'Tersedia' | 'Digunakan' | 'Rusak' | 'Disposed';
 
 export interface TransaksiDokumen {
@@ -75,6 +75,7 @@ export interface InvTransaksi {
     facility_building_id?: number | null;
     facility_room_id?: number | null;
     karyawan_id?: number | null;
+    department_id?: number | null;
     supplier_nama?: string | null;
     no_referensi?: string | null;
     catatan?: string | null;
@@ -91,6 +92,7 @@ export interface InvTransaksi {
     facility_building?: { id: number; code: string; nama: string } | null;
     facility_room?: { id: number; code: string; nama: string } | null;
     karyawan?: { id: number; nama_lengkap: string; nomor_induk_karyawan?: string } | null;
+    department?: { id: number; code?: string; nama: string } | null;
     creator?: { id: number; nama: string };
     approver?: { id: number; nama: string } | null;
     details?: InvTransaksiDetail[];
@@ -150,6 +152,7 @@ export interface TransaksiPayload {
     facility_building_id?: number | null;
     facility_room_id?: number | null;
     karyawan_id?: number | null;
+    department_id?: number | null;
     supplier_nama?: string | null;
     no_referensi?: string | null;
     catatan?: string | null;
@@ -197,4 +200,34 @@ export interface KartuStokFilter {
     sampai?: string;
     page?: number;
     limit?: number;
+}
+
+export interface LaporanKonsumsiFilter {
+    department_id?: number;
+    karyawan_id?: number;
+    gudang_id?: number;
+    produk_id?: number;
+    dari?: string;
+    sampai?: string;
+    page?: number;
+    limit?: number;
+}
+
+export interface LaporanKonsumsiSummary {
+    per_produk: { id: number; code: string; nama: string; total_jumlah: number }[];
+    per_department: { id: number; code: string; nama: string; total_jumlah: number }[];
+    per_karyawan: { id: number; nama_lengkap: string; total_jumlah: number }[];
+    total_baris: number;
+    total_transaksi: number;
+}
+
+export interface LaporanKonsumsiResponse {
+    status: string;
+    data: InvTransaksi[];
+    summary: LaporanKonsumsiSummary;
+    pagination: {
+        total: number;
+        page: number;
+        totalPages: number;
+    };
 }

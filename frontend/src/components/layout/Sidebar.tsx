@@ -134,6 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
                 { name: 'Transaksi Stok', path: '/inventory/transaksi', icon: 'swap_horiz' },
                 { name: 'Retur Aset', path: '/inventory/retur', icon: 'assignment_return' },
                 { name: 'Kartu Stok', path: '/inventory/kartu-stok', icon: 'receipt_long' },
+                { name: 'Laporan Konsumsi', path: '/inventory/laporan-konsumsi', icon: 'local_fire_department' },
                 { name: 'Label & QR Code', path: '/inventory/label', icon: 'qr_code_2' },
             ]
         },

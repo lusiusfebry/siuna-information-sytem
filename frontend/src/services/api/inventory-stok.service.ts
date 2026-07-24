@@ -11,6 +11,8 @@ import {
     TransaksiFilter,
     SerialNumberFilter,
     KartuStokFilter,
+    LaporanKonsumsiFilter,
+    LaporanKonsumsiResponse,
 } from '../../types/inventory';
 
 const getStok = async (params?: StokFilter): Promise<PaginatedResponse<InvStok>> => {
@@ -40,6 +42,11 @@ const getTransaksiDetail = async (id: number): Promise<{ status: string; data: I
 
 const getKartuStok = async (params: KartuStokFilter): Promise<PaginatedResponse<InvTransaksiDetail>> => {
     const response = await client.get<PaginatedResponse<InvTransaksiDetail>>('/inventory/kartu-stok', { params });
+    return response.data;
+};
+
+const getLaporanKonsumsi = async (params?: LaporanKonsumsiFilter): Promise<LaporanKonsumsiResponse> => {
+    const response = await client.get<LaporanKonsumsiResponse>('/inventory/laporan/konsumsi', { params });
     return response.data;
 };
 
@@ -74,6 +81,7 @@ const inventoryStokService = {
     getTransaksiList,
     getTransaksiDetail,
     getKartuStok,
+    getLaporanKonsumsi,
     uploadDokumen,
     getFacilityInventory,
     approveTransaksi,
