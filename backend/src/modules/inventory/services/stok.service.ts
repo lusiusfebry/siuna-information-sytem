@@ -1167,20 +1167,26 @@ class StokService {
 
             for (const d of details) {
                 if (d.produk) {
-                    const e = perProduk.get(d.produk.id) || { ...d.produk, total_jumlah: 0 };
+                    // d.produk is a Sequelize instance — spreading it copies internal
+                    // fields (dataValues, _previousDataValues, …) instead of the model
+                    // attributes. Read the plain shape so consumers can use p.id/p.nama.
+                    const pk = d.produk.get ? d.produk.get({ plain: true }) : d.produk;
+                    const e = perProduk.get(pk.id) || { id: pk.id, code: pk.code, nama: pk.nama, total_jumlah: 0 };
                     e.total_jumlah += Number(d.jumlah);
-                    perProduk.set(d.produk.id, e);
+                    perProduk.set(pk.id, e);
                 }
             }
             if (r.department) {
-                const e = perDepartment.get(r.department.id) || { ...r.department, total_jumlah: 0 };
+                const dp = r.department.get ? r.department.get({ plain: true }) : r.department;
+                const e = perDepartment.get(dp.id) || { id: dp.id, code: dp.code, nama: dp.nama, total_jumlah: 0 };
                 e.total_jumlah += totalRow;
-                perDepartment.set(r.department.id, e);
+                perDepartment.set(dp.id, e);
             }
             if (r.karyawan) {
-                const e = perKaryawan.get(r.karyawan.id) || { id: r.karyawan.id, nama_lengkap: r.karyawan.nama_lengkap, total_jumlah: 0 };
+                const kw = r.karyawan.get ? r.karyawan.get({ plain: true }) : r.karyawan;
+                const e = perKaryawan.get(kw.id) || { id: kw.id, nama_lengkap: kw.nama_lengkap, total_jumlah: 0 };
                 e.total_jumlah += totalRow;
-                perKaryawan.set(r.karyawan.id, e);
+                perKaryawan.set(kw.id, e);
             }
         }
 
