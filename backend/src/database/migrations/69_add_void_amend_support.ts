@@ -60,15 +60,14 @@ export const up: Migration = async ({ context: queryInterface }) => {
     await queryInterface.addIndex('inv_transaksi', ['amended_by_transaksi_id'], {
         name: 'idx_transaksi_amended_by',
     });
-    // Partial index — raw query karena Sequelize queryInterface.addIndex
-    // tidak mendukung WHERE clause secara reliable di semua versi.
+    // Partial index — raw query karena Sequelize addIndex tidak mendukung WHERE clause secara reliable
     await sequelize.query(
-        `CREATE INDEX idx_transaksi_voided_at ON inv_transaksi(voided_at) WHERE voided_at IS NOT NULL`
+        `CREATE INDEX IF NOT EXISTS idx_transaksi_voided_at ON inv_transaksi(voided_at) WHERE voided_at IS NOT NULL`
     );
 };
 
 export const down: Migration = async ({ context: queryInterface }) => {
-    await queryInterface.removeIndex('inv_transaksi', 'idx_transaksi_voided_at');
+    await queryInterface.sequelize.query(`DROP INDEX IF EXISTS idx_transaksi_voided_at`);
     await queryInterface.removeIndex('inv_transaksi', 'idx_transaksi_amended_by');
     await queryInterface.removeIndex('inv_transaksi', 'idx_transaksi_amends');
     await queryInterface.removeColumn('inv_transaksi', 'amended_by_transaksi_id');
