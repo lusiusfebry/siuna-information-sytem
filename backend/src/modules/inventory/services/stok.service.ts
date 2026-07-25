@@ -935,7 +935,8 @@ class StokService {
     }
 
     async getTransaksiList(filters: any) {
-        const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, include_inactive = false, page = 1, limit = 10 } = filters;
+        const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const include_inactive = filters.include_inactive === true || filters.include_inactive === 'true';
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
@@ -1202,6 +1203,16 @@ class StokService {
 
             const reversal = await this.createTransaksiInternal(reversalSpec.primary, userId, t, { autoApprove: true });
             await this.applyTransaksiEffects(reversal, reversalSpec.primary, userId, t);
+
+            if (original.sub_tipe === 'Supplier') {
+                const allSerials = details.flatMap((d: any) => d.serial_numbers ?? []);
+                if (allSerials.length > 0) {
+                    await InvSerialNumber.destroy({
+                        where: { serial_number: allSerials },
+                        transaction: t,
+                    });
+                }
+            }
 
             if (['Disposal', 'Rusak/Terbuang'].includes(original.sub_tipe)) {
                 for (const d of details) {

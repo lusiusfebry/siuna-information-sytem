@@ -44,9 +44,13 @@ describe('Void/Amend API Integration (Real DB)', () => {
     });
 
     afterAll(async () => {
-        await InvTransaksiDetail.destroy({ where: {}, force: true });
-        await InvTransaksi.destroy({ where: {}, force: true });
-        await InvStok.destroy({ where: {}, force: true });
+        const transaksiRows = await InvTransaksi.findAll({ where: { created_by: testUser.id }, attributes: ['id'] });
+        const transaksiIds = transaksiRows.map((r) => r.id);
+        if (transaksiIds.length > 0) {
+            await InvTransaksiDetail.destroy({ where: { transaksi_id: transaksiIds }, force: true });
+            await InvTransaksi.destroy({ where: { id: transaksiIds }, force: true });
+        }
+        await InvStok.destroy({ where: { gudang_id: gudang?.id ?? 0 }, force: true });
         if (produk) await InvProduk.destroy({ where: { id: produk.id }, force: true });
         if (gudang) await InvGudang.destroy({ where: { id: gudang.id }, force: true });
         if (uom) await InvUom.destroy({ where: { id: uom.id }, force: true });
