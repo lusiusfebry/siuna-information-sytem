@@ -71,6 +71,28 @@ class StokController {
         }
     }
 
+    async voidTransaksi(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = (req as any).user?.id;
+            const { reason } = req.body;
+            const result = await stokService.voidTransaksi(Number(req.params.id), userId, reason);
+            res.json({ status: 'success', data: result, message: 'Transaksi berhasil dibatalkan' });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async amendTransaksi(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = (req as any).user?.id;
+            const { reason, koreksi } = req.body;
+            const result = await stokService.amendTransaksi(Number(req.params.id), userId, reason, koreksi);
+            res.json({ status: 'success', data: result, message: 'Transaksi berhasil dikoreksi' });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getKartuStok(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await stokService.getKartuStok({ ...req.query, departmentFilter: req.departmentFilter });

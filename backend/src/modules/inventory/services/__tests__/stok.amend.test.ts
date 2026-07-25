@@ -337,6 +337,41 @@ describe('amendTransaksi — reversal serial', () => {
     });
 });
 
+describe('amendTransaksi — Transfer Masuk (paired)', () => {
+    it('membangun 2 reversal: destinasi (Adjustment -N) + asal (Adjustment +N)', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Masuk', sub_tipe: 'Transfer Masuk',
+            gudang_id: 2, gudang_tujuan_id: 1, // 1 = asal, 2 = destinasi
+        });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 5, catatan: null, serial_numbers: null },
+        ]);
+        let counter = 500;
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: ++counter, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: false, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 20, update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Transfer salah gudang');
+
+        // 2 create dipanggil: primary reversal + paired reversal
+        expect(Trx.create).toHaveBeenCalledTimes(2);
+        const firstArgs = Trx.create.mock.calls[0][0];
+        const secondArgs = Trx.create.mock.calls[1][0];
+        expect(firstArgs.gudang_id).toBe(2); // destinasi asli
+        expect(secondArgs.gudang_id).toBe(1); // asal
+    });
+});
+
 describe('amendTransaksi — reversal fasilitas', () => {
     it('Ke Gedung/Mess: reversal Ambil dari Gedung dari ruangan yang sama', async () => {
         const tx = makeTx();

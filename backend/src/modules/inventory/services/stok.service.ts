@@ -935,10 +935,13 @@ class StokService {
     }
 
     async getTransaksiList(filters: any) {
-        const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, include_inactive = false, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
+        if (!include_inactive) {
+            where.approval_status = { [Op.notIn]: ['Voided', 'Rejected'] };
+        }
         if (tipe) where.tipe = tipe;
         if (sub_tipe) where.sub_tipe = sub_tipe;
         if (gudang_id) where.gudang_id = gudang_id;
@@ -1371,6 +1374,39 @@ class StokService {
                         details: mapDetails((d) => -d.jumlah),
                     },
                 };
+            case 'Transfer Masuk': {
+                // Transfer Masuk mencatat SATU baris di destinasi tetapi efek stoknya
+                // menyentuh dua gudang (keluar dari asal, masuk ke destinasi). Reversal
+                // otomatis karena itu harus paired: tarik dari destinasi (-N) DAN
+                // kembalikan ke asal (+N). Keduanya di-link ke original via amends_transaksi_id
+                // oleh amendTransaksi.
+                if (!original.gudang_tujuan_id) {
+                    throw new AppError('Transfer Masuk tanpa gudang tujuan tidak bisa dikoreksi', 400);
+                }
+                const mapTransferDetails = (sign: 1 | -1) => details.map((d) => ({
+                    produk_id: d.produk_id,
+                    uom_id: d.uom_id,
+                    jumlah: sign * Math.abs(d.jumlah),
+                    catatan: d.catatan ?? undefined,
+                }));
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: 'Transfer Masuk' as any,
+                        gudang_id: original.gudang_id, // destinasi
+                        details: mapTransferDetails(-1),
+                    },
+                    paired: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: 'Transfer Gudang' as any,
+                        gudang_id: original.gudang_tujuan_id, // asal
+                        catatan: `REVERSAL paired transaksi ${original.code}: ${reason}`,
+                        details: mapTransferDetails(1),
+                    },
+                };
+            }
             case 'Ke Karyawan':
                 return {
                     primary: {
