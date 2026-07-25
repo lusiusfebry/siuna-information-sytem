@@ -336,3 +336,75 @@ describe('amendTransaksi — reversal serial', () => {
         expect(tx.rollback).toHaveBeenCalled();
     });
 });
+
+describe('amendTransaksi — reversal fasilitas', () => {
+    it('Ke Gedung/Mess: reversal Ambil dari Gedung dari ruangan yang sama', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Keluar', sub_tipe: 'Ke Gedung/Mess',
+            facility_building_id: 5, facility_room_id: 7,
+        });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 1, catatan: null, serial_numbers: ['SN-100'] },
+        ]);
+        Serial.findAll.mockResolvedValue([
+            { serial_number: 'SN-100', transaksi_terakhir_id: 100, gudang_id: null, status: 'Digunakan' },
+        ]);
+        // Guard facility: penempatan masih Aktif
+        FA.count.mockResolvedValue(1);
+        FA.findOne.mockResolvedValue({
+            serial_number_id: 999, status: 'Aktif', room_id: 7,
+        });
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 400, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: true, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 5, update: jest.fn().mockResolvedValue(undefined),
+        });
+        (require('../../models/SerialNumber').default.findOne as jest.Mock).mockResolvedValue({
+            id: 999, update: jest.fn().mockResolvedValue(undefined),
+        });
+        (require('../../../facility/models/Room').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 7, building_id: 5,
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Salah ruangan penempatan');
+
+        const reversalArgs = Trx.create.mock.calls[0][0];
+        expect(reversalArgs.tipe).toBe('Masuk');
+        expect(reversalArgs.sub_tipe).toBe('Ambil dari Gedung');
+    });
+
+    it('Guard: menolak 409 jika penempatan fasilitas sudah ditarik', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Keluar', sub_tipe: 'Ke Gedung/Mess',
+            facility_building_id: 5, facility_room_id: 7,
+        });
+        Trx.findByPk.mockResolvedValue(original);
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 1, catatan: null, serial_numbers: ['SN-100'] },
+        ]);
+        Serial.findAll.mockResolvedValue([
+            { serial_number: 'SN-100', transaksi_terakhir_id: 100, gudang_id: null, status: 'Digunakan' },
+        ]);
+        // Penempatan sudah ditarik
+        FA.count.mockResolvedValue(0);
+
+        try {
+            await stokService.amendTransaksi(100, 9, 'Salah ruangan penempatan');
+            throw new Error('Should have thrown');
+        } catch (e: any) {
+            expect(e.message).toMatch(/sudah ditarik/);
+            expect(e.statusCode).toBe(409);
+        }
+        expect(tx.rollback).toHaveBeenCalled();
+    });
+});

@@ -1286,7 +1286,22 @@ class StokService {
                 }
             }
         }
-        // Guard fasilitas di Task 8.
+
+        // Guard fasilitas: penempatan asli harus masih Aktif agar reversal aman.
+        // 'Ke Gedung/Mess' menempatkan aset ke ruangan; jika penempatan sudah ditarik
+        // atau dipindah oleh transaksi lain, koreksi otomatis bisa merusak state.
+        if (original.sub_tipe === 'Ke Gedung/Mess' && original.facility_room_id) {
+            const activePlacements = await FacilityAsset.count({
+                where: { transaksi_id: original.id, status: 'Aktif' },
+                transaction: t,
+            });
+            if (activePlacements === 0) {
+                throw new AppError(
+                    'Aset sudah ditarik dari ruangan atau dipindah. Koreksi otomatis tidak aman.',
+                    409,
+                );
+            }
+        }
     }
 
     /**
@@ -1404,7 +1419,40 @@ class StokService {
                         })),
                     },
                 };
-            // Cabang transfer/fasilitas ditambahkan di Task 8.
+            case 'Ke Gedung/Mess':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Masuk',
+                        sub_tipe: 'Ambil dari Gedung' as any,
+                        facility_building_id: original.facility_building_id ?? undefined,
+                        facility_room_id: original.facility_room_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Ambil dari Gedung':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Keluar',
+                        sub_tipe: 'Ke Gedung/Mess' as any,
+                        facility_building_id: original.facility_building_id ?? undefined,
+                        facility_room_id: original.facility_room_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
             default:
                 throw new AppError(
                     `Amend untuk sub_tipe ${original.sub_tipe} belum didukung. Hubungi admin.`,
