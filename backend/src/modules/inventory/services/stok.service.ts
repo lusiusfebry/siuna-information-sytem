@@ -240,90 +240,76 @@ class StokService {
         };
     }
 
+    private async createTransaksiInternal(
+        payload: TransaksiPayload,
+        userId: number | null,
+        t: Transaction,
+        opts: { autoApprove?: boolean } = {},
+    ): Promise<InvTransaksi> {
+        if (payload.facility_room_id) {
+            const room = await FacilityRoom.findByPk(payload.facility_room_id, { transaction: t });
+            if (!room) throw new AppError(`Kamar/ruang dengan ID ${payload.facility_room_id} tidak ditemukan`, 400);
+            if (!payload.facility_building_id) throw new AppError('Gedung wajib dipilih jika kamar/ruang diisi', 400);
+            if (room.building_id !== payload.facility_building_id) {
+                throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
+            }
+        }
+
+        payload.created_by = userId;
+
+        if (payload.sub_tipe === 'Konsumsi') {
+            await this.validateKonsumsi(payload, t);
+        }
+
+        const requiresApproval = opts.autoApprove ? false : this.requiresApproval(payload);
+
+        const code = await this.generateCode(payload.tipe, t);
+
+        const transaksi = await InvTransaksi.create({
+            code,
+            tipe: payload.tipe,
+            sub_tipe: payload.sub_tipe,
+            tanggal: payload.tanggal,
+            gudang_id: payload.gudang_id,
+            gudang_tujuan_id: payload.gudang_tujuan_id || null,
+            facility_building_id: payload.facility_building_id || null,
+            facility_room_id: payload.facility_room_id || null,
+            karyawan_id: payload.karyawan_id || null,
+            department_id: payload.department_id || null,
+            supplier_nama: payload.supplier_nama || null,
+            no_referensi: payload.no_referensi || null,
+            catatan: payload.catatan || null,
+            created_by: userId,
+            approval_status: requiresApproval ? 'Pending' : 'Approved',
+        }, { transaction: t });
+
+        for (const detail of payload.details) {
+            await InvTransaksiDetail.create({
+                transaksi_id: transaksi.id,
+                produk_id: detail.produk_id,
+                uom_id: detail.uom_id,
+                jumlah: detail.jumlah,
+                catatan: detail.catatan || null,
+                serial_numbers: requiresApproval ? (detail.serial_numbers ?? null) : null,
+            }, { transaction: t });
+        }
+
+        return transaksi;
+    }
+
     async createTransaksi(payload: TransaksiPayload, userId: number | null) {
         const t = await sequelize.transaction();
-
         try {
-            // Referential validation for facility placement (INV-M09): if a room is given,
-            // it must exist and belong to the selected building. Runs before any insert so a
-            // bad reference returns a clean 400 rather than a downstream FK violation.
-            if (payload.facility_room_id) {
-                const room = await FacilityRoom.findByPk(payload.facility_room_id, { transaction: t });
-                if (!room) {
-                    throw new AppError(`Kamar/ruang dengan ID ${payload.facility_room_id} tidak ditemukan`, 400);
-                }
-                if (!payload.facility_building_id) {
-                    throw new AppError('Gedung wajib dipilih jika kamar/ruang diisi', 400);
-                }
-                if (room.building_id !== payload.facility_building_id) {
-                    throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
-                }
-            }
+            const transaksi = await this.createTransaksiInternal(payload, userId, t);
+            const isApproved = transaksi.approval_status === 'Approved';
 
-            payload.created_by = userId;
-
-            // Consumable issue ('Konsumsi'): validate the recipient shape and that every
-            // line is a genuine consumable product. Consumables leave the warehouse as
-            // "used" — no serial/tag tracking, no return — so we reject serial/tag products
-            // and require exactly one recipient (an employee OR a division, not both/neither).
-            if (payload.sub_tipe === 'Konsumsi') {
-                await this.validateKonsumsi(payload, t);
-            }
-
-            // INV-N07: does this movement need approval before its stock/serial effects
-            // apply? Outbound ('Keluar') and reconciliation ('Adjustment') do. 'Transfer
-            // Masuk' has a 'Masuk' header but generates a paired OUTBOUND leg that reduces
-            // the source warehouse — so it is gated too, otherwise the control could be
-            // bypassed simply by recording a transfer from the destination side.
-            const requiresApproval = this.requiresApproval(payload);
-
-            const code = await this.generateCode(payload.tipe, t);
-
-            const transaksi = await InvTransaksi.create({
-                code,
-                tipe: payload.tipe,
-                sub_tipe: payload.sub_tipe,
-                tanggal: payload.tanggal,
-                gudang_id: payload.gudang_id,
-                gudang_tujuan_id: payload.gudang_tujuan_id || null,
-                facility_building_id: payload.facility_building_id || null,
-                facility_room_id: payload.facility_room_id || null,
-                karyawan_id: payload.karyawan_id || null,
-                department_id: payload.department_id || null,
-                supplier_nama: payload.supplier_nama || null,
-                no_referensi: payload.no_referensi || null,
-                catatan: payload.catatan || null,
-                created_by: userId,
-                approval_status: requiresApproval ? 'Pending' : 'Approved',
-            }, { transaction: t });
-
-            // Always persist the detail lines. For a Pending transaction we also snapshot
-            // the serial/tag selection so effects can be replayed faithfully on approval;
-            // for an auto-approved one the selection is consumed now, so no snapshot.
-            for (const detail of payload.details) {
-                const produk = await InvProduk.findByPk(detail.produk_id, { transaction: t });
-                if (!produk) throw new AppError(`Produk dengan ID ${detail.produk_id} tidak ditemukan`, 404);
-
-                await InvTransaksiDetail.create({
-                    transaksi_id: transaksi.id,
-                    produk_id: detail.produk_id,
-                    uom_id: detail.uom_id,
-                    jumlah: detail.jumlah,
-                    catatan: detail.catatan || null,
-                    serial_numbers: requiresApproval ? (detail.serial_numbers ?? null) : null,
-                }, { transaction: t });
-            }
-
-            // Auto-approved transactions apply their effects immediately. Pending ones
-            // defer everything (stock, serials, facility placements, paired legs) until
-            // approveTransaksi replays them — so a Pending row never touches stock.
-            if (!requiresApproval) {
+            if (isApproved) {
                 await this.applyTransaksiEffects(transaksi, payload, userId, t);
             }
 
             await t.commit();
 
-            if (!requiresApproval) {
+            if (isApproved) {
                 const affectedProdukIds = payload.details.map(d => d.produk_id);
                 notificationService.checkLowStockAndNotify(affectedProdukIds).catch(() => {});
             } else {
