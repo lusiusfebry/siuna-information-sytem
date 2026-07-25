@@ -127,6 +127,7 @@ const TransaksiListPage = () => {
     const [gudangId, setGudangId] = useState<number | undefined>();
     const [tanggalDari, setTanggalDari] = useState('');
     const [tanggalSampai, setTanggalSampai] = useState('');
+    const [includeInactive, setIncludeInactive] = useState(false);
 
     const { data, isLoading } = useTransaksiList({
         page,
@@ -137,6 +138,7 @@ const TransaksiListPage = () => {
         gudang_id: gudangId,
         tanggal_dari: tanggalDari || undefined,
         tanggal_sampai: tanggalSampai || undefined,
+        include_inactive: includeInactive,
     });
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
     const { can } = usePermission();
@@ -229,6 +231,15 @@ const TransaksiListPage = () => {
                     className="flex h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
                     placeholder="Sampai tanggal"
                 />
+                <label className="flex items-center gap-2 h-10 px-1 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={includeInactive}
+                        onChange={(e) => { setIncludeInactive(e.target.checked); setPage(1); }}
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    Termasuk dibatalkan/ditolak
+                </label>
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -287,9 +298,21 @@ const TransaksiListPage = () => {
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.gudang?.nama}</td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300 max-w-[200px] truncate">{keterangan}</td>
                                             <td className="px-4 py-3">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[item.approval_status] || ''}`}>
-                                                    {APPROVAL_LABELS[item.approval_status] ?? item.approval_status}
-                                                </span>
+                                                <div className="flex flex-col gap-1">
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[item.approval_status] || ''}`}>
+                                                        {APPROVAL_LABELS[item.approval_status] ?? item.approval_status}
+                                                    </span>
+                                                    {item.approval_status === 'Approved' && item.amends_transaksi_id && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                                                            Reversal
+                                                        </span>
+                                                    )}
+                                                    {item.approval_status === 'Approved' && item.amended_by_transaksi_id && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                                                            Dikoreksi
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.creator?.nama}</td>
                                             <td className="px-4 py-3">
@@ -316,24 +339,26 @@ const TransaksiListPage = () => {
                                                             >
                                                                 Tolak
                                                             </button>
-                                                        </>
-                                                    )}
-                                                    {canApprove && item.approval_status === 'Approved' && (
-                                                        <>
                                                             <button
                                                                 onClick={() => setVoidModal(item)}
-                                                                className="text-red-600 hover:text-red-700 text-xs font-medium"
+                                                                className="text-gray-500 hover:text-gray-700 text-xs font-medium"
                                                             >
-                                                                Void
-                                                            </button>
-                                                            <button
-                                                                onClick={() => setAmendModal(item)}
-                                                                className="text-orange-600 hover:text-orange-700 text-xs font-medium"
-                                                            >
-                                                                Amend
+                                                                Batalkan
                                                             </button>
                                                         </>
                                                     )}
+                                                    {canApprove
+                                                        && item.approval_status === 'Approved'
+                                                        && !item.amended_by_transaksi_id
+                                                        && !item.amends_transaksi_id
+                                                        && (
+                                                            <button
+                                                                onClick={() => setAmendModal(item)}
+                                                                className="text-yellow-600 hover:text-yellow-700 text-xs font-medium"
+                                                            >
+                                                                Koreksi
+                                                            </button>
+                                                        )}
                                                 </div>
                                             </td>
                                         </tr>
