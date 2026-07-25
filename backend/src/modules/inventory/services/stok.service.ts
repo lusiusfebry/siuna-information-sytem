@@ -447,6 +447,50 @@ class StokService {
         return this.getTransaksiDetail(id);
     }
 
+    // INV-N08: void (batalkan) a Pending transaction. A Pending row has never applied
+    // any effect (INV-N07), so voiding only flips the status and stamps the audit trail —
+    // stock, serials, and facility_assets are untouched. Approved rows must use Koreksi
+    // (amend) instead. Reversal/correction rows (amends_transaksi_id set) cannot be voided.
+    async voidTransaksi(id: number, userId: number, reason: string): Promise<InvTransaksi> {
+        const trimmed = reason?.trim() ?? '';
+        if (trimmed.length < 5) {
+            throw new AppError('Alasan wajib diisi (minimal 5 karakter)', 400);
+        }
+
+        const t = await sequelize.transaction();
+        try {
+            const row = await InvTransaksi.findByPk(id, {
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+            if (!row) throw new AppError('Transaksi tidak ditemukan', 404);
+
+            if (row.approval_status !== 'Pending') {
+                throw new AppError(
+                    `Hanya transaksi berstatus Pending yang bisa dibatalkan. Transaksi ini berstatus ${row.approval_status}. Gunakan Koreksi untuk transaksi yang sudah disetujui.`,
+                    400,
+                );
+            }
+
+            if (row.amends_transaksi_id) {
+                throw new AppError('Transaksi reversal/koreksi tidak bisa dibatalkan.', 400);
+            }
+
+            await row.update({
+                approval_status: 'Voided',
+                voided_by: userId,
+                voided_at: new Date(),
+                void_reason: trimmed,
+            }, { transaction: t });
+
+            await t.commit();
+            return this.getTransaksiDetail(id);
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
     private async handleStokMasuk(
         payload: TransaksiPayload,
         detail: TransaksiDetailPayload,
