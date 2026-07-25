@@ -68,6 +68,49 @@ const transaksiSchema = z.object({
     }
 });
 
+const voidSchema = z.object({
+    reason: z.string().trim().min(5, 'Alasan wajib diisi (minimal 5 karakter)'),
+});
+
+const amendSchema = z.object({
+    reason: z.string().trim().min(5, 'Alasan wajib diisi (minimal 5 karakter)'),
+    koreksi: z.object({
+        details: z.array(transaksiDetailAdjustmentSchema).min(1, 'Minimal satu item detail koreksi'),
+    }).optional(),
+});
+
+export const validateVoid = (req: Request, _res: Response, next: NextFunction) => {
+    try {
+        req.body = voidSchema.parse(req.body);
+        next();
+    } catch (error: any) {
+        if (error instanceof z.ZodError) {
+            const formattedErrors = (error.issues ?? (error as any).errors).map((err: any) => ({
+                field: err.path.join('.'),
+                message: err.message,
+            }));
+            return next(new AppError(formattedErrors[0]?.message ?? 'Validasi gagal', 400));
+        }
+        next(error);
+    }
+};
+
+export const validateAmend = (req: Request, _res: Response, next: NextFunction) => {
+    try {
+        req.body = amendSchema.parse(req.body);
+        next();
+    } catch (error: any) {
+        if (error instanceof z.ZodError) {
+            const formattedErrors = (error.issues ?? (error as any).errors).map((err: any) => ({
+                field: err.path.join('.'),
+                message: err.message,
+            }));
+            return next(new AppError(formattedErrors[0]?.message ?? 'Validasi gagal', 400));
+        }
+        next(error);
+    }
+};
+
 export const validateInventoryStok = (req: Request, _res: Response, next: NextFunction) => {
     try {
         const validatedData = transaksiSchema.parse(req.body);

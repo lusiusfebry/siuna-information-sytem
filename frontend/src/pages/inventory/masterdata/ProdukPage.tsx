@@ -65,6 +65,7 @@ const ProdukPage = () => {
         { header: 'UOM', accessor: (item: InvProduk) => item.uom?.nama || '-' },
         { header: 'Serial Number', accessor: (item: InvProduk) => item.has_serial_number ? 'Ya' : 'Tidak' },
         { header: 'Tag Number', accessor: (item: InvProduk) => item.has_tag_number ? 'Ya' : 'Tidak' },
+        { header: 'Consumable', accessor: (item: InvProduk) => item.is_consumable ? 'Ya' : 'Tidak' },
         { header: 'Stok Min', accessor: (item: InvProduk) => item.stok_minimum ?? 5, className: 'w-24' },
         { header: 'Status', accessor: 'status' },
     ];
@@ -87,6 +88,7 @@ const ProdukPage = () => {
         },
         { name: 'has_serial_number', label: 'Memiliki Serial Number', type: 'toggle' as const },
         { name: 'has_tag_number', label: 'Memiliki Tag Number', type: 'toggle' as const },
+        { name: 'is_consumable', label: 'Barang Consumable (tidak bisa bersamaan dengan serial/tag)', type: 'toggle' as const },
         { name: 'stok_minimum', label: 'Stok Minimum', type: 'number' as const },
         { name: 'keterangan', label: 'Keterangan', type: 'textarea' as const, autoTitleCase: true },
         { name: 'status', label: 'Status', type: 'toggle' as const },
@@ -120,6 +122,7 @@ const ProdukPage = () => {
             uom_id: formData.uom_id ? Number(formData.uom_id) : null,
             has_serial_number: formData.has_serial_number === true || formData.has_serial_number === 'true',
             has_tag_number: formData.has_tag_number === true || formData.has_tag_number === 'true',
+            is_consumable: formData.is_consumable === true || formData.is_consumable === 'true',
             stok_minimum: formData.stok_minimum ? Number(formData.stok_minimum) : 5,
         };
         if (modalMode === 'create') {

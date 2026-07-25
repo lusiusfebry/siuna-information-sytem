@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validateInventoryMasterData } from '../../../shared/middleware/validateInventoryMasterData';
-import { validateInventoryStok } from '../../../shared/middleware/validateInventoryStok';
+import { validateInventoryStok, validateVoid, validateAmend } from '../../../shared/middleware/validateInventoryStok';
 import masterDataController from '../controllers/master-data.controller';
 import stokController from '../controllers/stok.controller';
 import dashboardController from '../controllers/dashboard.controller';
@@ -149,6 +149,22 @@ router.post(
     checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),
     uploadTransaksiDocuments,
     (req, res, next) => stokController.uploadDokumen(req, res, next)
+);
+
+router.post(
+    '/transaksi/:id/void',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    validateVoid,
+    auditLogger('inv_transaksi'),
+    (req, res, next) => stokController.voidTransaksi(req, res, next),
+);
+
+router.post(
+    '/transaksi/:id/amend',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    validateAmend,
+    auditLogger('inv_transaksi'),
+    (req, res, next) => stokController.amendTransaksi(req, res, next),
 );
 
 // === Dashboard Routes ===

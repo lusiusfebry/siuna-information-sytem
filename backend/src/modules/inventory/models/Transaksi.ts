@@ -18,10 +18,15 @@ export class InvTransaksi extends Model {
     public catatan!: string | null;
     public dokumen!: any[] | null;
     public created_by!: number | null;
-    public approval_status!: 'Pending' | 'Approved' | 'Rejected';
+    public approval_status!: 'Pending' | 'Approved' | 'Rejected' | 'Voided';
     public approved_by!: number | null;
     public approved_at!: Date | null;
     public rejection_reason!: string | null;
+    public voided_by!: number | null;
+    public voided_at!: Date | null;
+    public void_reason!: string | null;
+    public amends_transaksi_id!: number | null;
+    public amended_by_transaksi_id!: number | null;
 
     public gudang?: any;
     public gudang_tujuan?: any;
@@ -31,6 +36,10 @@ export class InvTransaksi extends Model {
     public department?: any;
     public creator?: any;
     public approver?: any;
+    public voider?: any;
+    public transaksi_asli?: any;
+    public transaksi_koreksi?: any;
+    public transaksi_amender?: any;
     public details?: any[];
 
     public readonly created_at!: Date;
@@ -112,7 +121,7 @@ InvTransaksi.init({
         references: { model: 'users', key: 'id' },
     },
     approval_status: {
-        type: DataTypes.ENUM('Pending', 'Approved', 'Rejected'),
+        type: DataTypes.ENUM('Pending', 'Approved', 'Rejected', 'Voided'),
         allowNull: false,
         defaultValue: 'Approved',
     },
@@ -128,6 +137,29 @@ InvTransaksi.init({
     rejection_reason: {
         type: DataTypes.TEXT,
         allowNull: true,
+    },
+    voided_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'users', key: 'id' },
+    },
+    voided_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
+    void_reason: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    amends_transaksi_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'inv_transaksi', key: 'id' },
+    },
+    amended_by_transaksi_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'inv_transaksi', key: 'id' },
     },
 }, {
     sequelize,

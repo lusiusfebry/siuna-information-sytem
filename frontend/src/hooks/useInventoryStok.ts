@@ -8,6 +8,8 @@ import {
     TransaksiFilter,
     SerialNumberFilter,
     KartuStokFilter,
+    LaporanKonsumsiFilter,
+    TransaksiDetailPayload,
 } from '../types/inventory';
 
 export const useStokList = (filters?: StokFilter) => {
@@ -36,6 +38,7 @@ export const useCreateTransaksi = () => {
             queryClient.invalidateQueries({ queryKey: ['inventorySerialNumbers'] });
             queryClient.invalidateQueries({ queryKey: ['inventoryKartuStok'] });
             queryClient.invalidateQueries({ queryKey: ['facilityInventory'] });
+            queryClient.invalidateQueries({ queryKey: ['inventoryLaporanKonsumsi'] });
         },
     });
 };
@@ -46,6 +49,7 @@ const invalidateTransaksiCaches = (queryClient: ReturnType<typeof useQueryClient
     queryClient.invalidateQueries({ queryKey: ['inventorySerialNumbers'] });
     queryClient.invalidateQueries({ queryKey: ['inventoryKartuStok'] });
     queryClient.invalidateQueries({ queryKey: ['facilityInventory'] });
+    queryClient.invalidateQueries({ queryKey: ['inventoryLaporanKonsumsi'] });
 };
 
 // INV-N07: approving replays the deferred stock/serial effects, so it must
@@ -67,7 +71,31 @@ export const useRejectTransaksi = () => {
     });
 };
 
-export const useTransaksiList = (filters?: TransaksiFilter) => {
+// Voiding reverses the original transaction's stock/serial effects, so it must
+// invalidate the same caches as approve/create.
+export const useVoidTransaksi = () => {
+    const queryClient = useQueryClient();
+    return useMutation<{ status: string; data: InvTransaksi; message: string }, AxiosError<{ message: string }>, { id: number; reason: string }>({
+        mutationFn: ({ id, reason }) => inventoryStokService.voidTransaksi(id, { reason }),
+        onSuccess: () => invalidateTransaksiCaches(queryClient),
+    });
+};
+
+// Amending posts a reversal plus an optional correction transaction, replaying
+// stock/serial effects, so it invalidates the same caches as approve/create.
+export const useAmendTransaksi = () => {
+    const queryClient = useQueryClient();
+    return useMutation<
+        { status: string; data: { reversal: InvTransaksi; koreksi: InvTransaksi | null }; message: string },
+        AxiosError<{ message: string }>,
+        { id: number; reason: string; koreksi?: { details: TransaksiDetailPayload[] } }
+    >({
+        mutationFn: ({ id, reason, koreksi }) => inventoryStokService.amendTransaksi(id, { reason, koreksi }),
+        onSuccess: () => invalidateTransaksiCaches(queryClient),
+    });
+};
+
+export const useTransaksiList = (filters: TransaksiFilter & { include_inactive?: boolean } = {}) => {
     return useQuery({
         queryKey: ['inventoryTransaksi', filters],
         queryFn: () => inventoryStokService.getTransaksiList(filters),
@@ -89,6 +117,14 @@ export const useKartuStok = (filters: KartuStokFilter) => {
         queryFn: () => inventoryStokService.getKartuStok(filters),
         placeholderData: keepPreviousData,
         enabled: !!filters.produk_id,
+    });
+};
+
+export const useLaporanKonsumsi = (filters?: LaporanKonsumsiFilter) => {
+    return useQuery({
+        queryKey: ['inventoryLaporanKonsumsi', filters],
+        queryFn: () => inventoryStokService.getLaporanKonsumsi(filters),
+        placeholderData: keepPreviousData,
     });
 };
 

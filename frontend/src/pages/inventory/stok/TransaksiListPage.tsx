@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransaksiList, useTransaksiDetail, useApproveTransaksi, useRejectTransaksi } from '../../../hooks/useInventoryStok';
+import { useTransaksiList, useTransaksiDetail, useApproveTransaksi, useRejectTransaksi, useVoidTransaksi, useAmendTransaksi } from '../../../hooks/useInventoryStok';
 import { useInvGudangList } from '../../../hooks/useInventoryMasterData';
 import { usePermission } from '../../../hooks/usePermission';
 import { InvTransaksi, TransaksiTipe, ApprovalStatus } from '../../../types/inventory';
 import Button from '../../../components/common/Button';
+
+const APPROVAL_LABELS: Record<ApprovalStatus, string> = {
+    'Pending': 'Menunggu',
+    'Approved': 'Disetujui',
+    'Rejected': 'Ditolak',
+    'Voided': 'Dibatalkan',
+};
 
 const TIPE_COLORS: Record<string, string> = {
     'Masuk': 'bg-green-100 text-green-800',
@@ -16,6 +23,99 @@ const APPROVAL_COLORS: Record<ApprovalStatus, string> = {
     'Pending': 'bg-amber-100 text-amber-800',
     'Approved': 'bg-green-100 text-green-800',
     'Rejected': 'bg-red-100 text-red-800',
+    'Voided': 'bg-gray-100 text-gray-500',
+};
+
+// --- Void Modal ---
+const VoidTransaksiModal = ({ transaksi, onClose }: { transaksi: InvTransaksi; onClose: () => void }) => {
+    const [reason, setReason] = useState('');
+    const [error, setError] = useState('');
+    const mutation = useVoidTransaksi();
+
+    const handleSubmit = () => {
+        if (reason.trim().length < 5) { setError('Alasan minimal 5 karakter'); return; }
+        mutation.mutate({ id: transaksi.id, reason }, {
+            onSuccess: () => onClose(),
+            onError: (err) => setError(err.response?.data?.message || 'Gagal membatalkan transaksi'),
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Void Transaksi {transaksi.code}</h3>
+                <p className="text-sm text-gray-500">Transaksi akan dibatalkan dan efek stok akan dibalik.</p>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alasan <span className="text-red-500">*</span></label>
+                    <textarea
+                        value={reason}
+                        onChange={(e) => { setReason(e.target.value); setError(''); }}
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-100"
+                        placeholder="Masukkan alasan void..."
+                    />
+                    {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+                </div>
+                <div className="flex justify-end gap-2">
+                    <button onClick={onClose} className="px-4 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">Batal</button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={mutation.isPending}
+                        className="px-4 py-2 text-sm rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                    >
+                        {mutation.isPending ? 'Memproses...' : 'Void Transaksi'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Amend Modal ---
+const AmendTransaksiModal = ({ transaksi, onClose }: { transaksi: InvTransaksi; onClose: () => void }) => {
+    const [reason, setReason] = useState('');
+    const [error, setError] = useState('');
+    const mutation = useAmendTransaksi();
+
+    const handleSubmit = () => {
+        if (reason.trim().length < 5) { setError('Alasan minimal 5 karakter'); return; }
+        mutation.mutate({ id: transaksi.id, reason }, {
+            onSuccess: () => onClose(),
+            onError: (err) => setError(err.response?.data?.message || 'Gagal mengamend transaksi'),
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+            <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-2xl p-6 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Amend Transaksi {transaksi.code}</h3>
+                <p className="text-sm text-gray-500">Transaksi asli akan di-void dan dibuat transaksi koreksi baru.</p>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alasan <span className="text-red-500">*</span></label>
+                    <textarea
+                        value={reason}
+                        onChange={(e) => { setReason(e.target.value); setError(''); }}
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:text-gray-100"
+                        placeholder="Masukkan alasan amend..."
+                    />
+                    {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+                </div>
+                <div className="flex justify-end gap-2">
+                    <button onClick={onClose} className="px-4 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">Batal</button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={mutation.isPending}
+                        className="px-4 py-2 text-sm rounded-md bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50"
+                    >
+                        {mutation.isPending ? 'Memproses...' : 'Amend Transaksi'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 const TransaksiListPage = () => {
@@ -27,6 +127,7 @@ const TransaksiListPage = () => {
     const [gudangId, setGudangId] = useState<number | undefined>();
     const [tanggalDari, setTanggalDari] = useState('');
     const [tanggalSampai, setTanggalSampai] = useState('');
+    const [includeInactive, setIncludeInactive] = useState(false);
 
     const { data, isLoading } = useTransaksiList({
         page,
@@ -37,6 +138,7 @@ const TransaksiListPage = () => {
         gudang_id: gudangId,
         tanggal_dari: tanggalDari || undefined,
         tanggal_sampai: tanggalSampai || undefined,
+        include_inactive: includeInactive,
     });
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
     const { can } = usePermission();
@@ -46,6 +148,8 @@ const TransaksiListPage = () => {
     const rejectMutation = useRejectTransaksi();
 
     const [detailModal, setDetailModal] = useState<InvTransaksi | null>(null);
+    const [voidModal, setVoidModal] = useState<InvTransaksi | null>(null);
+    const [amendModal, setAmendModal] = useState<InvTransaksi | null>(null);
 
     const handleApprove = (item: InvTransaksi) => {
         if (!window.confirm(`Setujui transaksi ${item.code}? Efek stok akan diterapkan.`)) return;
@@ -127,6 +231,15 @@ const TransaksiListPage = () => {
                     className="flex h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
                     placeholder="Sampai tanggal"
                 />
+                <label className="flex items-center gap-2 h-10 px-1 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={includeInactive}
+                        onChange={(e) => { setIncludeInactive(e.target.checked); setPage(1); }}
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    Termasuk dibatalkan/ditolak
+                </label>
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -185,9 +298,21 @@ const TransaksiListPage = () => {
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.gudang?.nama}</td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300 max-w-[200px] truncate">{keterangan}</td>
                                             <td className="px-4 py-3">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[item.approval_status] || ''}`}>
-                                                    {item.approval_status === 'Pending' ? 'Menunggu' : item.approval_status === 'Approved' ? 'Disetujui' : 'Ditolak'}
-                                                </span>
+                                                <div className="flex flex-col gap-1">
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[item.approval_status] || ''}`}>
+                                                        {APPROVAL_LABELS[item.approval_status] ?? item.approval_status}
+                                                    </span>
+                                                    {item.approval_status === 'Approved' && item.amends_transaksi_id && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                                                            Reversal
+                                                        </span>
+                                                    )}
+                                                    {item.approval_status === 'Approved' && item.amended_by_transaksi_id && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300">
+                                                            Dikoreksi
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.creator?.nama}</td>
                                             <td className="px-4 py-3">
@@ -214,8 +339,26 @@ const TransaksiListPage = () => {
                                                             >
                                                                 Tolak
                                                             </button>
+                                                            <button
+                                                                onClick={() => setVoidModal(item)}
+                                                                className="text-gray-500 hover:text-gray-700 text-xs font-medium"
+                                                            >
+                                                                Batalkan
+                                                            </button>
                                                         </>
                                                     )}
+                                                    {canApprove
+                                                        && item.approval_status === 'Approved'
+                                                        && !item.amended_by_transaksi_id
+                                                        && !item.amends_transaksi_id
+                                                        && (
+                                                            <button
+                                                                onClick={() => setAmendModal(item)}
+                                                                className="text-yellow-600 hover:text-yellow-700 text-xs font-medium"
+                                                            >
+                                                                Koreksi
+                                                            </button>
+                                                        )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -239,6 +382,8 @@ const TransaksiListPage = () => {
             </div>
 
             {detailModal && <TransaksiDetailModal transaksi={detailModal} onClose={() => setDetailModal(null)} />}
+            {voidModal && <VoidTransaksiModal transaksi={voidModal} onClose={() => setVoidModal(null)} />}
+            {amendModal && <AmendTransaksiModal transaksi={amendModal} onClose={() => setAmendModal(null)} />}
         </div>
     );
 };
@@ -256,7 +401,7 @@ const TransaksiDetailModal = ({ transaksi, onClose }: { transaksi: InvTransaksi;
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-semibold text-gray-900">Detail Transaksi {transaksi.code}</h3>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${APPROVAL_COLORS[transaksi.approval_status] || ''}`}>
-                                {transaksi.approval_status === 'Pending' ? 'Menunggu' : transaksi.approval_status === 'Approved' ? 'Disetujui' : 'Ditolak'}
+                                {APPROVAL_LABELS[transaksi.approval_status] ?? transaksi.approval_status}
                             </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-0.5">

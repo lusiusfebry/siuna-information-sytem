@@ -240,90 +240,76 @@ class StokService {
         };
     }
 
+    private async createTransaksiInternal(
+        payload: TransaksiPayload,
+        userId: number | null,
+        t: Transaction,
+        opts: { autoApprove?: boolean } = {},
+    ): Promise<InvTransaksi> {
+        if (payload.facility_room_id) {
+            const room = await FacilityRoom.findByPk(payload.facility_room_id, { transaction: t });
+            if (!room) throw new AppError(`Kamar/ruang dengan ID ${payload.facility_room_id} tidak ditemukan`, 400);
+            if (!payload.facility_building_id) throw new AppError('Gedung wajib dipilih jika kamar/ruang diisi', 400);
+            if (room.building_id !== payload.facility_building_id) {
+                throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
+            }
+        }
+
+        payload.created_by = userId;
+
+        if (payload.sub_tipe === 'Konsumsi') {
+            await this.validateKonsumsi(payload, t);
+        }
+
+        const requiresApproval = opts.autoApprove ? false : this.requiresApproval(payload);
+
+        const code = await this.generateCode(payload.tipe, t);
+
+        const transaksi = await InvTransaksi.create({
+            code,
+            tipe: payload.tipe,
+            sub_tipe: payload.sub_tipe,
+            tanggal: payload.tanggal,
+            gudang_id: payload.gudang_id,
+            gudang_tujuan_id: payload.gudang_tujuan_id || null,
+            facility_building_id: payload.facility_building_id || null,
+            facility_room_id: payload.facility_room_id || null,
+            karyawan_id: payload.karyawan_id || null,
+            department_id: payload.department_id || null,
+            supplier_nama: payload.supplier_nama || null,
+            no_referensi: payload.no_referensi || null,
+            catatan: payload.catatan || null,
+            created_by: userId,
+            approval_status: requiresApproval ? 'Pending' : 'Approved',
+        }, { transaction: t });
+
+        for (const detail of payload.details) {
+            await InvTransaksiDetail.create({
+                transaksi_id: transaksi.id,
+                produk_id: detail.produk_id,
+                uom_id: detail.uom_id,
+                jumlah: detail.jumlah,
+                catatan: detail.catatan || null,
+                serial_numbers: detail.serial_numbers ?? null,
+            }, { transaction: t });
+        }
+
+        return transaksi;
+    }
+
     async createTransaksi(payload: TransaksiPayload, userId: number | null) {
         const t = await sequelize.transaction();
-
         try {
-            // Referential validation for facility placement (INV-M09): if a room is given,
-            // it must exist and belong to the selected building. Runs before any insert so a
-            // bad reference returns a clean 400 rather than a downstream FK violation.
-            if (payload.facility_room_id) {
-                const room = await FacilityRoom.findByPk(payload.facility_room_id, { transaction: t });
-                if (!room) {
-                    throw new AppError(`Kamar/ruang dengan ID ${payload.facility_room_id} tidak ditemukan`, 400);
-                }
-                if (!payload.facility_building_id) {
-                    throw new AppError('Gedung wajib dipilih jika kamar/ruang diisi', 400);
-                }
-                if (room.building_id !== payload.facility_building_id) {
-                    throw new AppError('Kamar/ruang yang dipilih bukan milik gedung yang dipilih', 400);
-                }
-            }
+            const transaksi = await this.createTransaksiInternal(payload, userId, t);
+            const isApproved = transaksi.approval_status === 'Approved';
 
-            payload.created_by = userId;
-
-            // Consumable issue ('Konsumsi'): validate the recipient shape and that every
-            // line is a genuine consumable product. Consumables leave the warehouse as
-            // "used" — no serial/tag tracking, no return — so we reject serial/tag products
-            // and require exactly one recipient (an employee OR a division, not both/neither).
-            if (payload.sub_tipe === 'Konsumsi') {
-                await this.validateKonsumsi(payload, t);
-            }
-
-            // INV-N07: does this movement need approval before its stock/serial effects
-            // apply? Outbound ('Keluar') and reconciliation ('Adjustment') do. 'Transfer
-            // Masuk' has a 'Masuk' header but generates a paired OUTBOUND leg that reduces
-            // the source warehouse — so it is gated too, otherwise the control could be
-            // bypassed simply by recording a transfer from the destination side.
-            const requiresApproval = this.requiresApproval(payload);
-
-            const code = await this.generateCode(payload.tipe, t);
-
-            const transaksi = await InvTransaksi.create({
-                code,
-                tipe: payload.tipe,
-                sub_tipe: payload.sub_tipe,
-                tanggal: payload.tanggal,
-                gudang_id: payload.gudang_id,
-                gudang_tujuan_id: payload.gudang_tujuan_id || null,
-                facility_building_id: payload.facility_building_id || null,
-                facility_room_id: payload.facility_room_id || null,
-                karyawan_id: payload.karyawan_id || null,
-                department_id: payload.department_id || null,
-                supplier_nama: payload.supplier_nama || null,
-                no_referensi: payload.no_referensi || null,
-                catatan: payload.catatan || null,
-                created_by: userId,
-                approval_status: requiresApproval ? 'Pending' : 'Approved',
-            }, { transaction: t });
-
-            // Always persist the detail lines. For a Pending transaction we also snapshot
-            // the serial/tag selection so effects can be replayed faithfully on approval;
-            // for an auto-approved one the selection is consumed now, so no snapshot.
-            for (const detail of payload.details) {
-                const produk = await InvProduk.findByPk(detail.produk_id, { transaction: t });
-                if (!produk) throw new AppError(`Produk dengan ID ${detail.produk_id} tidak ditemukan`, 404);
-
-                await InvTransaksiDetail.create({
-                    transaksi_id: transaksi.id,
-                    produk_id: detail.produk_id,
-                    uom_id: detail.uom_id,
-                    jumlah: detail.jumlah,
-                    catatan: detail.catatan || null,
-                    serial_numbers: requiresApproval ? (detail.serial_numbers ?? null) : null,
-                }, { transaction: t });
-            }
-
-            // Auto-approved transactions apply their effects immediately. Pending ones
-            // defer everything (stock, serials, facility placements, paired legs) until
-            // approveTransaksi replays them — so a Pending row never touches stock.
-            if (!requiresApproval) {
+            if (isApproved) {
                 await this.applyTransaksiEffects(transaksi, payload, userId, t);
             }
 
             await t.commit();
 
-            if (!requiresApproval) {
+            if (isApproved) {
                 const affectedProdukIds = payload.details.map(d => d.produk_id);
                 notificationService.checkLowStockAndNotify(affectedProdukIds).catch(() => {});
             } else {
@@ -459,6 +445,50 @@ class StokService {
         });
 
         return this.getTransaksiDetail(id);
+    }
+
+    // INV-N08: void (batalkan) a Pending transaction. A Pending row has never applied
+    // any effect (INV-N07), so voiding only flips the status and stamps the audit trail —
+    // stock, serials, and facility_assets are untouched. Approved rows must use Koreksi
+    // (amend) instead. Reversal/correction rows (amends_transaksi_id set) cannot be voided.
+    async voidTransaksi(id: number, userId: number, reason: string): Promise<InvTransaksi> {
+        const trimmed = reason?.trim() ?? '';
+        if (trimmed.length < 5) {
+            throw new AppError('Alasan wajib diisi (minimal 5 karakter)', 400);
+        }
+
+        const t = await sequelize.transaction();
+        try {
+            const row = await InvTransaksi.findByPk(id, {
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+            if (!row) throw new AppError('Transaksi tidak ditemukan', 404);
+
+            if (row.approval_status !== 'Pending') {
+                throw new AppError(
+                    `Hanya transaksi berstatus Pending yang bisa dibatalkan. Transaksi ini berstatus ${row.approval_status}. Gunakan Koreksi untuk transaksi yang sudah disetujui.`,
+                    400,
+                );
+            }
+
+            if (row.amends_transaksi_id) {
+                throw new AppError('Transaksi reversal/koreksi tidak bisa dibatalkan.', 400);
+            }
+
+            await row.update({
+                approval_status: 'Voided',
+                voided_by: userId,
+                voided_at: new Date(),
+                void_reason: trimmed,
+            }, { transaction: t });
+
+            await t.commit();
+            return InvTransaksi.findByPk(id) as Promise<InvTransaksi>;
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
     }
 
     private async handleStokMasuk(
@@ -906,9 +936,13 @@ class StokService {
 
     async getTransaksiList(filters: any) {
         const { tipe, sub_tipe, gudang_id, facility_building_id, approval_status, tanggal_dari, tanggal_sampai, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const include_inactive = filters.include_inactive === true || filters.include_inactive === 'true';
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
+        if (!include_inactive) {
+            where.approval_status = { [Op.notIn]: ['Voided', 'Rejected'] };
+        }
         if (tipe) where.tipe = tipe;
         if (sub_tipe) where.sub_tipe = sub_tipe;
         if (gudang_id) where.gudang_id = gudang_id;
@@ -1116,106 +1150,453 @@ class StokService {
      * Mengembalikan daftar baris (per detail) + ringkasan agregat per produk,
      * per divisi/departemen, dan per karyawan.
      */
+    async amendTransaksi(
+        id: number,
+        userId: number,
+        reason: string,
+        koreksi?: { details: TransaksiDetailPayload[] },
+    ): Promise<{ reversal: InvTransaksi; koreksi: InvTransaksi | null }> {
+        const trimmed = reason?.trim() ?? '';
+        if (trimmed.length < 5) {
+            throw new AppError('Alasan wajib diisi (minimal 5 karakter)', 400);
+        }
+
+        const t = await sequelize.transaction();
+        try {
+            const original = await InvTransaksi.findByPk(id, {
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+            if (!original) throw new AppError('Transaksi tidak ditemukan', 404);
+
+            if (original.approval_status !== 'Approved') {
+                throw new AppError(
+                    `Hanya transaksi berstatus Approved yang bisa dikoreksi. Transaksi ini berstatus ${original.approval_status}.`,
+                    400,
+                );
+            }
+            if (original.amended_by_transaksi_id) {
+                throw new AppError(
+                    `Transaksi ini sudah pernah dikoreksi sebelumnya (lihat #${original.amended_by_transaksi_id}).`,
+                    400,
+                );
+            }
+            if (original.amends_transaksi_id) {
+                throw new AppError('Transaksi reversal/koreksi tidak bisa di-amend.', 400);
+            }
+            if (original.sub_tipe === 'Transfer Gudang'
+                && original.catatan?.startsWith('Auto-generated dari transfer masuk')) {
+                throw new AppError(
+                    'Untuk membatalkan transfer, amend transaksi Transfer Masuk-nya.',
+                    400,
+                );
+            }
+
+            const details = await InvTransaksiDetail.findAll({
+                where: { transaksi_id: id },
+                transaction: t,
+            });
+
+            await this.validateReversalGuards(original, details, t);
+
+            const reversalSpec = this.buildReversalPayload(original, details, userId, trimmed);
+
+            const reversal = await this.createTransaksiInternal(reversalSpec.primary, userId, t, { autoApprove: true });
+            await this.applyTransaksiEffects(reversal, reversalSpec.primary, userId, t);
+
+            if (original.sub_tipe === 'Supplier') {
+                const allSerials = details.flatMap((d: any) => d.serial_numbers ?? []);
+                if (allSerials.length > 0) {
+                    await InvSerialNumber.destroy({
+                        where: { serial_number: allSerials },
+                        transaction: t,
+                    });
+                }
+            }
+
+            if (['Disposal', 'Rusak/Terbuang'].includes(original.sub_tipe)) {
+                for (const d of details) {
+                    if ((d.serial_numbers as any)?.length) {
+                        await InvSerialNumber.update(
+                            { status: 'Tersedia', gudang_id: original.gudang_id, transaksi_terakhir_id: reversal.id } as any,
+                            { where: { serial_number: d.serial_numbers as any }, transaction: t },
+                        );
+                    }
+                }
+            }
+
+            await reversal.update({
+                approved_by: userId,
+                approved_at: new Date(),
+                amends_transaksi_id: original.id,
+            }, { transaction: t });
+
+            if (reversalSpec.paired) {
+                const pairedRow = await this.createTransaksiInternal(reversalSpec.paired, userId, t, { autoApprove: true });
+                await this.applyTransaksiEffects(pairedRow, reversalSpec.paired, userId, t);
+                await pairedRow.update({
+                    approved_by: userId,
+                    approved_at: new Date(),
+                    amends_transaksi_id: original.id,
+                }, { transaction: t });
+            }
+
+            await original.update({ amended_by_transaksi_id: reversal.id }, { transaction: t });
+
+            let koreksiRow: InvTransaksi | null = null;
+            if (koreksi?.details?.length) {
+                const koreksiPayload: TransaksiPayload = {
+                    tipe: original.tipe,
+                    sub_tipe: original.sub_tipe as any,
+                    tanggal: original.tanggal,
+                    gudang_id: original.gudang_id,
+                    gudang_tujuan_id: original.gudang_tujuan_id ?? undefined,
+                    facility_building_id: original.facility_building_id ?? undefined,
+                    facility_room_id: original.facility_room_id ?? undefined,
+                    karyawan_id: original.karyawan_id ?? undefined,
+                    department_id: original.department_id ?? undefined,
+                    supplier_nama: original.supplier_nama ?? undefined,
+                    no_referensi: original.no_referensi ?? undefined,
+                    catatan: `Koreksi dari ${original.code}: ${trimmed}`,
+                    created_by: userId,
+                    details: koreksi.details,
+                };
+                koreksiRow = await this.createTransaksiInternal(koreksiPayload, userId, t, { autoApprove: true });
+                await this.applyTransaksiEffects(koreksiRow, koreksiPayload, userId, t);
+                await koreksiRow.update({
+                    approved_by: userId,
+                    approved_at: new Date(),
+                }, { transaction: t });
+            }
+
+            await t.commit();
+            return {
+                reversal: await this.getTransaksiDetail(reversal.id),
+                koreksi: koreksiRow ? await this.getTransaksiDetail(koreksiRow.id) : null,
+            };
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
+    private async validateReversalGuards(
+        original: InvTransaksi,
+        details: InvTransaksiDetail[],
+        t: Transaction,
+    ): Promise<void> {
+        const allSerials = details.flatMap((d) => d.serial_numbers ?? []);
+        if (allSerials.length > 0) {
+            const rows = await InvSerialNumber.findAll({
+                where: { serial_number: allSerials },
+                transaction: t,
+            }) as any[];
+            for (const row of rows) {
+                if (row.transaksi_terakhir_id !== original.id) {
+                    throw new AppError(
+                        `Serial ${row.serial_number} sudah dipindah oleh transaksi lain setelah transaksi ini. Koreksi otomatis tidak aman.`,
+                        409,
+                    );
+                }
+            }
+        }
+
+        // Guard fasilitas: penempatan asli harus masih Aktif agar reversal aman.
+        // 'Ke Gedung/Mess' menempatkan aset ke ruangan; jika penempatan sudah ditarik
+        // atau dipindah oleh transaksi lain, koreksi otomatis bisa merusak state.
+        if (original.sub_tipe === 'Ke Gedung/Mess' && original.facility_room_id) {
+            const activePlacements = await FacilityAsset.count({
+                where: { transaksi_id: original.id, status: 'Aktif' },
+                transaction: t,
+            });
+            if (activePlacements === 0) {
+                throw new AppError(
+                    'Aset sudah ditarik dari ruangan atau dipindah. Koreksi otomatis tidak aman.',
+                    409,
+                );
+            }
+        }
+    }
+
+    /**
+     * Bangun payload transaksi reversal (efek kebalikan) dari transaksi asli.
+     *
+     * Peta invers (§3.1 spec) untuk sub-tipe non-serial:
+     * - Supplier   → tipe Adjustment, jumlah -|N| (tarik kembali stok masuk)
+     * - Konsumsi   → tipe Adjustment, jumlah +|N| (kembalikan stok yang dikonsumsi)
+     * - Adjustment → tipe Adjustment, jumlah dinegasi langsung (-N)
+     *
+     * `sub_tipe` asli dipertahankan (bukan hardcode 'Adjustment') supaya jejak audit
+     * tetap terbaca — "reversal Supplier" tetap tampil sebagai Supplier di header.
+     * `handleAdjustment` bekerja pada `tipe === 'Adjustment'` tanpa memedulikan sub_tipe.
+     */
+    private buildReversalPayload(
+        original: InvTransaksi,
+        details: InvTransaksiDetail[],
+        userId: number,
+        reason: string,
+    ): { primary: TransaksiPayload; paired?: TransaksiPayload } {
+        const baseHeader = {
+            tanggal: new Date().toISOString().slice(0, 10),
+            gudang_id: original.gudang_id,
+            karyawan_id: original.karyawan_id ?? undefined,
+            department_id: original.department_id ?? undefined,
+            facility_building_id: original.facility_building_id ?? undefined,
+            facility_room_id: original.facility_room_id ?? undefined,
+            supplier_nama: original.supplier_nama ?? undefined,
+            no_referensi: original.no_referensi ?? undefined,
+            catatan: `REVERSAL transaksi ${original.code}: ${reason}`,
+            created_by: userId,
+        };
+
+        const mapDetails = (jumlah: (d: InvTransaksiDetail) => number) =>
+            details.map((d) => ({
+                produk_id: d.produk_id,
+                uom_id: d.uom_id,
+                jumlah: jumlah(d),
+                catatan: d.catatan ?? undefined,
+            }));
+
+        switch (original.sub_tipe as string) {
+            case 'Supplier':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => -Math.abs(d.jumlah)),
+                    },
+                };
+            case 'Konsumsi':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => Math.abs(d.jumlah)),
+                    },
+                };
+            case 'Adjustment':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => -d.jumlah),
+                    },
+                };
+            case 'Transfer Masuk': {
+                // Transfer Masuk mencatat SATU baris di destinasi tetapi efek stoknya
+                // menyentuh dua gudang (keluar dari asal, masuk ke destinasi). Reversal
+                // otomatis karena itu harus paired: tarik dari destinasi (-N) DAN
+                // kembalikan ke asal (+N). Keduanya di-link ke original via amends_transaksi_id
+                // oleh amendTransaksi.
+                if (!original.gudang_tujuan_id) {
+                    throw new AppError('Transfer Masuk tanpa gudang tujuan tidak bisa dikoreksi', 400);
+                }
+                const mapTransferDetails = (sign: 1 | -1) => details.map((d) => ({
+                    produk_id: d.produk_id,
+                    uom_id: d.uom_id,
+                    jumlah: sign * Math.abs(d.jumlah),
+                    catatan: d.catatan ?? undefined,
+                }));
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: 'Transfer Masuk' as any,
+                        gudang_id: original.gudang_id, // destinasi
+                        details: mapTransferDetails(-1),
+                    },
+                    paired: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: 'Transfer Gudang' as any,
+                        gudang_id: original.gudang_tujuan_id, // asal
+                        catatan: `REVERSAL paired transaksi ${original.code}: ${reason}`,
+                        details: mapTransferDetails(1),
+                    },
+                };
+            }
+            case 'Ke Karyawan':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Masuk',
+                        sub_tipe: 'Retur Karyawan' as any,
+                        karyawan_id: original.karyawan_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Retur Karyawan':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Keluar',
+                        sub_tipe: 'Ke Karyawan' as any,
+                        karyawan_id: original.karyawan_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Disposal':
+            case 'Rusak/Terbuang':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Ke Gedung/Mess':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Masuk',
+                        sub_tipe: 'Ambil dari Gedung' as any,
+                        facility_building_id: original.facility_building_id ?? undefined,
+                        facility_room_id: original.facility_room_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Ambil dari Gedung':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Keluar',
+                        sub_tipe: 'Ke Gedung/Mess' as any,
+                        facility_building_id: original.facility_building_id ?? undefined,
+                        facility_room_id: original.facility_room_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            default:
+                throw new AppError(
+                    `Amend untuk sub_tipe ${original.sub_tipe} belum didukung. Hubungi admin.`,
+                    501,
+                );
+        }
+    }
+
     async getLaporanKonsumsi(filters: any) {
-        const { tanggal_dari, tanggal_sampai, department_id, karyawan_id, produk_id, gudang_id, departmentFilter } = filters;
+        const { department_id, karyawan_id, gudang_id, produk_id, dari, sampai, departmentFilter, page = 1, limit = 20 } = filters;
 
         const where: any = { sub_tipe: 'Konsumsi', approval_status: 'Approved' };
         if (department_id) where.department_id = department_id;
         if (karyawan_id) where.karyawan_id = karyawan_id;
         if (gudang_id) where.gudang_id = gudang_id;
-        if (tanggal_dari && tanggal_sampai) {
-            where.tanggal = { [Op.between]: [tanggal_dari, tanggal_sampai] };
-        } else if (tanggal_dari) {
-            where.tanggal = { [Op.gte]: tanggal_dari };
-        } else if (tanggal_sampai) {
-            where.tanggal = { [Op.lte]: tanggal_sampai };
-        }
+        if (dari && sampai) where.tanggal = { [Op.between]: [dari, sampai] };
+        else if (dari) where.tanggal = { [Op.gte]: dari };
+        else if (sampai) where.tanggal = { [Op.lte]: sampai };
 
-        // Filter by produk lives on the detail rows, so it must be applied on the
-        // included detail model (required:true) rather than the transaksi where.
-        const detailWhere: any = {};
-        if (produk_id) detailWhere.produk_id = produk_id;
+        const detailInclude: any = {
+            model: InvTransaksiDetail,
+            as: 'details',
+            required: !!produk_id,
+            where: produk_id ? { produk_id } : undefined,
+            include: [
+                { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
+                { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
+            ],
+        };
 
-        const transaksi = await InvTransaksi.findAll({
+        const offset = (Number(page) - 1) * Number(limit);
+
+        const { rows, count } = await InvTransaksi.findAndCountAll({
             where,
             include: [
-                // Department scoping (INV-M07): scope by source warehouse's department.
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'code', 'nama'], ...this.gudangDeptScope(departmentFilter) },
                 { model: Employee, as: 'karyawan', attributes: ['id', 'nama_lengkap', 'nomor_induk_karyawan'], paranoid: false },
                 { model: Department, as: 'department', attributes: ['id', 'code', 'nama'] },
                 { model: User, as: 'creator', attributes: ['id', 'nama'] },
-                {
-                    model: InvTransaksiDetail,
-                    as: 'details',
-                    where: Object.keys(detailWhere).length ? detailWhere : undefined,
-                    required: !!produk_id,
-                    include: [
-                        { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama'] },
-                        { model: InvUom, as: 'uom', attributes: ['id', 'nama'] },
-                    ],
-                },
+                detailInclude,
             ],
-            order: [['tanggal', 'DESC'], ['created_at', 'DESC']],
+            limit: Number(limit),
+            offset,
+            order: [['tanggal', 'DESC'], ['id', 'DESC']],
+            subQuery: false,
         });
 
-        // Flatten to one row per detail line, then build the three aggregate views.
-        const rows: any[] = [];
-        const perProduk = new Map<number, any>();
-        const perDepartment = new Map<number, any>();
-        const perKaryawan = new Map<number, any>();
+        // Build summary aggregates
+        const perProduk = new Map<number, { id: number; code: string; nama: string; total_jumlah: number }>();
+        const perDepartment = new Map<number, { id: number; code: string; nama: string; total_jumlah: number }>();
+        const perKaryawan = new Map<number, { id: number; nama_lengkap: string; total_jumlah: number }>();
 
-        for (const trx of transaksi) {
-            const t: any = trx.toJSON();
-            const target = t.department
-                ? { tipe: 'Divisi', id: t.department.id, nama: t.department.nama, code: t.department.code }
-                : t.karyawan
-                    ? { tipe: 'Karyawan', id: t.karyawan.id, nama: t.karyawan.nama_lengkap, code: t.karyawan.nomor_induk_karyawan }
-                    : { tipe: '-', id: null, nama: '-', code: null };
+        for (const row of rows) {
+            const r = row as any;
+            const details: any[] = r.details || [];
+            const totalRow = details.reduce((s: number, d: any) => s + Number(d.jumlah), 0);
 
-            for (const d of (t.details || [])) {
-                rows.push({
-                    transaksi_id: t.id,
-                    code: t.code,
-                    tanggal: t.tanggal,
-                    gudang: t.gudang ? { id: t.gudang.id, code: t.gudang.code, nama: t.gudang.nama } : null,
-                    produk: d.produk ? { id: d.produk.id, code: d.produk.code, nama: d.produk.nama } : null,
-                    uom: d.uom ? { id: d.uom.id, nama: d.uom.nama } : null,
-                    jumlah: d.jumlah,
-                    catatan: d.catatan,
-                    target,
-                });
-
-                // Aggregate per produk
+            for (const d of details) {
                 if (d.produk) {
-                    const acc = perProduk.get(d.produk.id) || { produk_id: d.produk.id, code: d.produk.code, nama: d.produk.nama, uom: d.uom?.nama ?? null, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perProduk.set(d.produk.id, acc);
-                }
-
-                // Aggregate per divisi/departemen
-                if (t.department) {
-                    const acc = perDepartment.get(t.department.id) || { department_id: t.department.id, code: t.department.code, nama: t.department.nama, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perDepartment.set(t.department.id, acc);
-                }
-
-                // Aggregate per karyawan
-                if (t.karyawan) {
-                    const acc = perKaryawan.get(t.karyawan.id) || { karyawan_id: t.karyawan.id, nomor_induk_karyawan: t.karyawan.nomor_induk_karyawan, nama: t.karyawan.nama_lengkap, total_jumlah: 0 };
-                    acc.total_jumlah += d.jumlah;
-                    perKaryawan.set(t.karyawan.id, acc);
+                    // d.produk is a Sequelize instance — spreading it copies internal
+                    // fields (dataValues, _previousDataValues, …) instead of the model
+                    // attributes. Read the plain shape so consumers can use p.id/p.nama.
+                    const pk = d.produk.get ? d.produk.get({ plain: true }) : d.produk;
+                    const e = perProduk.get(pk.id) || { id: pk.id, code: pk.code, nama: pk.nama, total_jumlah: 0 };
+                    e.total_jumlah += Number(d.jumlah);
+                    perProduk.set(pk.id, e);
                 }
             }
+            if (r.department) {
+                const dp = r.department.get ? r.department.get({ plain: true }) : r.department;
+                const e = perDepartment.get(dp.id) || { id: dp.id, code: dp.code, nama: dp.nama, total_jumlah: 0 };
+                e.total_jumlah += totalRow;
+                perDepartment.set(dp.id, e);
+            }
+            if (r.karyawan) {
+                const kw = r.karyawan.get ? r.karyawan.get({ plain: true }) : r.karyawan;
+                const e = perKaryawan.get(kw.id) || { id: kw.id, nama_lengkap: kw.nama_lengkap, total_jumlah: 0 };
+                e.total_jumlah += totalRow;
+                perKaryawan.set(kw.id, e);
+            }
         }
+
+        const sortDesc = (arr: any[]) => arr.sort((a, b) => b.total_jumlah - a.total_jumlah);
 
         return {
             data: rows,
             summary: {
-                per_produk: Array.from(perProduk.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                per_department: Array.from(perDepartment.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                per_karyawan: Array.from(perKaryawan.values()).sort((a, b) => b.total_jumlah - a.total_jumlah),
-                total_baris: rows.length,
-                total_transaksi: transaksi.length,
+                per_produk: sortDesc([...perProduk.values()]),
+                per_department: sortDesc([...perDepartment.values()]),
+                per_karyawan: sortDesc([...perKaryawan.values()]),
+                total_baris: count,
+                total_transaksi: rows.length,
+            },
+            pagination: {
+                total: count,
+                page: Number(page),
+                totalPages: Math.ceil(count / Number(limit)),
             },
         };
     }

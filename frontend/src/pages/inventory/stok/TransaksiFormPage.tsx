@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { useCreateTransaksi } from '../../../hooks/useInventoryStok';
 import { useInvGudangList, useInvProdukList, useInvUomList } from '../../../hooks/useInventoryMasterData';
 import { useFacBuildingList, useFacRoomList } from '../../../hooks/useFacilityMasterData';
+import { useMasterDataList } from '../../../hooks/useMasterData';
 import { TransaksiPayload, TransaksiTipe, TransaksiSubTipe, TransaksiDetailPayload, InvSerialNumber } from '../../../types/inventory';
 import Button from '../../../components/common/Button';
 import { SearchableSelect } from '../../../components/common/SearchableSelect';
@@ -26,6 +27,7 @@ const SUB_TIPE_MAP: Record<TransaksiTipe, { value: TransaksiSubTipe; label: stri
         { value: 'Transfer Gudang', label: 'Transfer Gudang' },
         { value: 'Disposal', label: 'Disposal' },
         { value: 'Rusak/Terbuang', label: 'Rusak / Terbuang' },
+        { value: 'Konsumsi', label: 'Konsumsi Barang' },
     ],
     'Adjustment': [
         { value: 'Opname', label: 'Stock Opname' },
@@ -45,6 +47,7 @@ const TransaksiFormPage = () => {
     const { data: uomData } = useInvUomList({ limit: 100, status: 'Aktif' });
     const { data: buildingData } = useFacBuildingList({ limit: 100, status: 'Aktif' });
     const { data: roomData } = useFacRoomList({ limit: 200, status: 'Tersedia' });
+    const { data: departmentData } = useMasterDataList('department', { limit: 200 });
 
     const [tipe, setTipe] = useState<TransaksiTipe>('Masuk');
     const [subTipe, setSubTipe] = useState<TransaksiSubTipe>('Supplier');
@@ -54,6 +57,8 @@ const TransaksiFormPage = () => {
     const [buildingId, setBuildingId] = useState<number>(0);
     const [roomId, setRoomId] = useState<number>(0);
     const [karyawanId, setKaryawanId] = useState<number>(0);
+    const [departmentId, setDepartmentId] = useState<number>(0);
+    const [konsumsiTarget, setKonsumsiTarget] = useState<'karyawan' | 'department'>('karyawan');
     const [supplierNama, setSupplierNama] = useState('');
     const [noReferensi, setNoReferensi] = useState('');
     const [catatan, setCatatan] = useState('');
@@ -183,6 +188,9 @@ const TransaksiFormPage = () => {
     const showBuilding = subTipe === 'Ke Gedung/Mess';
     const showKaryawan = subTipe === 'Ke Karyawan';
     const showSupplier = subTipe === 'Supplier';
+    const isKonsumsi = subTipe === 'Konsumsi';
+    const showKonsumsiKaryawan = isKonsumsi && konsumsiTarget === 'karyawan';
+    const showKonsumsiDept = isKonsumsi && konsumsiTarget === 'department';
     // "Ambil dari Gedung" is a Masuk transaction, but the user must PICK units already
     // installed in a building (not free-type new serials). It therefore uses the same
     // checkbox picker as outbound flows, fed by facility_placed units.
@@ -202,6 +210,8 @@ const TransaksiFormPage = () => {
         if (showGudangTujuan && !gudangTujuanId) { toast.error('Pilih gudang tujuan'); return; }
         if (showBuilding && !buildingId) { toast.error('Pilih gedung/mess tujuan'); return; }
         if (showSupplier && !supplierNama.trim()) { toast.error('Isi nama supplier'); return; }
+        if (showKonsumsiKaryawan && !karyawanId) { toast.error('Pilih karyawan penerima'); return; }
+        if (showKonsumsiDept && !departmentId) { toast.error('Pilih department penerima'); return; }
 
         const invalidDetail = details.find(d => !d.produk_id || !d.uom_id || d.jumlah === 0);
         if (invalidDetail) { toast.error('Lengkapi semua detail item'); return; }
@@ -244,7 +254,8 @@ const TransaksiFormPage = () => {
             gudang_tujuan_id: showGudangTujuan ? gudangTujuanId : null,
             facility_building_id: showBuilding ? buildingId : null,
             facility_room_id: showBuilding && roomId ? roomId : null,
-            karyawan_id: showKaryawan ? karyawanId : null,
+            karyawan_id: (showKaryawan || showKonsumsiKaryawan) ? karyawanId : null,
+            department_id: showKonsumsiDept ? departmentId : null,
             supplier_nama: showSupplier ? supplierNama : null,
             no_referensi: noReferensi || null,
             catatan: catatan || null,
@@ -470,6 +481,62 @@ const TransaksiFormPage = () => {
                             </div>
                         )}
 
+                        {isKonsumsi && (
+                            <div className="flex flex-col gap-1.5 sm:col-span-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Penerima *</label>
+                                <div className="flex gap-4 mb-2">
+                                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="konsumsiTarget" value="karyawan"
+                                            checked={konsumsiTarget === 'karyawan'}
+                                            onChange={() => { setKonsumsiTarget('karyawan'); setDepartmentId(0); }}
+                                        /> Karyawan
+                                    </label>
+                                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="konsumsiTarget" value="department"
+                                            checked={konsumsiTarget === 'department'}
+                                            onChange={() => { setKonsumsiTarget('department'); setKaryawanId(0); setKaryawanNama(''); setKaryawanSearch(''); }}
+                                        /> Department
+                                    </label>
+                                </div>
+                                {showKonsumsiKaryawan && (
+                                    <div className="relative" ref={karyawanDropdownRef}>
+                                        <input type="text" placeholder="Ketik nama karyawan..."
+                                            value={karyawanNama || karyawanSearch}
+                                            onChange={(e) => { setKaryawanSearch(e.target.value); setKaryawanNama(''); setKaryawanId(0); }}
+                                            onFocus={() => { if (karyawanOptions.length > 0) setShowKaryawanDropdown(true); }}
+                                            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
+                                        />
+                                        {karyawanId > 0 && (
+                                            <button type="button" onClick={() => { setKaryawanId(0); setKaryawanNama(''); setKaryawanSearch(''); }}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                                <span className="material-symbols-outlined text-[16px]">close</span>
+                                            </button>
+                                        )}
+                                        {showKaryawanDropdown && karyawanOptions.length > 0 && (
+                                            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                                {karyawanOptions.map((emp) => (
+                                                    <button key={emp.id} type="button"
+                                                        onClick={() => { setKaryawanId(emp.id); setKaryawanNama(`${emp.nama_lengkap} (${emp.nomor_induk_karyawan})`); setKaryawanSearch(''); setShowKaryawanDropdown(false); }}
+                                                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-between items-center">
+                                                        <span className="text-gray-900 dark:text-white">{emp.nama_lengkap}</span>
+                                                        <span className="text-xs text-gray-400 font-mono">{emp.nomor_induk_karyawan}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {showKonsumsiDept && (
+                                    <SearchableSelect
+                                        options={(departmentData?.data as any[] || []).map((d: any) => ({ value: d.id, label: `${d.code ? d.code + ' - ' : ''}${d.nama}` }))}
+                                        value={departmentId || null}
+                                        onChange={(val) => setDepartmentId(Number(val) || 0)}
+                                        placeholder="-- Pilih Department --"
+                                    />
+                                )}
+                            </div>
+                        )}
+
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-200">No. Referensi</label>
                             <input type="text" placeholder="Nomor surat jalan / PO" value={noReferensi} onChange={(e) => setNoReferensi(e.target.value)} className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100" />
@@ -507,7 +574,9 @@ const TransaksiFormPage = () => {
                                         <div className="flex flex-col gap-1.5">
                                             <label className="text-xs font-medium text-gray-500">Produk *</label>
                                             <SearchableSelect
-                                                options={(produkData?.data || []).map(p => ({ value: p.id, label: `${p.code} - ${p.nama}` }))}
+                                                options={(produkData?.data || [])
+                                                    .filter(p => !isKonsumsi || p.is_consumable)
+                                                    .map(p => ({ value: p.id, label: `${p.code} - ${p.nama}` }))}
                                                 value={detail.produk_id || null}
                                                 onChange={(val) => updateDetail(detail._key, 'produk_id', Number(val))}
                                                 placeholder="-- Pilih Produk --"
@@ -560,7 +629,7 @@ const TransaksiFormPage = () => {
                                         </div>
                                     )}
 
-                                    {(selectedProduk?.has_serial_number || selectedProduk?.has_tag_number) && ((tipe !== 'Masuk' && gudangId > 0) || isAmbilGedung) && (
+                                    {(selectedProduk?.has_serial_number || selectedProduk?.has_tag_number) && !selectedProduk?.is_consumable && ((tipe !== 'Masuk' && gudangId > 0) || isAmbilGedung) && (
                                         <div className="flex flex-col gap-1.5">
                                             <label className="text-xs font-medium text-gray-500">
                                                 Pilih {selectedProduk.has_serial_number ? 'Serial Number' : 'Tag Number'}

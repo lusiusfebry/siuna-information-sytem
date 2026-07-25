@@ -11,6 +11,10 @@ import {
     TransaksiFilter,
     SerialNumberFilter,
     KartuStokFilter,
+    LaporanKonsumsiFilter,
+    LaporanKonsumsiResponse,
+    VoidTransaksiPayload,
+    AmendTransaksiPayload,
 } from '../../types/inventory';
 
 const getStok = async (params?: StokFilter): Promise<PaginatedResponse<InvStok>> => {
@@ -28,7 +32,7 @@ const createTransaksi = async (data: TransaksiPayload): Promise<{ status: string
     return response.data;
 };
 
-const getTransaksiList = async (params?: TransaksiFilter): Promise<PaginatedResponse<InvTransaksi>> => {
+const getTransaksiList = async (params?: TransaksiFilter & { include_inactive?: boolean }): Promise<PaginatedResponse<InvTransaksi>> => {
     const response = await client.get<PaginatedResponse<InvTransaksi>>('/inventory/transaksi', { params });
     return response.data;
 };
@@ -40,6 +44,11 @@ const getTransaksiDetail = async (id: number): Promise<{ status: string; data: I
 
 const getKartuStok = async (params: KartuStokFilter): Promise<PaginatedResponse<InvTransaksiDetail>> => {
     const response = await client.get<PaginatedResponse<InvTransaksiDetail>>('/inventory/kartu-stok', { params });
+    return response.data;
+};
+
+const getLaporanKonsumsi = async (params?: LaporanKonsumsiFilter): Promise<LaporanKonsumsiResponse> => {
+    const response = await client.get<LaporanKonsumsiResponse>('/inventory/laporan/konsumsi', { params });
     return response.data;
 };
 
@@ -67,6 +76,16 @@ const rejectTransaksi = async (id: number, reason?: string): Promise<{ status: s
     return response.data;
 };
 
+const voidTransaksi = async (id: number, payload: VoidTransaksiPayload): Promise<{ status: string; data: InvTransaksi; message: string }> => {
+    const response = await client.post<{ status: string; data: InvTransaksi; message: string }>(`/inventory/transaksi/${id}/void`, payload);
+    return response.data;
+};
+
+const amendTransaksi = async (id: number, payload: AmendTransaksiPayload): Promise<{ status: string; data: { reversal: InvTransaksi; koreksi: InvTransaksi | null }; message: string }> => {
+    const response = await client.post<{ status: string; data: { reversal: InvTransaksi; koreksi: InvTransaksi | null }; message: string }>(`/inventory/transaksi/${id}/amend`, payload);
+    return response.data;
+};
+
 const inventoryStokService = {
     getStok,
     getSerialNumbers,
@@ -74,10 +93,13 @@ const inventoryStokService = {
     getTransaksiList,
     getTransaksiDetail,
     getKartuStok,
+    getLaporanKonsumsi,
     uploadDokumen,
     getFacilityInventory,
     approveTransaksi,
     rejectTransaksi,
+    voidTransaksi,
+    amendTransaksi,
 };
 
 export default inventoryStokService;
