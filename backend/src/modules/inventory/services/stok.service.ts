@@ -484,7 +484,7 @@ class StokService {
             }, { transaction: t });
 
             await t.commit();
-            return this.getTransaksiDetail(id);
+            return InvTransaksi.findByPk(id) as Promise<InvTransaksi>;
         } catch (error) {
             await t.rollback();
             throw error;
