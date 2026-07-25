@@ -85,6 +85,14 @@ export interface InvTransaksi {
     approved_by?: number | null;
     approved_at?: string | null;
     rejection_reason?: string | null;
+    voided_by?: number | null;
+    voided_at?: string | null;
+    void_reason?: string | null;
+    amends_transaksi_id?: number | null;
+    amended_by_transaksi_id?: number | null;
+    voider?: { id: number; nama: string } | null;
+    transaksi_asli?: { id: number; code: string } | null;
+    transaksi_koreksi?: { id: number; code: string } | null;
     created_at: string;
     updated_at: string;
     gudang?: { id: number; code: string; nama: string };
@@ -98,7 +106,7 @@ export interface InvTransaksi {
     details?: InvTransaksiDetail[];
 }
 
-export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected' | 'Voided';
 
 export interface InvTransaksiDetail {
     id: number;
@@ -141,6 +149,15 @@ export interface TransaksiDetailPayload {
     jumlah: number;
     catatan?: string;
     serial_numbers?: string[];
+}
+
+export interface VoidTransaksiPayload {
+    reason: string;
+}
+
+export interface AmendTransaksiPayload {
+    reason: string;
+    koreksi?: { details: TransaksiDetailPayload[] };
 }
 
 export interface TransaksiPayload {

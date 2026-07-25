@@ -16,6 +16,7 @@ const APPROVAL_COLORS: Record<ApprovalStatus, string> = {
     'Pending': 'bg-amber-100 text-amber-800',
     'Approved': 'bg-green-100 text-green-800',
     'Rejected': 'bg-red-100 text-red-800',
+    'Voided': 'bg-gray-100 text-gray-500',
 };
 
 const TransaksiListPage = () => {
