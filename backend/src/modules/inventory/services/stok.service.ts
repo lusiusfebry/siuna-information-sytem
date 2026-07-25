@@ -1146,6 +1146,72 @@ class StokService {
      * Mengembalikan daftar baris (per detail) + ringkasan agregat per produk,
      * per divisi/departemen, dan per karyawan.
      */
+    async amendTransaksi(
+        id: number,
+        userId: number,
+        reason: string,
+        koreksi?: { details: TransaksiDetailPayload[] },
+    ): Promise<{ reversal: InvTransaksi; koreksi: InvTransaksi | null }> {
+        const trimmed = reason?.trim() ?? '';
+        if (trimmed.length < 5) {
+            throw new AppError('Alasan wajib diisi (minimal 5 karakter)', 400);
+        }
+
+        const t = await sequelize.transaction();
+        try {
+            const original = await InvTransaksi.findByPk(id, {
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+            if (!original) throw new AppError('Transaksi tidak ditemukan', 404);
+
+            if (original.approval_status !== 'Approved') {
+                throw new AppError(
+                    `Hanya transaksi berstatus Approved yang bisa dikoreksi. Transaksi ini berstatus ${original.approval_status}.`,
+                    400,
+                );
+            }
+            if (original.amended_by_transaksi_id) {
+                throw new AppError(
+                    `Transaksi ini sudah pernah dikoreksi sebelumnya (lihat #${original.amended_by_transaksi_id}).`,
+                    400,
+                );
+            }
+            if (original.amends_transaksi_id) {
+                throw new AppError('Transaksi reversal/koreksi tidak bisa di-amend.', 400);
+            }
+            if (original.sub_tipe === 'Transfer Gudang'
+                && original.catatan?.startsWith('Auto-generated dari transfer masuk')) {
+                throw new AppError(
+                    'Untuk membatalkan transfer, amend transaksi Transfer Masuk-nya.',
+                    400,
+                );
+            }
+
+            const details = await InvTransaksiDetail.findAll({
+                where: { transaksi_id: id },
+                transaction: t,
+            });
+
+            await this.validateReversalGuards(original, details, t);
+
+            // Reversal + koreksi — implementasi penuh di Task 6-7.
+            throw new AppError('Amend belum diimplementasikan lengkap', 501);
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
+
+    private async validateReversalGuards(
+        _original: InvTransaksi,
+        _details: InvTransaksiDetail[],
+        _t: Transaction,
+    ): Promise<void> {
+        // Guard serial & facility — implementasi penuh di Task 6-7.
+        return;
+    }
+
     async getLaporanKonsumsi(filters: any) {
         const { department_id, karyawan_id, gudang_id, produk_id, dari, sampai, departmentFilter, page = 1, limit = 20 } = filters;
 
