@@ -210,6 +210,7 @@ describe('amendTransaksi — reversal non-serial', () => {
     });
 
     it('Amend + koreksi.details: reversal + koreksi baru dibuat sebagai transaksi terpisah', async () => {
+
         const tx = makeTx();
         db.transaction.mockResolvedValue(tx);
         const original = approvedSupplier();
@@ -236,5 +237,102 @@ describe('amendTransaksi — reversal non-serial', () => {
         expect(Trx.create).toHaveBeenCalledTimes(2);
         expect(result).toHaveProperty('reversal');
         expect(result).toHaveProperty('koreksi');
+    });
+});
+
+describe('amendTransaksi — reversal serial', () => {
+    it('Ke Karyawan: reversal Retur Karyawan dengan serial yang sama', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Keluar', sub_tipe: 'Ke Karyawan', karyawan_id: 3,
+        });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 1, catatan: null, serial_numbers: ['SN-001'] },
+        ]);
+        // Guard: serial masih di posisi asli (transaksi_terakhir_id = 100)
+        Serial.findAll.mockResolvedValue([
+            { serial_number: 'SN-001', transaksi_terakhir_id: 100, karyawan_id: 3, status: 'Digunakan' },
+        ]);
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 300, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: true, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 5, update: jest.fn().mockResolvedValue(undefined),
+        });
+        Serial.update.mockResolvedValue([1]);
+
+        await stokService.amendTransaksi(100, 9, 'Salah karyawan penerima');
+
+        const reversalArgs = Trx.create.mock.calls[0][0];
+        expect(reversalArgs.tipe).toBe('Masuk');
+        expect(reversalArgs.sub_tipe).toBe('Retur Karyawan');
+        expect(reversalArgs.karyawan_id).toBe(3);
+        expect(TrxDetail.create.mock.calls[0][0].serial_numbers).toEqual(['SN-001']);
+    });
+
+    it('Retur Karyawan: reversal Ke Karyawan ke karyawan yang sama', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Masuk', sub_tipe: 'Retur Karyawan', karyawan_id: 3,
+        });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 1, catatan: null, serial_numbers: ['SN-002'] },
+        ]);
+        Serial.findAll.mockResolvedValue([
+            { serial_number: 'SN-002', transaksi_terakhir_id: 100, gudang_id: 1, status: 'Tersedia' },
+        ]);
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 301, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: true, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 5, update: jest.fn().mockResolvedValue(undefined),
+        });
+        (require('../../models/SerialNumber').default.findOne as jest.Mock).mockResolvedValue({
+            update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Retur diproses karena salah');
+
+        const reversalArgs = Trx.create.mock.calls[0][0];
+        expect(reversalArgs.tipe).toBe('Keluar');
+        expect(reversalArgs.sub_tipe).toBe('Ke Karyawan');
+        expect(reversalArgs.karyawan_id).toBe(3);
+    });
+
+    it('Guard: menolak 409 jika serial sudah dipindah oleh transaksi lain', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({
+            id: 100, tipe: 'Keluar', sub_tipe: 'Ke Karyawan', karyawan_id: 3,
+        });
+        Trx.findByPk.mockResolvedValue(original);
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 1, catatan: null, serial_numbers: ['SN-001'] },
+        ]);
+        // Serial sudah dipindah oleh transaksi 555
+        Serial.findAll.mockResolvedValue([
+            { serial_number: 'SN-001', transaksi_terakhir_id: 555, karyawan_id: 8, status: 'Digunakan' },
+        ]);
+
+        try {
+            await stokService.amendTransaksi(100, 9, 'Salah karyawan penerima');
+            throw new Error('Should have thrown');
+        } catch (e: any) {
+            expect(e.message).toMatch(/sudah dipindah/);
+            expect(e.statusCode).toBe(409);
+        }
+        expect(tx.rollback).toHaveBeenCalled();
     });
 });

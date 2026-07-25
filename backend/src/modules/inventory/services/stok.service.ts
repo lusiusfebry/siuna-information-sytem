@@ -290,7 +290,7 @@ class StokService {
                 uom_id: detail.uom_id,
                 jumlah: detail.jumlah,
                 catatan: detail.catatan || null,
-                serial_numbers: requiresApproval ? (detail.serial_numbers ?? null) : null,
+                serial_numbers: detail.serial_numbers ?? null,
             }, { transaction: t });
         }
 
@@ -1199,6 +1199,18 @@ class StokService {
 
             const reversal = await this.createTransaksiInternal(reversalSpec.primary, userId, t, { autoApprove: true });
             await this.applyTransaksiEffects(reversal, reversalSpec.primary, userId, t);
+
+            if (['Disposal', 'Rusak/Terbuang'].includes(original.sub_tipe)) {
+                for (const d of details) {
+                    if ((d.serial_numbers as any)?.length) {
+                        await InvSerialNumber.update(
+                            { status: 'Tersedia', gudang_id: original.gudang_id, transaksi_terakhir_id: reversal.id } as any,
+                            { where: { serial_number: d.serial_numbers as any }, transaction: t },
+                        );
+                    }
+                }
+            }
+
             await reversal.update({
                 approved_by: userId,
                 approved_at: new Date(),
@@ -1255,12 +1267,26 @@ class StokService {
     }
 
     private async validateReversalGuards(
-        _original: InvTransaksi,
-        _details: InvTransaksiDetail[],
-        _t: Transaction,
+        original: InvTransaksi,
+        details: InvTransaksiDetail[],
+        t: Transaction,
     ): Promise<void> {
-        // Guard serial & facility — implementasi penuh di Task 7-8.
-        return;
+        const allSerials = details.flatMap((d) => d.serial_numbers ?? []);
+        if (allSerials.length > 0) {
+            const rows = await InvSerialNumber.findAll({
+                where: { serial_number: allSerials },
+                transaction: t,
+            }) as any[];
+            for (const row of rows) {
+                if (row.transaksi_terakhir_id !== original.id) {
+                    throw new AppError(
+                        `Serial ${row.serial_number} sudah dipindah oleh transaksi lain setelah transaksi ini. Koreksi otomatis tidak aman.`,
+                        409,
+                    );
+                }
+            }
+        }
+        // Guard fasilitas di Task 8.
     }
 
     /**
@@ -1330,7 +1356,55 @@ class StokService {
                         details: mapDetails((d) => -d.jumlah),
                     },
                 };
-            // Cabang serial/transfer/fasilitas ditambahkan di Task 7-8.
+            case 'Ke Karyawan':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Masuk',
+                        sub_tipe: 'Retur Karyawan' as any,
+                        karyawan_id: original.karyawan_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Retur Karyawan':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Keluar',
+                        sub_tipe: 'Ke Karyawan' as any,
+                        karyawan_id: original.karyawan_id ?? undefined,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            case 'Disposal':
+            case 'Rusak/Terbuang':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: details.map((d) => ({
+                            produk_id: d.produk_id,
+                            uom_id: d.uom_id,
+                            jumlah: Math.abs(d.jumlah),
+                            serial_numbers: d.serial_numbers ?? undefined,
+                            catatan: d.catatan ?? undefined,
+                        })),
+                    },
+                };
+            // Cabang transfer/fasilitas ditambahkan di Task 8.
             default:
                 throw new AppError(
                     `Amend untuk sub_tipe ${original.sub_tipe} belum didukung. Hubungi admin.`,
