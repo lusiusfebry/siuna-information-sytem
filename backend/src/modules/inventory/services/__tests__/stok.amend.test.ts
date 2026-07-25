@@ -72,6 +72,7 @@ beforeEach(() => {
     jest.clearAllMocks();
     db.query.mockResolvedValue([[], []]);
     Trx.findOne.mockResolvedValue(null);
+    Serial.findAll.mockResolvedValue([]);
 });
 
 describe('amendTransaksi — guards (§3.2 spec)', () => {
@@ -116,5 +117,124 @@ describe('amendTransaksi — guards (§3.2 spec)', () => {
         db.transaction.mockResolvedValue(tx);
         await expect(stokService.amendTransaksi(100, 9, '  ok  '))
             .rejects.toThrow(/minimal 5 karakter/);
+    });
+});
+
+describe('amendTransaksi — reversal non-serial', () => {
+    it('Supplier: reversal Adjustment -N, transaksi asli ditandai amended_by', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+
+        const original = approvedSupplier();
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 5, catatan: null, serial_numbers: null },
+        ]);
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 200, ...v,
+            update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: false, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 100, update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Salah input quantity');
+
+        const reversalArgs = Trx.create.mock.calls[0][0];
+        expect(reversalArgs.tipe).toBe('Adjustment');
+        expect(reversalArgs.sub_tipe).toBe('Supplier');
+        expect(reversalArgs.amends_transaksi_id).toBeUndefined();
+        expect(reversalArgs.approval_status).toBe('Approved');
+        const detailArgs = TrxDetail.create.mock.calls[0][0];
+        expect(detailArgs.jumlah).toBe(-5);
+        expect(original.update).toHaveBeenCalledWith(
+            expect.objectContaining({ amended_by_transaksi_id: 200 }),
+            expect.anything(),
+        );
+        expect(tx.commit).toHaveBeenCalled();
+    });
+
+    it('Konsumsi: reversal Adjustment +N di gudang yang sama', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({ tipe: 'Keluar', sub_tipe: 'Konsumsi', karyawan_id: 3 });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 5, catatan: null, serial_numbers: null },
+        ]);
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 201, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: false, has_tag_number: false, is_consumable: true,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 50, update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Salah input jumlah konsumsi');
+
+        const reversalArgs = Trx.create.mock.calls[0][0];
+        expect(reversalArgs.tipe).toBe('Adjustment');
+        expect(TrxDetail.create.mock.calls[0][0].jumlah).toBe(5);
+        expect(reversalArgs.gudang_id).toBe(1);
+    });
+
+    it('Adjustment: reversal Adjustment dengan jumlah dinegasi', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier({ tipe: 'Adjustment', sub_tipe: 'Adjustment' });
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: -3, catatan: null, serial_numbers: null },
+        ]);
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: 202, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: false, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 100, update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        await stokService.amendTransaksi(100, 9, 'Adjustment salah arah');
+        const detailArgs = TrxDetail.create.mock.calls[0][0];
+        expect(detailArgs.jumlah).toBe(3);
+    });
+
+    it('Amend + koreksi.details: reversal + koreksi baru dibuat sebagai transaksi terpisah', async () => {
+        const tx = makeTx();
+        db.transaction.mockResolvedValue(tx);
+        const original = approvedSupplier();
+        Trx.findByPk.mockImplementation((_id: number, opts: any) =>
+            opts?.lock ? Promise.resolve(original) : Promise.resolve({ toJSON: () => ({ id: _id, details: [] }) }));
+        TrxDetail.findAll.mockResolvedValue([
+            { produk_id: 10, uom_id: 1, jumlah: 5, catatan: null, serial_numbers: null },
+        ]);
+        let createIdCounter = 200;
+        Trx.create.mockImplementation((v: any) => Promise.resolve({
+            id: ++createIdCounter, ...v, update: jest.fn().mockResolvedValue(undefined),
+        }));
+        (require('../../models/Produk').default.findByPk as jest.Mock).mockResolvedValue({
+            id: 10, has_serial_number: false, has_tag_number: false,
+        });
+        (require('../../models/Stok').default.findOne as jest.Mock).mockResolvedValue({
+            jumlah: 100, update: jest.fn().mockResolvedValue(undefined),
+        });
+
+        const result = await stokService.amendTransaksi(100, 9, 'Salah input quantity, seharusnya 3', {
+            details: [{ produk_id: 10, uom_id: 1, jumlah: 3 }],
+        });
+
+        expect(Trx.create).toHaveBeenCalledTimes(2);
+        expect(result).toHaveProperty('reversal');
+        expect(result).toHaveProperty('koreksi');
     });
 });

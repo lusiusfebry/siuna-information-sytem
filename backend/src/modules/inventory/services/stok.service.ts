@@ -1195,8 +1195,59 @@ class StokService {
 
             await this.validateReversalGuards(original, details, t);
 
-            // Reversal + koreksi — implementasi penuh di Task 6-7.
-            throw new AppError('Amend belum diimplementasikan lengkap', 501);
+            const reversalSpec = this.buildReversalPayload(original, details, userId, trimmed);
+
+            const reversal = await this.createTransaksiInternal(reversalSpec.primary, userId, t, { autoApprove: true });
+            await this.applyTransaksiEffects(reversal, reversalSpec.primary, userId, t);
+            await reversal.update({
+                approved_by: userId,
+                approved_at: new Date(),
+                amends_transaksi_id: original.id,
+            }, { transaction: t });
+
+            if (reversalSpec.paired) {
+                const pairedRow = await this.createTransaksiInternal(reversalSpec.paired, userId, t, { autoApprove: true });
+                await this.applyTransaksiEffects(pairedRow, reversalSpec.paired, userId, t);
+                await pairedRow.update({
+                    approved_by: userId,
+                    approved_at: new Date(),
+                    amends_transaksi_id: original.id,
+                }, { transaction: t });
+            }
+
+            await original.update({ amended_by_transaksi_id: reversal.id }, { transaction: t });
+
+            let koreksiRow: InvTransaksi | null = null;
+            if (koreksi?.details?.length) {
+                const koreksiPayload: TransaksiPayload = {
+                    tipe: original.tipe,
+                    sub_tipe: original.sub_tipe as any,
+                    tanggal: original.tanggal,
+                    gudang_id: original.gudang_id,
+                    gudang_tujuan_id: original.gudang_tujuan_id ?? undefined,
+                    facility_building_id: original.facility_building_id ?? undefined,
+                    facility_room_id: original.facility_room_id ?? undefined,
+                    karyawan_id: original.karyawan_id ?? undefined,
+                    department_id: original.department_id ?? undefined,
+                    supplier_nama: original.supplier_nama ?? undefined,
+                    no_referensi: original.no_referensi ?? undefined,
+                    catatan: `Koreksi dari ${original.code}: ${trimmed}`,
+                    created_by: userId,
+                    details: koreksi.details,
+                };
+                koreksiRow = await this.createTransaksiInternal(koreksiPayload, userId, t, { autoApprove: true });
+                await this.applyTransaksiEffects(koreksiRow, koreksiPayload, userId, t);
+                await koreksiRow.update({
+                    approved_by: userId,
+                    approved_at: new Date(),
+                }, { transaction: t });
+            }
+
+            await t.commit();
+            return {
+                reversal: await this.getTransaksiDetail(reversal.id),
+                koreksi: koreksiRow ? await this.getTransaksiDetail(koreksiRow.id) : null,
+            };
         } catch (error) {
             await t.rollback();
             throw error;
@@ -1208,8 +1259,84 @@ class StokService {
         _details: InvTransaksiDetail[],
         _t: Transaction,
     ): Promise<void> {
-        // Guard serial & facility — implementasi penuh di Task 6-7.
+        // Guard serial & facility — implementasi penuh di Task 7-8.
         return;
+    }
+
+    /**
+     * Bangun payload transaksi reversal (efek kebalikan) dari transaksi asli.
+     *
+     * Peta invers (§3.1 spec) untuk sub-tipe non-serial:
+     * - Supplier   → tipe Adjustment, jumlah -|N| (tarik kembali stok masuk)
+     * - Konsumsi   → tipe Adjustment, jumlah +|N| (kembalikan stok yang dikonsumsi)
+     * - Adjustment → tipe Adjustment, jumlah dinegasi langsung (-N)
+     *
+     * `sub_tipe` asli dipertahankan (bukan hardcode 'Adjustment') supaya jejak audit
+     * tetap terbaca — "reversal Supplier" tetap tampil sebagai Supplier di header.
+     * `handleAdjustment` bekerja pada `tipe === 'Adjustment'` tanpa memedulikan sub_tipe.
+     */
+    private buildReversalPayload(
+        original: InvTransaksi,
+        details: InvTransaksiDetail[],
+        userId: number,
+        reason: string,
+    ): { primary: TransaksiPayload; paired?: TransaksiPayload } {
+        const baseHeader = {
+            tanggal: new Date().toISOString().slice(0, 10),
+            gudang_id: original.gudang_id,
+            karyawan_id: original.karyawan_id ?? undefined,
+            department_id: original.department_id ?? undefined,
+            facility_building_id: original.facility_building_id ?? undefined,
+            facility_room_id: original.facility_room_id ?? undefined,
+            supplier_nama: original.supplier_nama ?? undefined,
+            no_referensi: original.no_referensi ?? undefined,
+            catatan: `REVERSAL transaksi ${original.code}: ${reason}`,
+            created_by: userId,
+        };
+
+        const mapDetails = (jumlah: (d: InvTransaksiDetail) => number) =>
+            details.map((d) => ({
+                produk_id: d.produk_id,
+                uom_id: d.uom_id,
+                jumlah: jumlah(d),
+                catatan: d.catatan ?? undefined,
+            }));
+
+        switch (original.sub_tipe as string) {
+            case 'Supplier':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => -Math.abs(d.jumlah)),
+                    },
+                };
+            case 'Konsumsi':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => Math.abs(d.jumlah)),
+                    },
+                };
+            case 'Adjustment':
+                return {
+                    primary: {
+                        ...baseHeader,
+                        tipe: 'Adjustment',
+                        sub_tipe: original.sub_tipe as any,
+                        details: mapDetails((d) => -d.jumlah),
+                    },
+                };
+            // Cabang serial/transfer/fasilitas ditambahkan di Task 7-8.
+            default:
+                throw new AppError(
+                    `Amend untuk sub_tipe ${original.sub_tipe} belum didukung. Hubungi admin.`,
+                    501,
+                );
+        }
     }
 
     async getLaporanKonsumsi(filters: any) {
