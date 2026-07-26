@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { validateInventoryMasterData } from '../../../shared/middleware/validateInventoryMasterData';
 import { validateInventoryStok, validateVoid, validateAmend } from '../../../shared/middleware/validateInventoryStok';
+import { validateCreateOpname, validateUpsertOpnameDetail, validateUpsertOpnameSerial, validateCancelOpname } from '../../../shared/middleware/validateOpname';
 import masterDataController from '../controllers/master-data.controller';
 import stokController from '../controllers/stok.controller';
+import opnameController from '../controllers/opname.controller';
 import dashboardController from '../controllers/dashboard.controller';
 import exportController from '../controllers/export.controller';
 import importController from '../controllers/import.controller';
@@ -165,6 +167,77 @@ router.post(
     validateAmend,
     auditLogger('inv_transaksi'),
     (req, res, next) => stokController.amendTransaksi(req, res, next),
+);
+
+// === Stock Opname Routes ===
+// Semua di bawah /api/inventory/opname, JWT + RBAC inventory_stock.
+router.get(
+    '/opname',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => opnameController.listSessions(req, res, next),
+);
+
+router.get(
+    '/opname/:id',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => opnameController.getSession(req, res, next),
+);
+
+router.post(
+    '/opname',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.CREATE),
+    validateCreateOpname,
+    auditLogger('inv_opname_session'),
+    (req, res, next) => opnameController.createSession(req, res, next),
+);
+
+router.post(
+    '/opname/:id/start',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),
+    auditLogger('inv_opname_session'),
+    (req, res, next) => opnameController.startSession(req, res, next),
+);
+
+router.put(
+    '/opname/:id/detail',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),
+    validateUpsertOpnameDetail,
+    (req, res, next) => opnameController.upsertDetail(req, res, next),
+);
+
+router.put(
+    '/opname/:id/serial',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),
+    validateUpsertOpnameSerial,
+    (req, res, next) => opnameController.upsertSerial(req, res, next),
+);
+
+router.post(
+    '/opname/:id/finish',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.UPDATE),
+    auditLogger('inv_opname_session'),
+    (req, res, next) => opnameController.finishSession(req, res, next),
+);
+
+router.post(
+    '/opname/:id/approve',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    auditLogger('inv_opname_session'),
+    (req, res, next) => opnameController.approveSession(req, res, next),
+);
+
+router.post(
+    '/opname/:id/cancel',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.APPROVE),
+    validateCancelOpname,
+    auditLogger('inv_opname_session'),
+    (req, res, next) => opnameController.cancelSession(req, res, next),
+);
+
+router.get(
+    '/opname/:id/berita-acara',
+    checkPermission(RESOURCES.INVENTORY_STOCK, ACTIONS.READ),
+    (req, res, next) => opnameController.exportBeritaAcara(req, res, next),
 );
 
 // === Dashboard Routes ===

@@ -8,6 +8,10 @@ import InvStok from './Stok';
 import InvTransaksi from './Transaksi';
 import InvTransaksiDetail from './TransaksiDetail';
 import InvSerialNumber from './SerialNumber';
+import InvOpnameSession from './OpnameSession';
+import InvOpnameDetail from './OpnameDetail';
+import InvOpnamePetugas from './OpnamePetugas';
+import InvOpnameSerial from './OpnameSerial';
 import Employee from '../../hr/models/Employee';
 import Department from '../../hr/models/Department';
 import LokasiKerja from '../../hr/models/LokasiKerja';
@@ -75,3 +79,22 @@ InvSerialNumber.belongsTo(InvGudang, { foreignKey: 'gudang_id', as: 'gudang' });
 InvSerialNumber.belongsTo(Employee, { foreignKey: 'karyawan_id', as: 'karyawan' });
 InvSerialNumber.belongsTo(InvTransaksi, { foreignKey: 'transaksi_masuk_id', as: 'transaksi_masuk' });
 InvSerialNumber.belongsTo(InvTransaksi, { foreignKey: 'transaksi_terakhir_id', as: 'transaksi_terakhir' });
+
+// OpnameSession -> Gudang, Transaksi, User; OpnameDetail -> Session, Produk
+InvOpnameSession.belongsTo(InvGudang, { foreignKey: 'gudang_id', as: 'gudang' });
+InvOpnameSession.belongsTo(InvTransaksi, { foreignKey: 'transaksi_id', as: 'transaksi' });
+InvOpnameSession.belongsTo(User, { foreignKey: 'created_by', as: 'creator' });
+InvOpnameSession.belongsTo(User, { foreignKey: 'approved_by', as: 'approver' });
+InvOpnameSession.hasMany(InvOpnameDetail, { foreignKey: 'opname_session_id', as: 'detail' });
+InvOpnameDetail.belongsTo(InvOpnameSession, { foreignKey: 'opname_session_id', as: 'session' });
+InvOpnameDetail.belongsTo(InvProduk, { foreignKey: 'produk_id', as: 'produk' });
+
+// OpnamePetugas: karyawan yang melakukan opname (many-to-many via join table)
+InvOpnameSession.hasMany(InvOpnamePetugas, { foreignKey: 'opname_session_id', as: 'petugas' });
+InvOpnamePetugas.belongsTo(InvOpnameSession, { foreignKey: 'opname_session_id', as: 'session' });
+InvOpnamePetugas.belongsTo(Employee, { foreignKey: 'karyawan_id', as: 'karyawan' });
+
+// OpnameSerial: snapshot per unit ber-serial/tag di gudang saat sesi dimulai
+InvOpnameDetail.hasMany(InvOpnameSerial, { foreignKey: 'opname_detail_id', as: 'serials' });
+InvOpnameSerial.belongsTo(InvOpnameDetail, { foreignKey: 'opname_detail_id', as: 'detail' });
+InvOpnameSerial.belongsTo(InvSerialNumber, { foreignKey: 'serial_number_id', as: 'serial' });
