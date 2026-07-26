@@ -8,6 +8,10 @@ import InvStok from './Stok';
 import InvTransaksi from './Transaksi';
 import InvTransaksiDetail from './TransaksiDetail';
 import InvSerialNumber from './SerialNumber';
+import InvOpnameSession from './OpnameSession';
+import InvOpnameDetail from './OpnameDetail';
+import InvOpnamePetugas from './OpnamePetugas';
+import InvOpnameSerial from './OpnameSerial';
 import './associations';
 
 export {
@@ -21,4 +25,8 @@ export {
     InvTransaksi,
     InvTransaksiDetail,
     InvSerialNumber,
+    InvOpnameSession,
+    InvOpnameDetail,
+    InvOpnamePetugas,
+    InvOpnameSerial,
 };

@@ -52,6 +52,8 @@ const ReturPage = lazy(() => import('./pages/inventory/stok/ReturPage'));
 const TransaksiListPage = lazy(() => import('./pages/inventory/stok/TransaksiListPage'));
 const KartuStokPage = lazy(() => import('./pages/inventory/stok/KartuStokPage'));
 const LaporanKonsumsiPage = lazy(() => import('./pages/inventory/stok/LaporanKonsumsiPage'));
+const OpnameListPage = lazy(() => import('./pages/inventory/stok/OpnameListPage'));
+const OpnameDetailPage = lazy(() => import('./pages/inventory/stok/OpnameDetailPage'));
 
 // Inventory Dashboard & Label Pages
 const InventoryDashboardPage = lazy(() => import('./pages/inventory/DashboardPage'));
@@ -232,6 +234,12 @@ function App() {
                         } />
                         <Route path="laporan-konsumsi" element={
                             <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.READ} redirectTo="/403"><LaporanKonsumsiPage /></PermissionGuard>
+                        } />
+                        <Route path="opname" element={
+                            <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.READ} redirectTo="/403"><OpnameListPage /></PermissionGuard>
+                        } />
+                        <Route path="opname/:id" element={
+                            <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.READ} redirectTo="/403"><OpnameDetailPage /></PermissionGuard>
                         } />
                         <Route path="label" element={
                             <PermissionGuard resource={RESOURCES.INVENTORY_STOCK} action={ACTIONS.READ} redirectTo="/403"><LabelPage /></PermissionGuard>

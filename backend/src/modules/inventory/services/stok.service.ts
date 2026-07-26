@@ -5,6 +5,7 @@ import InvStok from '../models/Stok';
 import InvTransaksi from '../models/Transaksi';
 import InvTransaksiDetail from '../models/TransaksiDetail';
 import InvSerialNumber from '../models/SerialNumber';
+import InvOpnameSession from '../models/OpnameSession';
 import InvProduk from '../models/Produk';
 import InvGudang from '../models/Gudang';
 import InvUom from '../models/Uom';
@@ -297,9 +298,37 @@ class StokService {
         return transaksi;
     }
 
+    // Cek apakah gudang sedang punya sesi opname 'Berjalan' — dipakai guard transaksi
+    // dan endpoint frontend. Diindeks (gudang_id, status).
+    async isGudangLocked(gudangId: number, t?: Transaction): Promise<boolean> {
+        const count = await InvOpnameSession.count({
+            where: { gudang_id: gudangId, status: 'Berjalan' },
+            transaction: t,
+        });
+        return count > 0;
+    }
+
     async createTransaksi(payload: TransaksiPayload, userId: number | null) {
         const t = await sequelize.transaction();
         try {
+            // Lock gudang saat sesi opname Berjalan (INV opname §4.4). Adjustment hasil
+            // opname sendiri di-generate lewat createAndApplyAdjustment, bukan jalur ini.
+            const gudangSumber = payload.gudang_id;
+            if (gudangSumber && await this.isGudangLocked(gudangSumber, t)) {
+                throw new AppError(
+                    'Gudang sedang dalam sesi stock opname aktif. Transaksi ke gudang ini dikunci sampai opname selesai.',
+                    409,
+                );
+            }
+            // Transfer Gudang juga memindahkan stok dari gudang tujuan (leg keluar) —
+            // kunci bila gudang tujuan sedang opname.
+            if (payload.gudang_tujuan_id && await this.isGudangLocked(payload.gudang_tujuan_id, t)) {
+                throw new AppError(
+                    'Gudang tujuan sedang dalam sesi stock opname aktif. Transaksi ke gudang ini dikunci sampai opname selesai.',
+                    409,
+                );
+            }
+
             const transaksi = await this.createTransaksiInternal(payload, userId, t);
             const isApproved = transaksi.approval_status === 'Approved';
 
@@ -321,6 +350,48 @@ class StokService {
             await t.rollback();
             throw error;
         }
+    }
+
+    // Buat transaksi Adjustment langsung berstatus Approved + apply efek stok dalam
+    // transaksi DB yang diberikan (t). Dipakai oleh alur approve stock opname, yang
+    // sudah punya jalur approval sendiri — approver opname = approver Adjustment ini,
+    // jadi tidak melewati approval Pending ganda. Guard lock gudang TIDAK berlaku di
+    // sini karena Adjustment ini justru dihasilkan saat opname di-approve.
+    // Delta bertanda: jumlah > 0 menambah stok, < 0 mengurangi (handleAdjustment).
+    async createAndApplyAdjustment(
+        payload: {
+            gudang_id: number;
+            catatan?: string;
+            tanggal?: string;
+            detail: Array<{ produk_id: number; jumlah: number; catatan?: string }>;
+        },
+        userId: number | null,
+        t: Transaction,
+    ): Promise<InvTransaksi> {
+        // Resolusi uom_id dari produk default (kolom uom_id, migration 49). Diperlukan
+        // handleAdjustment saat harus membuat baris stok baru (delta positif).
+        const details: TransaksiDetailPayload[] = [];
+        for (const d of payload.detail) {
+            const produk = await InvProduk.findByPk(d.produk_id, { transaction: t });
+            if (!produk) throw new AppError(`Produk dengan ID ${d.produk_id} tidak ditemukan`, 404);
+            const uomId = (produk as any).uom_id;
+            if (!uomId) throw new AppError(`Produk ${produk.code || d.produk_id} belum memiliki UOM default`, 400);
+            details.push({ produk_id: d.produk_id, uom_id: uomId, jumlah: d.jumlah, catatan: d.catatan });
+        }
+
+        const fullPayload: TransaksiPayload = {
+            tipe: 'Adjustment',
+            sub_tipe: 'Opname',
+            tanggal: payload.tanggal ?? new Date().toISOString().slice(0, 10),
+            gudang_id: payload.gudang_id,
+            catatan: payload.catatan,
+            details,
+        };
+
+        const transaksi = await this.createTransaksiInternal(fullPayload, userId, t, { autoApprove: true });
+        await this.applyTransaksiEffects(transaksi, fullPayload, userId, t);
+        await transaksi.update({ approved_by: userId, approved_at: new Date() }, { transaction: t });
+        return transaksi;
     }
 
     // Movements that reduce or reconcile stock require approval (INV-N07). See the

@@ -248,3 +248,113 @@ export interface LaporanKonsumsiResponse {
         totalPages: number;
     };
 }
+
+// === Stock Opname Types ===
+
+export type OpnameStatus = 'Draft' | 'Berjalan' | 'Selesai' | 'Approved' | 'Dibatalkan';
+
+export type OpnameSerialKondisi = 'Ada' | 'Tidak Ada';
+
+export interface InvOpnameSerial {
+    id: number;
+    opname_detail_id: number;
+    serial_number_id: number;
+    serial_number: string | null;
+    tag_number: string | null;
+    kondisi: OpnameSerialKondisi;
+    catatan?: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface InvOpnameDetail {
+    id: number;
+    opname_session_id: number;
+    produk_id: number;
+    jumlah_sistem_snapshot: number;
+    jumlah_fisik: number | null;
+    selisih: number | null;
+    catatan?: string | null;
+    tipe_hitung: 'Fisik' | 'Serial';
+    created_at: string;
+    updated_at: string;
+    produk?: {
+        id: number;
+        code: string;
+        nama: string;
+        has_serial_number?: boolean;
+        has_tag_number?: boolean;
+        uom?: { id: number; nama: string };
+    };
+    serials?: InvOpnameSerial[];
+}
+
+export interface OpnameKaryawanRingkas {
+    id: number;
+    nama_lengkap: string;
+    nomor_induk_karyawan?: string | null;
+    manager?: {
+        id: number;
+        nama_lengkap: string;
+        nomor_induk_karyawan?: string | null;
+    } | null;
+}
+
+export interface InvOpnamePetugas {
+    id: number;
+    opname_session_id: number;
+    karyawan_id: number;
+    karyawan?: OpnameKaryawanRingkas;
+}
+
+export interface InvOpnameSession {
+    id: number;
+    kode: string;
+    gudang_id: number;
+    status: OpnameStatus;
+    tanggal_mulai?: string | null;
+    tanggal_selesai?: string | null;
+    catatan?: string | null;
+    transaksi_id?: number | null;
+    created_by?: number | null;
+    approved_by?: number | null;
+    approved_at?: string | null;
+    created_at: string;
+    updated_at: string;
+    gudang?: {
+        id: number;
+        code: string;
+        nama: string;
+        department_id?: number | null;
+        penanggung_jawab?: OpnameKaryawanRingkas | null;
+        department?: { id: number; code: string; nama: string } | null;
+    };
+    creator?: { id: number; nama: string } | null;
+    approver?: { id: number; nama: string } | null;
+    transaksi?: { id: number; code: string } | null;
+    petugas?: InvOpnamePetugas[];
+    detail?: InvOpnameDetail[];
+}
+
+export interface OpnameFilter {
+    gudang_id?: number;
+    status?: OpnameStatus;
+}
+
+export interface CreateOpnamePayload {
+    gudang_id: number;
+    catatan?: string | null;
+    petugas_ids: number[];
+}
+
+export interface UpsertOpnameDetailPayload {
+    produk_id: number;
+    jumlah_fisik: number | null;
+    catatan?: string | null;
+}
+
+export interface UpsertOpnameSerialPayload {
+    opname_serial_id: number;
+    kondisi: OpnameSerialKondisi;
+    catatan?: string | null;
+}
