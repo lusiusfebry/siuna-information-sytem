@@ -182,6 +182,7 @@ export interface StokFilter {
     search?: string;
     page?: number;
     limit?: number;
+    hide_zero?: boolean;
 }
 
 export interface TransaksiFilter {

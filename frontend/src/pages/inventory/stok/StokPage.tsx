@@ -9,9 +9,10 @@ const StokPage = () => {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [gudangId, setGudangId] = useState<number | undefined>();
+    const [hideZero, setHideZero] = useState(false);
     const [selectedStok, setSelectedStok] = useState<InvStok | null>(null);
 
-    const { data, isLoading, isError, refetch } = useStokList({ page, limit: 15, search, gudang_id: gudangId });
+    const { data, isLoading, isError, refetch } = useStokList({ page, limit: 15, search, gudang_id: gudangId, hide_zero: hideZero });
     const { data: gudangData } = useInvGudangList({ limit: 100, status: 'Aktif' });
 
     const isTracked = (item: InvStok) => item.produk?.has_serial_number || item.produk?.has_tag_number;
@@ -23,7 +24,7 @@ const StokPage = () => {
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Saldo stok per gudang — klik baris bertanda <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">Tracked</span> untuk melihat detail asset tag</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
                 <input
                     type="text"
                     placeholder="Cari produk..."
@@ -41,6 +42,15 @@ const StokPage = () => {
                         <option key={g.id} value={g.id}>{g.nama}</option>
                     ))}
                 </select>
+                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer select-none whitespace-nowrap">
+                    <input
+                        type="checkbox"
+                        checked={hideZero}
+                        onChange={(e) => { setHideZero(e.target.checked); setPage(1); }}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    Sembunyikan stok kosong
+                </label>
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">

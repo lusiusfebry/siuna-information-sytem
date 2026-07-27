@@ -146,12 +146,13 @@ class StokService {
     }
 
     async getStokList(filters: any) {
-        const { gudang_id, produk_id, search, departmentFilter, page = 1, limit = 10 } = filters;
+        const { gudang_id, produk_id, search, departmentFilter, hide_zero, page = 1, limit = 10 } = filters;
         const offset = (Number(page) - 1) * Number(limit);
         const where: any = {};
 
         if (gudang_id) where.gudang_id = gudang_id;
         if (produk_id) where.produk_id = produk_id;
+        if (hide_zero === true || hide_zero === 'true') where.jumlah = { [Op.gt]: 0 };
 
         const include: any[] = [
             { model: InvProduk, as: 'produk', attributes: ['id', 'code', 'nama', 'has_serial_number', 'has_tag_number'], include: [{ model: InvBrand, as: 'brand', attributes: ['id', 'nama'] }] },
