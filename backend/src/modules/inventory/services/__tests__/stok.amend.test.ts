@@ -20,12 +20,13 @@ jest.mock('../../models/TransaksiDetail', () => ({
     __esModule: true,
     default: { create: jest.fn(), findAll: jest.fn() },
 }));
-jest.mock('../../models/Produk', () => ({ __esModule: true, default: { findByPk: jest.fn() } }));
+jest.mock('../../models/Produk', () => ({ __esModule: true, default: { findByPk: jest.fn(), findAll: jest.fn().mockResolvedValue([]) } }));
 jest.mock('../../models/Stok', () => ({ __esModule: true, default: { findOne: jest.fn(), create: jest.fn() } }));
 jest.mock('../../models/SerialNumber', () => ({
     __esModule: true,
     default: { findOne: jest.fn(), findAll: jest.fn(), destroy: jest.fn(), update: jest.fn(), create: jest.fn() },
 }));
+jest.mock('../../models/OpnameSession', () => ({ __esModule: true, default: { count: jest.fn().mockResolvedValue(0) } }));
 jest.mock('../../models/Gudang', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Uom', () => ({ __esModule: true, default: {} }));
 jest.mock('../../models/Brand', () => ({ __esModule: true, default: {} }));
