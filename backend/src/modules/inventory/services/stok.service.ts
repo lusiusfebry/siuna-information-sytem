@@ -256,6 +256,26 @@ class StokService {
             }
         }
 
+        // "Ke Gedung/Mess": unit ber-serial/tag harus ditempatkan pada ruangan konkret,
+        // karena facility_assets.room_id NOT NULL. Tanpa ruangan, unit keluar dari gudang
+        // tapi tidak pernah tercatat di modul Facility ("aset menggantung"). Cegah di sini
+        // agar berlaku baik untuk alur auto-approve maupun approval.
+        if (payload.sub_tipe === 'Ke Gedung/Mess' && !payload.facility_room_id) {
+            const produkIds = [...new Set(payload.details.map(d => d.produk_id))];
+            const produkList = await InvProduk.findAll({
+                where: { id: produkIds },
+                attributes: ['id', 'has_serial_number', 'has_tag_number'],
+                transaction: t,
+            });
+            const adaSerialTag = produkList.some(p => p.has_serial_number || p.has_tag_number);
+            if (adaSerialTag) {
+                throw new AppError(
+                    'Ruangan wajib dipilih untuk produk ber-serial/tag pada penempatan Ke Gedung/Mess.',
+                    400
+                );
+            }
+        }
+
         payload.created_by = userId;
 
         if (payload.sub_tipe === 'Konsumsi') {

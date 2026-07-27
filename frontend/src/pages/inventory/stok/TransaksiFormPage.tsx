@@ -201,6 +201,13 @@ const TransaksiFormPage = () => {
 
     const filteredRooms = roomData?.data?.filter(r => r.building_id === buildingId) || [];
 
+    // Ruangan wajib bila ada produk ber-serial/tag pada penempatan Ke Gedung/Mess
+    // (agar unit tercatat sebagai aset di modul Facility).
+    const roomRequired = showBuilding && details.some(d => {
+        const p = produkData?.data?.find(pr => pr.id === d.produk_id);
+        return p?.has_serial_number || p?.has_tag_number;
+    });
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Retur Karyawan submits via its own handler (handleReturSubmit), not this one.
@@ -209,6 +216,18 @@ const TransaksiFormPage = () => {
         if (!gudangId) { toast.error('Pilih gudang'); return; }
         if (showGudangTujuan && !gudangTujuanId) { toast.error('Pilih gudang tujuan'); return; }
         if (showBuilding && !buildingId) { toast.error('Pilih gedung/mess tujuan'); return; }
+        // Produk ber-serial/tag wajib ditempatkan pada ruangan konkret (facility_assets
+        // terikat ke ruangan). Tanpa ruangan, unit keluar gudang tapi tak muncul di Facility.
+        if (showBuilding && !roomId) {
+            const adaSerialTag = details.some(d => {
+                const p = produkData?.data?.find(pr => pr.id === d.produk_id);
+                return p?.has_serial_number || p?.has_tag_number;
+            });
+            if (adaSerialTag) {
+                toast.error('Ruangan wajib dipilih untuk produk ber-serial/tag agar tercatat di Facility.');
+                return;
+            }
+        }
         if (showSupplier && !supplierNama.trim()) { toast.error('Isi nama supplier'); return; }
         if (showKonsumsiKaryawan && !karyawanId) { toast.error('Pilih karyawan penerima'); return; }
         if (showKonsumsiDept && !departmentId) { toast.error('Pilih department penerima'); return; }
@@ -413,14 +432,29 @@ const TransaksiFormPage = () => {
                                 </div>
                                 {buildingId > 0 && filteredRooms.length > 0 && (
                                     <div className="flex flex-col gap-1.5">
-                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">Ruangan (opsional)</label>
+                                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                            Ruangan {roomRequired ? <span className="text-red-500">*</span> : '(opsional)'}
+                                        </label>
                                         <SearchableSelect
-                                            options={[{ value: 0, label: '-- Semua / Tidak Spesifik --' }, ...filteredRooms.map((r) => ({ value: r.id, label: `${r.code} - ${r.nama}${r.lantai ? ` (Lt. ${r.lantai})` : ''}` }))]}
+                                            options={[
+                                                ...(roomRequired ? [] : [{ value: 0, label: '-- Semua / Tidak Spesifik --' }]),
+                                                ...filteredRooms.map((r) => ({ value: r.id, label: `${r.code} - ${r.nama}${r.lantai ? ` (Lt. ${r.lantai})` : ''}` })),
+                                            ]}
                                             value={roomId || null}
                                             onChange={(val) => setRoomId(Number(val) || 0)}
-                                            placeholder="-- Semua / Tidak Spesifik --"
+                                            placeholder={roomRequired ? '-- Pilih Ruangan --' : '-- Semua / Tidak Spesifik --'}
                                         />
+                                        {roomRequired && (
+                                            <span className="text-xs text-amber-600 dark:text-amber-500">
+                                                Produk ber-serial/tag wajib ditempatkan pada ruangan agar tercatat sebagai aset di modul Facility.
+                                            </span>
+                                        )}
                                     </div>
+                                )}
+                                {buildingId > 0 && filteredRooms.length === 0 && roomRequired && (
+                                    <span className="text-xs text-red-500">
+                                        Gedung ini belum punya ruangan. Buat ruangan dulu di Facility → Master Data → Ruangan sebelum menempatkan produk ber-serial/tag.
+                                    </span>
                                 )}
                             </>
                         )}
