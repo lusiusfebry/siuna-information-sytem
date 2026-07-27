@@ -30,8 +30,8 @@ const roomTypeSchema = z.object({
 const roomSchema = z.object({
     nama: z.string().min(1, 'Nama ruangan tidak boleh kosong'),
     building_id: z.number().int().positive('Gedung harus dipilih'),
-    room_type_id: z.number().int().positive('Tipe ruangan harus dipilih'),
-    lantai: z.number().int().optional().nullable(),
+    room_type_id: z.number().int().positive('Tipe ruangan harus dipilih').optional().nullable(),
+    lantai: z.string().max(20, 'Lantai maksimal 20 karakter').optional().nullable(),
     kapasitas: z.number().int().positive().optional().default(1),
     keterangan: z.string().optional().nullable(),
     status: z.enum(['Tersedia', 'Penuh', 'Maintenance', 'Tidak Aktif']).optional().default('Tersedia'),

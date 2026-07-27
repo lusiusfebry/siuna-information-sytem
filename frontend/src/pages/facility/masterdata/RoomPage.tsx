@@ -82,7 +82,7 @@ const RoomForm = ({
             lantai: data.lantai || null,
             kapasitas: data.kapasitas ? Number(data.kapasitas) : 1,
             keterangan: data.keterangan || null,
-            status: data.status ? 'Aktif' : 'Tidak Aktif',
+            status: data.status,
         });
     };
 
