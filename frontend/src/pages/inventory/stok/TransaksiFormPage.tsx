@@ -252,8 +252,9 @@ const TransaksiFormPage = () => {
         const seenSerials = new Map<string, string>(); // serial -> "code - nama"
         for (const d of details) {
             const produk = produkData?.data?.find(p => p.id === d.produk_id);
-            if (produk?.has_serial_number && tipe === 'Masuk' && !isAmbilGedung) {
-                const sns = (d.serial_numbers || []).map(s => s.trim()).filter(Boolean);
+            if (!produk) continue;
+            const sns = (d.serial_numbers || []).map(s => s.trim()).filter(Boolean);
+            if (produk.has_serial_number && tipe === 'Masuk' && !isAmbilGedung) {
                 if (sns.length !== d.jumlah) {
                     toast.error(`${produk.code} - ${produk.nama}: jumlah serial number (${sns.length}) harus sama dengan kuantitas (${d.jumlah})`);
                     return;
@@ -271,6 +272,14 @@ const TransaksiFormPage = () => {
                         return;
                     }
                     seenSerials.set(key, `${produk.code} - ${produk.nama}`);
+                }
+            } else if ((produk.has_serial_number || produk.has_tag_number) && tipe !== 'Masuk') {
+                // Outbound / transfer: each unit is identified one-per-serial/tag, while the
+                // aggregate stock moves by `jumlah`. They must match or inv_stok and the serial
+                // ledger diverge (mirrors the backend guard in stok.service handleStokKeluar).
+                if (sns.length !== d.jumlah) {
+                    toast.error(`${produk.code} - ${produk.nama}: jumlah serial/tag number (${sns.length}) harus sama dengan kuantitas (${d.jumlah})`);
+                    return;
                 }
             }
         }

@@ -282,6 +282,32 @@ class StokService {
             await this.validateKonsumsi(payload, t);
         }
 
+        // For outbound lines, a serial/tag-tracked product moves one unit per identifier
+        // while inv_stok moves by `jumlah`; reject a mismatch at creation so a corrupting
+        // transaction is never even recorded (defense beyond handleStokKeluar's apply-time
+        // guard, and covers API-direct callers that bypass the form). INV: STK-0008.
+        if (payload.tipe === 'Keluar') {
+            const produkIds = [...new Set(payload.details.map(d => d.produk_id))];
+            const produkList = await InvProduk.findAll({
+                where: { id: produkIds },
+                attributes: ['id', 'code', 'nama', 'has_serial_number', 'has_tag_number'],
+                transaction: t,
+            });
+            const produkById = new Map(produkList.map(p => [p.id, p]));
+            for (const detail of payload.details) {
+                const produk = produkById.get(detail.produk_id);
+                if (produk && (produk.has_serial_number || produk.has_tag_number)) {
+                    const snCount = detail.serial_numbers?.length ?? 0;
+                    if (snCount !== detail.jumlah) {
+                        throw new AppError(
+                            `${produk.code} - ${produk.nama}: jumlah serial/tag number (${snCount}) harus sama dengan kuantitas (${detail.jumlah})`,
+                            400
+                        );
+                    }
+                }
+            }
+        }
+
         const requiresApproval = opts.autoApprove ? false : this.requiresApproval(payload);
 
         const code = await this.generateCode(payload.tipe, t);
@@ -752,6 +778,21 @@ class StokService {
         t: Transaction
     ) {
         const gudangId = payload.gudang_id;
+
+        // Serial/tag-tracked units are moved one-per-identifier by the loops below, while
+        // the aggregate inv_stok is moved by `jumlah`. If the two disagree the tables
+        // silently diverge (INV: STK-0008 moved 4 serials with jumlah=1, leaving inv_stok
+        // and inv_serial_number out of sync). Enforce equality up front so an outbound /
+        // transfer can never split a serial-tracked product's aggregate from its units.
+        if (produk.has_serial_number || produk.has_tag_number) {
+            const snCount = detail.serial_numbers?.length ?? 0;
+            if (snCount !== detail.jumlah) {
+                throw new AppError(
+                    `${produk.code} - ${produk.nama}: jumlah serial/tag number (${snCount}) harus sama dengan kuantitas (${detail.jumlah})`,
+                    400
+                );
+            }
+        }
 
         await this.validateStokCukup(detail.produk_id, gudangId, detail.jumlah, t);
         await this.upsertStok(detail.produk_id, gudangId, detail.uom_id, -detail.jumlah, t);
