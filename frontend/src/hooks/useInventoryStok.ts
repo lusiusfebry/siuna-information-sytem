@@ -12,11 +12,12 @@ import {
     TransaksiDetailPayload,
 } from '../types/inventory';
 
-export const useStokList = (filters?: StokFilter) => {
+export const useStokList = (filters?: StokFilter, enabled = true) => {
     return useQuery({
         queryKey: ['inventoryStok', filters],
         queryFn: () => inventoryStokService.getStok(filters),
         placeholderData: keepPreviousData,
+        enabled,
     });
 };
 

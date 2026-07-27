@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { AxiosError } from 'axios';
-import { useCreateTransaksi } from '../../../hooks/useInventoryStok';
+import { useCreateTransaksi, useStokList } from '../../../hooks/useInventoryStok';
 import { useInvGudangList, useInvProdukList, useInvUomList } from '../../../hooks/useInventoryMasterData';
 import { useFacBuildingList, useFacRoomList } from '../../../hooks/useFacilityMasterData';
 import { useMasterDataList } from '../../../hooks/useMasterData';
@@ -77,6 +77,16 @@ const TransaksiFormPage = () => {
     const [downloadingBA, setDownloadingBA] = useState(false);
     const [availableSNs, setAvailableSNs] = useState<Record<string, InvSerialNumber[]>>({});
     const [snSearchTerms, setSnSearchTerms] = useState<Record<string, string>>({});
+
+    // Stok gudang asal (hanya alur keluar/adjustment yang butuh gudang). Dipakai untuk
+    // menampilkan jumlah stok di label produk + memperingatkan bila produk stoknya 0 di
+    // gudang terpilih — mencegah kasus "serial/stok 0" akibat salah pilih gudang.
+    const needStok = tipe !== 'Masuk' && gudangId > 0;
+    const { data: stokGudangData } = useStokList(needStok ? { gudang_id: gudangId, limit: 500 } : undefined, needStok);
+    const stokByProduk = new Map<number, number>();
+    if (needStok) {
+        (stokGudangData?.data || []).forEach(s => stokByProduk.set(s.produk_id, s.jumlah));
+    }
 
     const searchKaryawan = useCallback(async (query: string) => {
         if (query.length < 2) { setKaryawanOptions([]); return; }
@@ -610,11 +620,21 @@ const TransaksiFormPage = () => {
                                             <SearchableSelect
                                                 options={(produkData?.data || [])
                                                     .filter(p => !isKonsumsi || p.is_consumable)
-                                                    .map(p => ({ value: p.id, label: `${p.code} - ${p.nama}` }))}
+                                                    .map(p => ({
+                                                        value: p.id,
+                                                        label: needStok
+                                                            ? `${p.code} - ${p.nama} (stok: ${stokByProduk.get(p.id) ?? 0})`
+                                                            : `${p.code} - ${p.nama}`,
+                                                    }))}
                                                 value={detail.produk_id || null}
                                                 onChange={(val) => updateDetail(detail._key, 'produk_id', Number(val))}
                                                 placeholder="-- Pilih Produk --"
                                             />
+                                            {needStok && !isAmbilGedung && detail.produk_id > 0 && (stokByProduk.get(detail.produk_id) ?? 0) === 0 && (
+                                                <span className="text-xs text-red-600 dark:text-red-400">
+                                                    Stok produk ini 0 di gudang yang dipilih. Pastikan gudang asal sudah benar.
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div className="flex flex-col gap-1.5">
