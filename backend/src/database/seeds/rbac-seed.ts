@@ -67,6 +67,9 @@ const seedRBAC = async () => {
         { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.READ },
         { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.UPDATE },
         { resource: RESOURCES.FACILITY_WORK_ORDER, action: ACTIONS.DELETE },
+
+        // Company Settings (F-2: RBAC-based instead of role-name authorize())
+        { resource: RESOURCES.COMPANY_SETTINGS, action: ACTIONS.UPDATE },
     ];
 
     // Upsert Permissions
@@ -124,6 +127,7 @@ const seedRBAC = async () => {
             ...findPerms(RESOURCES.EXPORT),
             ...findPerms(RESOURCES.USERS, [ACTIONS.READ, ACTIONS.UPDATE]), // Manage users but maybe not roles?
             ...findPerms(RESOURCES.ROLES, [ACTIONS.READ]),
+            ...findPerms(RESOURCES.COMPANY_SETTINGS),
         ];
         await admin.setPermissions(adminPerms);
     }

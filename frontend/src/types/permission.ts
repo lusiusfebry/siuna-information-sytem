@@ -28,6 +28,7 @@ export const RESOURCES = {
     INVENTORY_STOCK: 'inventory_stock',
     FACILITY_MASTER_DATA: 'facility_master_data',
     FACILITY_WORK_ORDER: 'facility_work_order',
+    COMPANY_SETTINGS: 'company_settings',
 } as const;
 
 export const ACTIONS = {

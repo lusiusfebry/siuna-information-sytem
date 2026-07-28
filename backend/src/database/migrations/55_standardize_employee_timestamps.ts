@@ -9,8 +9,21 @@ import { Migration } from '../umzug';
 // `field:` mapping, so application code (e.g. order: [['createdAt','DESC']]) is
 // unaffected — only the physical column names change.
 
+// Idempotent rename: only rename when the source column still exists and the
+// target does not yet exist (safe on partial-apply / manual re-run).
 const rename = async (qi: any, table: string, from: string, to: string) => {
-    await qi.sequelize.query(`ALTER TABLE "${table}" RENAME COLUMN "${from}" TO "${to}";`);
+    await qi.sequelize.query(`
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = '${table}' AND column_name = '${from}')
+               AND NOT EXISTS (SELECT 1 FROM information_schema.columns
+                               WHERE table_name = '${table}' AND column_name = '${to}')
+            THEN
+                ALTER TABLE "${table}" RENAME COLUMN "${from}" TO "${to}";
+            END IF;
+        END $$;
+    `);
 };
 
 export const up: Migration = async ({ context: queryInterface }) => {

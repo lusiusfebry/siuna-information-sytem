@@ -305,7 +305,7 @@ function App() {
                             </PermissionGuard>
                         } />
                         <Route path="company" element={
-                            <PermissionGuard resource={RESOURCES.USERS} action={ACTIONS.READ} redirectTo="/403">
+                            <PermissionGuard resource={RESOURCES.COMPANY_SETTINGS} action={ACTIONS.UPDATE} redirectTo="/403">
                                 <CompanySettingsPage />
                             </PermissionGuard>
                         } />

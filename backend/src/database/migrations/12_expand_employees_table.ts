@@ -2,13 +2,29 @@ import { DataTypes } from 'sequelize';
 import { Migration } from '../umzug';
 import sequelize from '../../config/database';
 
+// Idempotent rename: only rename when the source column still exists and the
+// target does not yet exist (safe on partial-apply / manual re-run).
+const renameColumn = async (table: string, from: string, to: string) => {
+    await sequelize.query(`
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM information_schema.columns
+                       WHERE table_name = '${table}' AND column_name = '${from}')
+               AND NOT EXISTS (SELECT 1 FROM information_schema.columns
+                               WHERE table_name = '${table}' AND column_name = '${to}')
+            THEN
+                ALTER TABLE "${table}" RENAME COLUMN "${from}" TO "${to}";
+            END IF;
+        END $$;
+    `);
+};
+
 export const up: Migration = async ({ context: queryInterface }) => {
-    // 1. Renames
-    // Using raw queries because renameColumn function is reported missing in runtime
-    await sequelize.query('ALTER TABLE "employees" RENAME COLUMN "name" TO "nama_lengkap";');
-    await sequelize.query('ALTER TABLE "employees" RENAME COLUMN "nik" TO "nomor_induk_karyawan";');
-    await sequelize.query('ALTER TABLE "employees" RENAME COLUMN "email" TO "email_perusahaan";');
-    await sequelize.query('ALTER TABLE "employees" RENAME COLUMN "phone" TO "nomor_handphone";');
+    // 1. Renames (idempotent — guarded against partial-apply / manual re-run)
+    await renameColumn('employees', 'name', 'nama_lengkap');
+    await renameColumn('employees', 'nik', 'nomor_induk_karyawan');
+    await renameColumn('employees', 'email', 'email_perusahaan');
+    await renameColumn('employees', 'phone', 'nomor_handphone');
 
     // 2. Remove columns
     await sequelize.query('ALTER TABLE "employees" DROP COLUMN IF EXISTS "position";');
