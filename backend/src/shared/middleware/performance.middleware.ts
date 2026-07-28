@@ -7,7 +7,7 @@ export const performanceMonitor = (req: Request, res: Response, next: NextFuncti
     res.on('finish', () => {
         const duration = Date.now() - start;
         if (duration > 1000) {
-            console.warn(`⚠️ Slow request: ${req.method} ${req.path} - ${duration}ms`);
+            logger.warn(`Slow request: ${req.method} ${req.path} - ${duration}ms`);
         }
     });
 

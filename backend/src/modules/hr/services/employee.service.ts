@@ -19,6 +19,7 @@ import { qrcodeService } from './qrcode.service';
 import { validateManagerPosition, validateAtasanLangsungActive, validateDepartmentBelongsToDivisi, validatePosisiJabatanBelongsToDepartment, validateContractDates } from '../validators/business-rules.validator';
 import { ERROR_MESSAGES } from '../../../shared/constants/error-messages';
 import { AppError } from '../../../shared/utils/errorHandler';
+import logger from '../../../shared/utils/logger';
 
 class EmployeeService {
     async getEmployeeQRCode(id: number) {
@@ -381,7 +382,7 @@ class EmployeeService {
                         try {
                             familyInfoData.data_anak = JSON.parse(familyInfoData.data_anak);
                         } catch (e) {
-                            console.error('Error parsing data_anak:', e);
+                            logger.error('Error parsing data_anak:', e);
                             familyInfoData.data_anak = [];
                         }
                     }
@@ -394,7 +395,7 @@ class EmployeeService {
                         try {
                             familyInfoData.data_saudara_kandung = JSON.parse(familyInfoData.data_saudara_kandung);
                         } catch (e) {
-                            console.error('Error parsing data_saudara_kandung:', e);
+                            logger.error('Error parsing data_saudara_kandung:', e);
                             familyInfoData.data_saudara_kandung = [];
                         }
                     }

@@ -257,7 +257,7 @@ class EmployeeController {
                     const qrResult = await employeeService.getEmployeeQRCode(employee.id);
                     qrCodeData = qrResult.qrCode;
                 } catch (e) {
-                    console.warn('Failed to generate QR code on create:', e);
+                    logger.warn('Failed to generate QR code on create:', e);
                 }
             }
 
@@ -269,7 +269,7 @@ class EmployeeController {
                 } : null
             });
         } catch (error) {
-            console.error('[EmployeeController] Create Error:', error);
+            logger.error('[EmployeeController] Create Error:', error);
             next(error);
         }
     }
@@ -348,7 +348,7 @@ class EmployeeController {
                     const qrResult = await employeeService.getEmployeeQRCode(employee.id);
                     qrCodeData = qrResult.qrCode;
                 } catch (e) {
-                    console.warn('Failed to generate QR code on update:', e);
+                    logger.warn('Failed to generate QR code on update:', e);
                 }
             }
 
@@ -359,7 +359,7 @@ class EmployeeController {
                 } : null
             });
         } catch (error) {
-            console.error('[EmployeeController] Update Error:', error);
+            logger.error('[EmployeeController] Update Error:', error);
             next(error);
         }
     }

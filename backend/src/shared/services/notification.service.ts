@@ -11,6 +11,7 @@ import { Role } from '../../modules/auth/models/Role';
 import { Permission } from '../../modules/auth/models/Permission';
 import { env } from '../../config/env';
 import { Sequelize } from 'sequelize';
+import logger from '../utils/logger';
 
 // Turn a "N days ago" threshold into a YYYY-MM-DD boundary. Transaction dates and
 // facility placement dates are DATEONLY, so we compare on date strings, not timestamps.
@@ -127,7 +128,7 @@ class NotificationService {
                 await Notification.bulkCreate(notifications);
             }
         } catch (error) {
-            console.error('Failed to check low stock notifications:', error);
+            logger.error('Failed to check low stock notifications:', error);
         }
     }
 
@@ -147,7 +148,7 @@ class NotificationService {
                 entity_id: transaksiId,
             })));
         } catch (error) {
-            console.error('Failed to send pending-approval notification:', error);
+            logger.error('Failed to send pending-approval notification:', error);
         }
     }
 
@@ -275,10 +276,10 @@ class NotificationService {
                 (await this.dispatchReminders('facility_asset', facilityItems, targetUsers));
 
             if (created > 0) {
-                console.log(`Asset reminders: created ${created} notification(s).`);
+                logger.info(`Asset reminders: created ${created} notification(s).`);
             }
         } catch (error) {
-            console.error('Failed to check asset reminders:', error);
+            logger.error('Failed to check asset reminders:', error);
         }
     }
 }

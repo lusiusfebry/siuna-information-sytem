@@ -19,13 +19,13 @@ export const cacheMiddleware = (ttl: number = 3600) => {
 
             const originalJson = res.json.bind(res);
             res.json = (body: any) => {
-                cacheService.set(key, body, ttl).catch(console.error);
+                cacheService.set(key, body, ttl).catch((e) => logger.error('Cache set error:', e));
                 return originalJson(body);
             };
 
             next();
         } catch (error) {
-            console.error('Cache middleware error:', error);
+            logger.error('Cache middleware error:', error);
             next();
         }
     };

@@ -88,7 +88,7 @@ export const auditLogger = (entityType: string) => {
                     }
                 }
             } catch (err) {
-                console.warn(`[AuditLog] Failed to fetch old values for ${entityType} ${id}`, err);
+                logger.warn(`[AuditLog] Failed to fetch old values for ${entityType} ${id}`, err);
             }
         }
 
@@ -159,7 +159,7 @@ export const auditLogger = (entityType: string) => {
                         timestamp: new Date()
                     });
                 } catch (error) {
-                    console.error('Audit Logging Failed:', error);
+                    logger.error('Audit Logging Failed:', error);
                 }
             }
         });

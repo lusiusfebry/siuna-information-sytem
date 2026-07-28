@@ -15,7 +15,7 @@ export const fileStorage = {
                 fs.unlinkSync(filePath);
                 return true;
             } catch (error) {
-                console.error(`Error deleting file: ${filePath}`, error);
+                logger.error(`Error deleting file: ${filePath}`, error);
                 return false;
             }
         }

@@ -61,7 +61,7 @@ class ImportController {
                 try {
                     fs.unlinkSync(filePath);
                 } catch (e) {
-                    console.error('Failed to delete temp file', e);
+                    logger.error('Failed to delete temp file', e);
                 }
             }
 
@@ -90,7 +90,7 @@ class ImportController {
                 try {
                     fs.unlinkSync(filePath);
                 } catch (e) {
-                    console.error('Failed to delete temp file', e);
+                    logger.error('Failed to delete temp file', e);
                 }
             }
 

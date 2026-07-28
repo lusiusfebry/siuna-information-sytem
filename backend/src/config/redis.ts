@@ -1,3 +1,4 @@
+import logger from '../shared/utils/logger';
 
 // const redis = new Redis({
 //     host: env.redis.host,
@@ -22,11 +23,11 @@ const redis = {
 } as any;
 
 redis.on('connect', () => {
-    console.log('✅ Redis connected');
+    logger.info('Redis connected');
 });
 
 redis.on('error', (err: any) => {
-    console.error('❌ Redis error:', err);
+    logger.error('Redis error:', err);
 });
 
 export default redis;

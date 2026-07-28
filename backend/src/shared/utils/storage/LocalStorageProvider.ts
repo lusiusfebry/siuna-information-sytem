@@ -27,7 +27,7 @@ export class LocalStorageProvider implements IStorageProvider {
             if (fs.existsSync(filePath)) {
                 fs.unlink(filePath, (err) => {
                     if (err) {
-                        console.error('Error deleting file:', err);
+                        logger.error('Error deleting file:', err);
                         resolve(false);
                     } else {
                         resolve(true);

@@ -36,7 +36,7 @@ export const checkPermission = (resource: string, action: string) => {
 
             next();
         } catch (error) {
-            console.error('Permission check error:', error);
+            logger.error('Permission check error:', error);
             res.status(500).json({ message: 'Internal Server Error during permission check' });
         }
     };

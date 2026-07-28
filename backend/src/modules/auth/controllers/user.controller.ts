@@ -25,7 +25,7 @@ class UserController {
             });
             res.json({ data: users });
         } catch (error) {
-            console.error('Failed to fetch users:', error);
+            logger.error('Failed to fetch users:', error);
             res.status(500).json({ message: 'Failed to fetch users' });
         }
     }
@@ -72,7 +72,7 @@ class UserController {
             await user.update({ role_id });
             res.json({ message: 'User role updated' });
         } catch (error) {
-            console.error('Failed to update user role:', error);
+            logger.error('Failed to update user role:', error);
             res.status(500).json({ message: 'Failed to update user role' });
         }
     }
@@ -105,7 +105,7 @@ class UserController {
             await user.update({ is_active });
             res.json({ message: `User ${is_active ? 'activated' : 'deactivated'}` });
         } catch (error) {
-            console.error('Failed to update user status:', error);
+            logger.error('Failed to update user status:', error);
             res.status(500).json({ message: 'Failed to update user status' });
         }
     }

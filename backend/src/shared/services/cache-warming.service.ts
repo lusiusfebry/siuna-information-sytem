@@ -1,4 +1,5 @@
 import cacheService from './cache.service';
+import logger from '../utils/logger';
 
 // NOTE: Redis is intentionally disabled (see src/config/redis.ts — the client is
 // a no-op stub). Cache warming previously loaded every master-data table on boot
@@ -8,7 +9,7 @@ import cacheService from './cache.service';
 class CacheWarmingService {
     async warmMasterDataCache() {
         void cacheService; // referenced so the module contract stays stable
-        console.log('ℹ️  Cache is disabled (Redis not configured) — skipping cache warming.');
+        logger.info('Cache is disabled (Redis not configured) — skipping cache warming.');
     }
 }
 

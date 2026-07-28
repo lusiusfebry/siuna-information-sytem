@@ -116,7 +116,7 @@ export const validateEmployeeUpdate = async (req: Request, res: Response, next: 
         next();
     } catch (error) {
         if (error instanceof z.ZodError) {
-            console.log('Update Validation Error:', JSON.stringify(error.issues));
+            logger.warn('Update Validation Error:', JSON.stringify(error.issues));
             return res.status(400).json({
                 message: 'Validation Error',
                 errors: error.issues.map(issue => ({

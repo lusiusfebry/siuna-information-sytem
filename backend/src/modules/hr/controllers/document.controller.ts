@@ -36,7 +36,7 @@ class DocumentController {
                 data: uploadedDocs
             });
         } catch (error: any) {
-            console.error('Upload error:', error);
+            logger.error('Upload error:', error);
             res.status(500).json({ message: error.message || 'Failed to upload documents' });
         }
     }
