@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import sequelize from '../../../config/database';
 import FacilityOccupant from '../models/Occupant';
 import FacilityRoom from '../models/Room';
 
@@ -63,28 +64,29 @@ class FacilityOccupantService {
     }
 
     async create(data: any) {
-        // Check room capacity
-        const room = await FacilityRoom.findByPk(data.room_id);
-        if (!room) return null;
+        return await sequelize.transaction(async (t) => {
+            const room = await FacilityRoom.findByPk(data.room_id, { lock: t.LOCK.UPDATE, transaction: t });
+            if (!room) return null;
 
-        const activeCount = await FacilityOccupant.count({
-            where: { room_id: data.room_id, status: 'Aktif' }
+            const activeCount = await FacilityOccupant.count({
+                where: { room_id: data.room_id, status: 'Aktif' },
+                transaction: t,
+            });
+
+            if (activeCount >= room.kapasitas) {
+                const error: any = new Error('Kamar sudah penuh, tidak dapat menambah penghuni.');
+                error.statusCode = 400;
+                throw error;
+            }
+
+            const result = await FacilityOccupant.create(data, { transaction: t });
+
+            if (activeCount + 1 >= room.kapasitas) {
+                await room.update({ status: 'Penuh' }, { transaction: t });
+            }
+
+            return result;
         });
-
-        if (activeCount >= room.kapasitas) {
-            const error: any = new Error('Kamar sudah penuh, tidak dapat menambah penghuni.');
-            error.statusCode = 400;
-            throw error;
-        }
-
-        const result = await FacilityOccupant.create(data);
-
-        // Update room status if full
-        if (activeCount + 1 >= room.kapasitas) {
-            await room.update({ status: 'Penuh' });
-        }
-
-        return result;
     }
 
     async update(id: number, data: any) {

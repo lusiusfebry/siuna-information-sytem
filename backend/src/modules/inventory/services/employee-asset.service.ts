@@ -130,6 +130,9 @@ class EmployeeAssetService {
                 }],
             });
             if (!transaksi) throw new AppError('Transaksi tidak ditemukan', 404);
+            if (transaksi.karyawan_id !== employeeId) {
+                throw new AppError('Transaksi ini bukan milik karyawan yang dimaksud', 403);
+            }
             transaksiInfo = transaksi;
             items = (transaksi as any).details || [];
         } else {

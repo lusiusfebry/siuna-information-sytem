@@ -1,4 +1,5 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
+import sequelize from '../../../config/database';
 import FacilityWorkOrder from '../models/WorkOrder';
 import FacilityRoom from '../models/Room';
 import FacilityMaintenanceCategory from '../models/MaintenanceCategory';
@@ -8,16 +9,26 @@ import cacheService from '../../../shared/services/cache.service';
 const CODE_PREFIX = 'FWO';
 
 class FacilityWorkOrderService {
-    async generateCode(): Promise<string> {
+    async generateCode(t: Transaction): Promise<string> {
+        // Serialize code generation across concurrent transactions (advisory lock held
+        // until the transaction ends) and sort by the numeric suffix — a lexicographic
+        // 'code DESC' sort ranks FWO-0099 above FWO-0100, producing duplicate codes past
+        // 100 records (same class of bug as inventory C-06).
+        await sequelize.query('SELECT pg_advisory_xact_lock(hashtext(:k))', {
+            replacements: { k: `facility_wo_code_${CODE_PREFIX}` },
+            transaction: t,
+        });
+
         const lastRecord = await FacilityWorkOrder.findOne({
             where: { code: { [Op.like]: `${CODE_PREFIX}-%` } },
-            order: [['code', 'DESC']],
+            order: [[Sequelize.literal(`CAST(SPLIT_PART(code, '-', 2) AS INTEGER)`), 'DESC']],
+            transaction: t,
+            lock: t.LOCK.UPDATE,
         });
 
         let nextNumber = 1;
         if (lastRecord) {
-            const lastCode = lastRecord.code;
-            const lastNumber = parseInt(lastCode.split('-')[1], 10);
+            const lastNumber = parseInt(lastRecord.code.split('-')[1], 10);
             if (!isNaN(lastNumber)) nextNumber = lastNumber + 1;
         }
 
@@ -76,19 +87,43 @@ class FacilityWorkOrderService {
 
     async create(data: any) {
         delete data.code;
-        const code = await this.generateCode();
         // Model requires tanggal_lapor (NOT NULL) but the validator marks it
         // optional; default to today so create never fails on a missing date.
         if (!data.tanggal_lapor) {
             data.tanggal_lapor = new Date().toISOString().slice(0, 10);
         }
-        return await FacilityWorkOrder.create({ ...data, code });
+        const t = await sequelize.transaction();
+        try {
+            const code = await this.generateCode(t);
+            const result = await FacilityWorkOrder.create({ ...data, code }, { transaction: t });
+            await t.commit();
+            return result;
+        } catch (err) {
+            await t.rollback();
+            throw err;
+        }
     }
 
     async update(id: number, data: any) {
         const item = await FacilityWorkOrder.findByPk(id);
         if (!item) return null;
         delete data.code;
+
+        if (data.status && data.status !== item.status) {
+            const ALLOWED: Record<string, string[]> = {
+                'Open': ['In Progress', 'Closed'],
+                'In Progress': ['Resolved', 'Open'],
+                'Resolved': ['Closed', 'In Progress'],
+                'Closed': [],
+            };
+            const allowed = ALLOWED[item.status] ?? [];
+            if (!allowed.includes(data.status)) {
+                const err: any = new Error(`Transisi status dari '${item.status}' ke '${data.status}' tidak diizinkan.`);
+                err.statusCode = 400;
+                throw err;
+            }
+        }
+
         return await item.update(data);
     }
 }

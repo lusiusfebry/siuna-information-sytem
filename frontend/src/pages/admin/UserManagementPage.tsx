@@ -26,6 +26,7 @@ const UserManagementPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [selectedRole, setSelectedRole] = useState<number | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const loadData = async () => {
         setLoading(true);
@@ -49,7 +50,8 @@ const UserManagementPage: React.FC = () => {
     }, []);
 
     const handleRoleUpdate = async () => {
-        if (selectedUser && selectedRole) {
+        if (selectedUser && selectedRole && !isSubmitting) {
+            setIsSubmitting(true);
             try {
                 await updateUserRole(selectedUser.id, selectedRole);
                 toast.success('Role user berhasil diperbarui');
@@ -58,6 +60,8 @@ const UserManagementPage: React.FC = () => {
             } catch (error) {
                 console.error(error);
                 toast.error('Gagal memperbarui role');
+            } finally {
+                setIsSubmitting(false);
             }
         }
     };
@@ -186,10 +190,11 @@ const UserManagementPage: React.FC = () => {
                             variant="secondary"
                             className="flex-1"
                             onClick={() => setIsModalOpen(false)}
+                            disabled={isSubmitting}
                         >
                             Batal
                         </Button>
-                        <Button type="submit" variant="primary" className="flex-1">
+                        <Button type="submit" variant="primary" className="flex-1" isLoading={isSubmitting}>
                             Simpan Perubahan
                         </Button>
                     </div>

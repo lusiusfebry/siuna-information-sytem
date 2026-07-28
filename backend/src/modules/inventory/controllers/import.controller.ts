@@ -1,6 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import importService from '../services/import.service';
 import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+
+// Token → absolute path map; entries expire after 10 minutes
+const fileTokens = new Map<string, { filePath: string; expiresAt: number }>();
+const TOKEN_TTL_MS = 10 * 60 * 1000;
+
+function storeFileToken(filePath: string): string {
+    const token = crypto.randomUUID();
+    fileTokens.set(token, { filePath, expiresAt: Date.now() + TOKEN_TTL_MS });
+    return token;
+}
+
+function resolveFileToken(token: string): string | null {
+    const entry = fileTokens.get(token);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) { fileTokens.delete(token); return null; }
+    fileTokens.delete(token);
+    return entry.filePath;
+}
 
 class InventoryImportController {
     async downloadTemplate(req: Request, res: Response, next: NextFunction) {
@@ -26,13 +46,14 @@ class InventoryImportController {
 
             try {
                 const { rows, headers } = await importService.parseExcelFile(req.file.path);
+                const fileToken = storeFileToken(req.file.path);
                 res.json({
                     status: 'success',
                     data: {
                         headers,
                         rows: rows.slice(0, 20),
                         totalRows: rows.length,
-                        filePath: req.file.path,
+                        fileToken,
                     },
                 });
             } catch (err: any) {
@@ -45,9 +66,10 @@ class InventoryImportController {
 
     async importProduk(req: Request, res: Response, next: NextFunction) {
         try {
-            const { filePath } = req.body;
+            const { fileToken } = req.body;
+            const filePath = fileToken ? resolveFileToken(fileToken) : null;
             if (!filePath || !fs.existsSync(filePath)) {
-                return res.status(400).json({ message: 'File tidak ditemukan. Upload ulang.' });
+                return res.status(400).json({ message: 'File tidak ditemukan atau token tidak valid. Upload ulang.' });
             }
 
             const result = await importService.importProduk(filePath);
@@ -62,9 +84,10 @@ class InventoryImportController {
 
     async importStokMasuk(req: Request, res: Response, next: NextFunction) {
         try {
-            const { filePath } = req.body;
+            const { fileToken } = req.body;
+            const filePath = fileToken ? resolveFileToken(fileToken) : null;
             if (!filePath || !fs.existsSync(filePath)) {
-                return res.status(400).json({ message: 'File tidak ditemukan. Upload ulang.' });
+                return res.status(400).json({ message: 'File tidak ditemukan atau token tidak valid. Upload ulang.' });
             }
 
             const userId = (req as any).user?.id || 0;

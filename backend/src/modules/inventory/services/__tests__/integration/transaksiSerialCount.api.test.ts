@@ -51,7 +51,7 @@ describe('Transaksi serial-count guard (Real DB)', () => {
 
         // Seed: 2 unit tersedia di gudang asal, dengan 2 serial number nyata.
         seedMasuk = await InvTransaksi.create({
-            code: 'STK-SC-SEED', tipe: 'Masuk', sub_tipe: 'Supplier',
+            code: 'STM-9000', tipe: 'Masuk', sub_tipe: 'Supplier',
             tanggal: '2026-07-01', gudang_id: gudangA.id,
             created_by: testUser.id, approval_status: 'Approved',
         });

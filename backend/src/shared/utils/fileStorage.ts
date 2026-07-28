@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import logger from './logger';
 
 export const fileStorage = {
     ensureDirectoryExists: (dirPath: string) => {

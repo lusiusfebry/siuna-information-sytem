@@ -125,7 +125,11 @@ class FacilityAssetService {
     async update(id: number, data: any) {
         const item = await FacilityAsset.findByPk(id);
         if (!item) return null;
-        return await item.update(data);
+        // Hanya izinkan update field keterangan; perubahan serial/room/status
+        // harus melalui withdraw() atau create() agar inventory engine tetap konsisten.
+        const allowed: any = {};
+        if (data.keterangan !== undefined) allowed.keterangan = data.keterangan;
+        return await item.update(allowed);
     }
 
     async withdraw(id: number, data: any, userId: number | null = null) {

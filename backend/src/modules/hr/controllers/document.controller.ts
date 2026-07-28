@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import documentService from '../services/document.service';
 import * as fs from 'fs';
+import logger from '../../../shared/utils/logger';
 
 class DocumentController {
     async uploadDocuments(req: Request, res: Response) {

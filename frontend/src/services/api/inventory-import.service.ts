@@ -4,7 +4,7 @@ export interface ImportPreviewData {
     headers: string[];
     rows: any[];
     totalRows: number;
-    filePath: string;
+    fileToken: string;
 }
 
 export interface ImportResultData {
@@ -23,13 +23,13 @@ const uploadAndPreview = async (file: File): Promise<{ status: string; data: Imp
     return response.data;
 };
 
-const importProduk = async (filePath: string): Promise<{ status: string; data: ImportResultData }> => {
-    const response = await client.post('/inventory/import/produk', { filePath });
+const importProduk = async (fileToken: string): Promise<{ status: string; data: ImportResultData }> => {
+    const response = await client.post('/inventory/import/produk', { fileToken });
     return response.data;
 };
 
-const importStokMasuk = async (filePath: string): Promise<{ status: string; data: ImportResultData }> => {
-    const response = await client.post('/inventory/import/stok-masuk', { filePath });
+const importStokMasuk = async (fileToken: string): Promise<{ status: string; data: ImportResultData }> => {
+    const response = await client.post('/inventory/import/stok-masuk', { fileToken });
     return response.data;
 };
 

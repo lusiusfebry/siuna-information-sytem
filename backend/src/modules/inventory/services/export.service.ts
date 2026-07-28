@@ -12,6 +12,7 @@ import InvSerialNumber from '../models/SerialNumber';
 import Employee from '../../hr/models/Employee';
 import User from '../../auth/models/User';
 import companySettingsService from '../../auth/services/company-settings.service';
+import { AppError } from '../../../shared/utils/errorHandler';
 
 class InventoryExportService {
     private async getBranding() {
@@ -233,15 +234,17 @@ tr:nth-child(even) { background: #f9f9f9; }
     }
 
     async exportTransaksiToExcel(filters: any): Promise<Buffer> {
+        if (!filters.tanggal_dari || !filters.tanggal_sampai) {
+            throw new AppError('Filter tanggal_dari dan tanggal_sampai wajib untuk export transaksi', 400);
+        }
         const where: any = {};
         if (filters.tipe) where.tipe = filters.tipe;
         if (filters.gudang_id) where.gudang_id = filters.gudang_id;
-        if (filters.tanggal_dari && filters.tanggal_sampai) {
-            where.tanggal = { [Op.between]: [filters.tanggal_dari, filters.tanggal_sampai] };
-        }
+        where.tanggal = { [Op.between]: [filters.tanggal_dari, filters.tanggal_sampai] };
 
         const transaksiData = await InvTransaksi.findAll({
             where,
+            limit: 10000,
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'nama'] },
@@ -316,16 +319,18 @@ tr:nth-child(even) { background: #f9f9f9; }
     }
 
     async exportTransaksiToPDF(filters: any): Promise<Buffer> {
+        if (!filters.tanggal_dari || !filters.tanggal_sampai) {
+            throw new AppError('Filter tanggal_dari dan tanggal_sampai wajib untuk export transaksi', 400);
+        }
         const branding = await this.getBranding();
         const where: any = {};
         if (filters.tipe) where.tipe = filters.tipe;
         if (filters.gudang_id) where.gudang_id = filters.gudang_id;
-        if (filters.tanggal_dari && filters.tanggal_sampai) {
-            where.tanggal = { [Op.between]: [filters.tanggal_dari, filters.tanggal_sampai] };
-        }
+        where.tanggal = { [Op.between]: [filters.tanggal_dari, filters.tanggal_sampai] };
 
         const transaksiData = await InvTransaksi.findAll({
             where,
+            limit: 10000,
             include: [
                 { model: InvGudang, as: 'gudang', attributes: ['id', 'nama'] },
                 { model: InvGudang, as: 'gudang_tujuan', attributes: ['id', 'nama'] },

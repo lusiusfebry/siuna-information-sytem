@@ -1,4 +1,5 @@
 import { IStorageProvider } from './IStorageProvider';
+import logger from '../logger';
 
 export class S3StorageProvider implements IStorageProvider {
     async saveFile(_file: Express.Multer.File, _destination: string, _filename: string): Promise<string> {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { permissionService } from '../../modules/auth/services/permission.service';
 import { Permission } from '../../modules/auth/models/Permission';
+import logger from '../utils/logger';
 
 // Extend Express Request to include user permissions
 declare global {

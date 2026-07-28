@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import auditService from '../../modules/hr/services/audit.service';
 import notificationService from '../services/notification.service';
 import { env } from '../../config/env';
+import logger from './logger';
 
 // Default retention 365 days
 const RETENTION_DAYS = env.auditLogRetentionDays;

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { env } from './config/env';
 import sequelize from './config/database';
+import logger from './shared/utils/logger';
 import './modules/hr/models/associations'; // Import associations
 import './modules/inventory/models/associations'; // Import inventory associations
 import './modules/facility/models/associations'; // Import facility associations
@@ -88,7 +89,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error(err.stack);
+    logger.error(err.stack);
 
     // Handle JSON string errors (Business Rule Validations)
     if (typeof err.message === 'string' && err.message.startsWith('{') && err.message.endsWith('}')) {
@@ -140,28 +141,28 @@ app.use((err: any, req: express.Request, res: express.Response, _next: express.N
 const startServer = async () => {
     try {
         await sequelize.authenticate();
-        console.log('Database connection has been established successfully.');
+        logger.info('Database connection has been established successfully.');
 
         // Initialize Scheduler
         try {
             const { initScheduler } = await import('./shared/utils/scheduler');
             initScheduler();
         } catch (schedErr) {
-            console.error('Failed to initialize scheduler:', schedErr);
+            logger.error('Failed to initialize scheduler:', schedErr);
         }
 
         app.listen(env.port, async () => {
-            console.log(`Server is running on port ${env.port}`);
+            logger.info(`Server is running on port ${env.port}`);
             // Cache Warming
             try {
                 const { default: cacheWarmingService } = await import('./shared/services/cache-warming.service');
                 await cacheWarmingService.warmMasterDataCache();
             } catch (err) {
-                console.error('Cache warming failed:', err);
+                logger.error('Cache warming failed:', err);
             }
         });
     } catch (error) {
-        console.error('Unable to connect to the database:', error);
+        logger.error('Unable to connect to the database:', error);
         process.exit(1);
     }
 };

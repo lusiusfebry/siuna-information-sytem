@@ -32,13 +32,13 @@ const ImportPage = () => {
     };
 
     const handleImport = async () => {
-        if (!preview?.filePath) return;
+        if (!preview?.fileToken) return;
         setLoading(true);
         try {
             const importFn = importType === 'produk'
                 ? inventoryImportService.importProduk
                 : inventoryImportService.importStokMasuk;
-            const res = await importFn(preview.filePath);
+            const res = await importFn(preview.fileToken);
             setResult(res.data);
             setStep('result');
             if (res.data.failed === 0) toast.success(`Import berhasil: ${res.data.success} data`);

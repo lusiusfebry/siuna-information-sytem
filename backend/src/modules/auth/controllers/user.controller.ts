@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { Role } from '../models/Role';
 import Employee from '../../hr/models/Employee';
+import logger from '../../../shared/utils/logger';
 
 class UserController {
     public async getAllUsers(req: Request, res: Response) {

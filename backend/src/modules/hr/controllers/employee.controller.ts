@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import employeeService from '../services/employee.service';
 import { parseIdParam, parseOptionalInt } from '../../../shared/utils/validation.utils';
+import logger from '../../../shared/utils/logger';
 
 const parseDate = (value: any): string | null | undefined => {
     if (!value || value === 'undefined' || value === 'null' || value === '') return null;

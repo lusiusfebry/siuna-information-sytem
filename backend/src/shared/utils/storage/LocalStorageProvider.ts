@@ -1,5 +1,6 @@
 import { IStorageProvider } from './IStorageProvider';
 import * as fs from 'fs';
+import logger from '../logger';
 
 export class LocalStorageProvider implements IStorageProvider {
     async saveFile(file: Express.Multer.File, _destination: string, _filename: string): Promise<string> {

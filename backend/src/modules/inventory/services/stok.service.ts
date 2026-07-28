@@ -1,4 +1,4 @@
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, Sequelize } from 'sequelize';
 import sequelize from '../../../config/database';
 import { AppError } from '../../../shared/utils/errorHandler';
 import InvStok from '../models/Stok';
@@ -68,7 +68,7 @@ class StokService {
 
         const lastRecord = await InvTransaksi.findOne({
             where: { code: { [Op.like]: `${prefix}-%` } },
-            order: [['code', 'DESC']],
+            order: [[Sequelize.literal(`CAST(SPLIT_PART(code, '-', 2) AS INTEGER)`), 'DESC']],
             transaction: t,
             lock: t.LOCK.UPDATE,
         });
@@ -121,7 +121,7 @@ class StokService {
 
         const lastTag = await InvSerialNumber.findOne({
             where: { tag_number: { [Op.like]: `${tagPrefix}%` } },
-            order: [['tag_number', 'DESC']],
+            order: [[Sequelize.literal(`CAST(SPLIT_PART(tag_number, '_', ARRAY_LENGTH(STRING_TO_ARRAY(tag_number, '_'), 1)) AS INTEGER)`), 'DESC']],
             transaction: t,
             lock: t.LOCK.UPDATE,
         });
@@ -523,6 +523,13 @@ class StokService {
                 throw new AppError(`Transaksi tidak dapat disetujui karena berstatus ${transaksi.approval_status}`, 400);
             }
 
+            if (await this.isGudangLocked(transaksi.gudang_id, t)) {
+                throw new AppError('Gudang sedang dalam sesi stock opname aktif. Approval ditolak.', 409);
+            }
+            if (transaksi.gudang_tujuan_id && await this.isGudangLocked(transaksi.gudang_tujuan_id, t)) {
+                throw new AppError('Gudang tujuan sedang dalam sesi stock opname aktif. Approval ditolak.', 409);
+            }
+
             const details = await InvTransaksiDetail.findAll({ where: { transaksi_id: id }, transaction: t });
             const payload = this.buildPayloadFromTransaksi(transaksi, details);
 
@@ -803,6 +810,7 @@ class StokService {
                 const snRecord = await InvSerialNumber.findOne({
                     where: { produk_id: detail.produk_id, serial_number: sn, gudang_id: gudangId },
                     transaction: t,
+                    lock: t.LOCK.UPDATE,
                 });
                 if (!snRecord) throw new AppError(`Serial number ${sn} tidak ditemukan di gudang ini`, 400);
 
@@ -833,6 +841,7 @@ class StokService {
                 const snRecord = await InvSerialNumber.findOne({
                     where: { produk_id: detail.produk_id, tag_number: tn, gudang_id: gudangId },
                     transaction: t,
+                    lock: t.LOCK.UPDATE,
                 });
                 if (!snRecord) throw new AppError(`Tag number ${tn} tidak ditemukan di gudang ini`, 400);
 
@@ -942,6 +951,7 @@ class StokService {
         const stok = await InvStok.findOne({
             where: { produk_id: detail.produk_id, gudang_id: payload.gudang_id },
             transaction: t,
+            lock: t.LOCK.UPDATE,
         });
 
         if (stok) {
@@ -1324,6 +1334,12 @@ class StokService {
                     400,
                 );
             }
+            if (original.sub_tipe === 'Transfer Gudang') {
+                throw new AppError(
+                    'Amend Transfer Gudang tidak didukung. Amend transaksi Transfer Masuk pasangannya.',
+                    400,
+                );
+            }
 
             const details = await InvTransaksiDetail.findAll({
                 where: { transaksi_id: id },
@@ -1352,7 +1368,15 @@ class StokService {
                     if ((d.serial_numbers as any)?.length) {
                         await InvSerialNumber.update(
                             { status: 'Tersedia', gudang_id: original.gudang_id, transaksi_terakhir_id: reversal.id } as any,
-                            { where: { serial_number: d.serial_numbers as any }, transaction: t },
+                            {
+                                where: {
+                                    [Op.or]: [
+                                        { serial_number: d.serial_numbers as any },
+                                        { tag_number: d.serial_numbers as any },
+                                    ],
+                                },
+                                transaction: t,
+                            },
                         );
                     }
                 }
@@ -1399,6 +1423,7 @@ class StokService {
                 await koreksiRow.update({
                     approved_by: userId,
                     approved_at: new Date(),
+                    amends_transaksi_id: original.id,
                 }, { transaction: t });
             }
 
@@ -1421,13 +1446,18 @@ class StokService {
         const allSerials = details.flatMap((d) => d.serial_numbers ?? []);
         if (allSerials.length > 0) {
             const rows = await InvSerialNumber.findAll({
-                where: { serial_number: allSerials },
+                where: {
+                    [Op.or]: [
+                        { serial_number: allSerials },
+                        { tag_number: allSerials },
+                    ],
+                },
                 transaction: t,
             }) as any[];
             for (const row of rows) {
                 if (row.transaksi_terakhir_id !== original.id) {
                     throw new AppError(
-                        `Serial ${row.serial_number} sudah dipindah oleh transaksi lain setelah transaksi ini. Koreksi otomatis tidak aman.`,
+                        `Serial/tag ${row.serial_number || row.tag_number} sudah dipindah oleh transaksi lain setelah transaksi ini. Koreksi otomatis tidak aman.`,
                         409,
                     );
                 }

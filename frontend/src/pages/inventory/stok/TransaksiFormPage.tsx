@@ -239,6 +239,7 @@ const TransaksiFormPage = () => {
             }
         }
         if (showSupplier && !supplierNama.trim()) { toast.error('Isi nama supplier'); return; }
+        if (showKaryawan && !karyawanId) { toast.error('Pilih karyawan penerima'); return; }
         if (showKonsumsiKaryawan && !karyawanId) { toast.error('Pilih karyawan penerima'); return; }
         if (showKonsumsiDept && !departmentId) { toast.error('Pilih department penerima'); return; }
 

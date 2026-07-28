@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import AuditLog, { AuditAction } from '../../modules/hr/models/AuditLog';
 import { sanitizeValues, getEntityName, shouldAudit } from '../utils/auditHelper';
+import logger from '../utils/logger';
 
 // Extend Request type to include potential user data from auth middleware
 interface AuthenticatedRequest extends Request {

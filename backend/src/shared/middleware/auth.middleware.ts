@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import authService from '../../modules/auth/services/auth.service';
 import User from '../../modules/auth/models/User';
+import logger from '../utils/logger';
 import { Role } from '../../modules/auth/models/Role';
 import { Permission } from '../../modules/auth/models/Permission';
 import Employee from '../../modules/hr/models/Employee';

@@ -34,7 +34,7 @@ describe('FacilityOccupantService.create capacity guard', () => {
         Occ.create.mockResolvedValue({ id: 5 });
         const res = await occupantService.create({ room_id: 1, employee_id: 9 });
         expect(res).toEqual({ id: 5 });
-        expect(room.update).toHaveBeenCalledWith({ status: 'Penuh' });
+        expect(room.update).toHaveBeenCalledWith({ status: 'Penuh' }, expect.objectContaining({ transaction: expect.anything() }));
     });
 });
 

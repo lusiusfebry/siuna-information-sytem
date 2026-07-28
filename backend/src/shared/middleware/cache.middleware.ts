@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import cacheService from '../services/cache.service';
+import logger from '../utils/logger';
 
 export const cacheMiddleware = (ttl: number = 3600) => {
     return async (req: Request, res: Response, next: NextFunction) => {
