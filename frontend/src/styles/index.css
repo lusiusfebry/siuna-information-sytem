@@ -56,4 +56,28 @@
   .value-text {
     @apply text-sm font-semibold text-[#0d121b] dark:text-white tracking-tight;
   }
+
+  /* Scrollbar tipis untuk baris tab yang bisa digeser (mis. tab profil karyawan
+     pada layar sempit). Tetap terlihat agar pengguna tahu masih ada tab lain. */
+  .tabs-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(76, 102, 154, 0.35) transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(76, 102, 154, 0.35);
+    border-radius: 9999px;
+  }
+
+  .dark .tabs-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 }

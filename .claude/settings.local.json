@@ -130,5 +130,8 @@
       "Bash(grep -rlnE \"updateEmployee|employees/\\\\$\\\\{|\\\\.put\\\\\\(.*employee\" src/)",
       "Bash(grep -viE \"JWT_SECRET|^$\")"
     ]
+  },
+  "enabledPlugins": {
+    "last30days@last30days-skill": true
   }
 }

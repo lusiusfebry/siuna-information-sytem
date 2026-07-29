@@ -145,7 +145,7 @@ const EmployeeDetailPage: React.FC = () => {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
             {/* Header Profil V2 - Tech Luxury */}
             <motion.div
@@ -275,18 +275,18 @@ const EmployeeDetailPage: React.FC = () => {
             </motion.div>
 
             {/* Tabs & Content */}
-            <div className="mb-10 border-b border-[#e7ebf3] dark:border-white/5 relative">
-                <div className="flex gap-4 min-w-max">
+            <div className="mb-10 border-b border-[#e7ebf3] dark:border-white/5 relative overflow-x-auto tabs-scroll">
+                <div className="flex gap-1 lg:gap-2 min-w-max">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className="relative group py-5 px-4 outline-none transition-all"
+                            className="relative group py-5 px-2 lg:px-3 outline-none transition-all whitespace-nowrap"
                         >
                             <span className={`${activeTab === tab.id
                                 ? 'text-primary'
                                 : 'text-[#4c669a] dark:text-gray-400 hover:text-[#0d121b] dark:hover:text-white'
-                                } text-[13px] font-extrabold uppercase tracking-[0.2em] relative z-10 transition-colors duration-300`}>
+                                } text-[13px] font-extrabold uppercase tracking-[0.1em] relative z-10 transition-colors duration-300`}>
                                 {tab.label}
                             </span>
                             {activeTab === tab.id && (
