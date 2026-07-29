@@ -1,66 +1,77 @@
 import sequelize from '../config/database';
 import { env } from '../config/env';
+import {
+    performReset,
+    keptTables,
+    clearedTables,
+    askConfirmation,
+    shouldSkipConfirm,
+    ResetOptions,
+} from './reset-data';
 
-const KEEP_TABLES = ['users', 'roles', 'permissions', 'role_permissions', 'company_settings'];
+/**
+ * Reset & Seed — kosongkan database lalu isi ulang dengan data demo.
+ *
+ * Berbeda dari `npm run reset-data`, script ini MENGHAPUS master data HR juga,
+ * karena tujuannya menghasilkan database demo yang benar-benar segar
+ * (`includeHrMaster: true`).
+ *
+ * Daftar tabel dan seluruh logika pengosongan berasal dari `reset-data.ts` —
+ * sengaja tidak diduplikasi lagi di sini. Versi lama menyalin kedua daftar dan
+ * mencantumkan `users` sebagai "dipertahankan" tanpa mekanisme apa pun yang
+ * benar-benar menjaganya, sehingga `TRUNCATE employees CASCADE` justru
+ * mengosongkan tabel kredensial. Kini `users` dipertahankan secara nyata:
+ * `employees` dihapus dengan `DELETE` sehingga FK ON DELETE SET NULL hanya
+ * meng-NULL-kan `users.employee_id`. Akun yang sudah ada tetap dengan password
+ * aslinya, dan `seed-complete` menambah akun demo lewat `findOrCreate` by NIK.
+ */
 
-const TABLES_TO_CLEAN = [
-    'facility_work_orders', 'facility_assets', 'facility_occupants',
-    'facility_rooms',
-    'facility_buildings', 'facility_room_types', 'facility_maintenance_categories',
-    'inv_serial_number', 'inv_transaksi_detail', 'inv_stok',
-    'inv_transaksi', 'inv_produk', 'inv_gudang',
-    'inv_brand', 'inv_sub_kategori', 'inv_kategori', 'inv_uom',
-    'audit_logs', 'notifications',
-    'employee_documents', 'employee_family_info', 'employee_hr_info',
-    'employee_personal_info', 'leaves', 'attendances',
-    'employees',
-    'posisi_jabatan', 'department', 'divisi',
-    'kategori_pangkat', 'golongan', 'sub_golongan',
-    'jenis_hubungan_kerja', 'tag', 'lokasi_kerja', 'status_karyawan',
-];
+const RESET_OPTIONS: ResetOptions = { includeHrMaster: true };
 
 async function resetAndSeed() {
     try {
         await sequelize.authenticate();
-        console.log(`\nConnected to database: ${env.db.name}`);
+        console.log(`\nTerhubung ke database: ${env.db.name}`);
         console.log(`Host: ${env.db.host}:${env.db.port}\n`);
 
-        console.log('╔══════════════════════════════════════════════════╗');
-        console.log('║  RESET & SEED — Hapus data lalu isi ulang       ║');
-        console.log('╚══════════════════════════════════════════════════╝\n');
+        console.log('╔══════════════════════════════════════════════════════════╗');
+        console.log('║  RESET & SEED — Hapus data lalu isi ulang data demo      ║');
+        console.log('╚══════════════════════════════════════════════════════════╝\n');
 
-        console.log(`Tabel yang DIPERTAHANKAN (${KEEP_TABLES.length}):`);
-        console.log(`  ${KEEP_TABLES.join(', ')}\n`);
+        const kept = keptTables(RESET_OPTIONS);
+        const cleared = clearedTables(RESET_OPTIONS);
+        console.log(`Tabel yang DIPERTAHANKAN (${kept.length}): ${kept.join(', ')}`);
+        console.log(`Tabel yang DIKOSONGKAN (${cleared.length}), termasuk MASTER DATA HR.\n`);
+        console.log('  Bila Anda hanya ingin mengosongkan data operasional dan MEMPERTAHANKAN');
+        console.log('  master data HR, hentikan sekarang dan jalankan: npm run reset-data\n');
 
-        // Phase 1: Nullify cross-boundary FK
-        console.log('=== PHASE 1: Reset Data ===');
-        await sequelize.query(
-            'UPDATE "users" SET "employee_id" = NULL WHERE "employee_id" IS NOT NULL'
-        );
-        console.log('  users.employee_id set to NULL');
-
-        // Phase 2: Disable FK checks & truncate
-        await sequelize.query('SET session_replication_role = replica;');
-        let cleaned = 0;
-        for (const table of TABLES_TO_CLEAN) {
-            try {
-                await sequelize.query(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE`);
-                cleaned++;
-            } catch { /* table mungkin belum ada */ }
+        if (!shouldSkipConfirm()) {
+            const confirmed = await askConfirmation(
+                'Lanjutkan reset + seed? Ketik "yes" untuk melanjutkan: '
+            );
+            if (!confirmed) {
+                console.log('\nDibatalkan. Tidak ada data yang dihapus.');
+                process.exit(0);
+            }
         }
-        await sequelize.query('SET session_replication_role = DEFAULT;');
-        console.log(`  ${cleaned}/${TABLES_TO_CLEAN.length} tabel dibersihkan\n`);
 
-        // Phase 3: Run seed-complete
-        console.log('=== PHASE 2: Seed Data ===');
+        console.log('\n=== TAHAP 1: Reset Data ===');
+        const summary = await performReset(RESET_OPTIONS);
+        console.log(
+            `\n  Ringkasan: ${summary.truncated.length} tabel di-TRUNCATE, ` +
+            `${summary.employeesDeleted} karyawan + ${summary.hrMasterDeleted} baris master data HR dihapus.`
+        );
+
+        console.log('\n=== TAHAP 2: Seed Data ===');
         console.log('  Menjalankan seed-complete...\n');
 
-        // Dynamic import to run seed after reset
+        // Import dinamis agar seeder baru dimuat setelah database bersih.
+        // Catatan: seedComplete() memanggil process.exit() sendiri di akhir.
         const { seedComplete } = await import('./seed-complete');
         await seedComplete();
-
     } catch (error) {
-        console.error('\nReset & Seed gagal:', error);
+        console.error('\nReset & Seed GAGAL:', error instanceof Error ? error.message : error);
+        console.error('  Seeding TIDAK dijalankan. Periksa pesan di atas sebelum mencoba lagi.\n');
         process.exit(1);
     }
 }

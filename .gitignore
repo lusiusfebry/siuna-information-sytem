@@ -29,6 +29,9 @@ template-karyawan .xlsx
 .kilo/worktrees/
 .playwright-mcp/
 
+# Backup dump database — berisi data karyawan sungguhan, jangan pernah di-commit
+backups/
+
 # Committed credential files — secrets must not live in the repo
 credential_aplikasi.md
 credential_login_aplikasi.md
