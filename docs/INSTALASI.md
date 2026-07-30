@@ -14,8 +14,9 @@ Panduan lengkap memasang dan menjalankan BIS di komputer lokal, **dengan Docker*
 4. [Metode B — Tanpa Docker (native)](#4-metode-b--tanpa-docker-native)
 5. [Migration & Seed](#5-migration--seed)
 6. [Verifikasi & Login](#6-verifikasi--login)
-7. [Deployment Production (Docker)](#7-deployment-production-docker)
-8. [Troubleshooting](#8-troubleshooting)
+7. [Menjalankan Test](#7-menjalankan-test)
+8. [Deployment Production (Docker)](#8-deployment-production-docker)
+9. [Troubleshooting](#9-troubleshooting)
 
 ---
 
@@ -49,6 +50,7 @@ Ada dua file `.env` yang perlu diperhatikan. Ini bagian yang **paling sering sal
 |------|-------------|--------|-----------------|
 | **`backend/.env`** | Backend (Express) — via `backend/src/config/env.ts` | **Ya** | root `.env.example` |
 | **`frontend/.env`** | Frontend (Vite) | Sudah ada di repo | — |
+| **`backend/.env.test`** | Jest (`src/test/globalSetup.ts`) — menunjuk ke DB `bebang_test` | Hanya untuk menjalankan test | Sudah ada di repo |
 
 > **Penting:** Backend membaca `backend/.env`, **bukan** `.env` di root project. Ini dikonfirmasi di `backend/src/config/env.ts`:
 > ```ts
@@ -228,7 +230,7 @@ Buat `backend/.env` seperti [bagian 2.1](#21-buat-backendenv).
 ```bash
 cd backend
 npm install
-npm run migrate          # buat 68 tabel/migration
+npm run migrate          # buat seluruh skema (73 migration)
 npm run seed:complete    # isi data demo (lihat bagian 5 untuk opsi lain)
 npm run dev              # jalankan di http://localhost:3000
 ```
@@ -257,7 +259,7 @@ Buka **http://localhost:5173**.
 cd backend
 npm run migrate
 ```
-Membuat seluruh skema (68 migration). Cukup dijalankan sekali saat setup awal, atau setiap ada migration baru.
+Membuat seluruh skema (**73 migration**, file bernomor `00`–`72` di `backend/src/database/migrations/`, dikelola umzug). Cukup dijalankan sekali saat setup awal, lalu setiap kali ada migration baru. Migration yang sudah pernah jalan dicatat di tabel `SequelizeMeta` sehingga aman dijalankan ulang.
 
 ### Opsi Seed
 
@@ -266,10 +268,38 @@ Membuat seluruh skema (68 migration). Cukup dijalankan sekali saat setup awal, a
 | `npm run seed` | 35 permission, 5 role, 2 akun superadmin | Ingin **langsung input data real** sendiri |
 | `npm run seed:all` | Cleanup data non-credential + RBAC + superadmin | **Reset data** tanpa hilangkan user/role |
 | `npm run seed:complete` | Semua data demo 3 modul (HR, Inventory, Facility) | **Mencoba/menguji semua fitur** sebelum data real |
-| `npm run reset-and-seed` | Hapus semua data (kecuali credential) lalu seed lengkap | **Reset cepat** dalam satu langkah |
-| `npm run reset-data` | Hapus data saja (minta konfirmasi `yes`) | Kosongkan data tanpa isi ulang |
+| `npm run reset-and-seed` | Kosongkan data **termasuk master data HR**, lalu seed lengkap | **Reset cepat ke database demo segar** dalam satu langkah |
+| `npm run reset-data` | Kosongkan data operasional, **pertahankan kredensial + master data HR** | Mulai input data real setelah selesai menguji dengan data demo |
 
-> `seed:complete` dan `reset-and-seed` **tidak menghapus** credential (users, roles, permissions, company_settings).
+> Semua opsi di atas **tidak pernah menghapus kredensial** (`users`, `roles`, `permissions`, `role_permissions`, `company_settings`). `seed:complete` menambah akun demo lewat `findOrCreate` by NIK, jadi akun yang sudah ada tetap dengan password aslinya.
+
+### Perilaku `reset-data` (penting)
+
+`npm run reset-data` meminta konfirmasi (ketik `yes`; lewati dengan flag `--yes`) lalu:
+
+| Kelompok | Jumlah tabel | Perlakuan |
+|----------|--------------|-----------|
+| Kredensial & identitas perusahaan (`users`, `roles`, `permissions`, `role_permissions`, `company_settings`) | 5 | **Tidak disentuh** |
+| Master data HR (`divisi`, `department`, `posisi_jabatan`, `kategori_pangkat`, `golongan`, `sub_golongan`, `jenis_hubungan_kerja`, `tag`, `lokasi_kerja`, `status_karyawan`) | 10 | **Dipertahankan** (hanya baris soft-delete dibersihkan) |
+| Data operasional (Inventory, Facility, detail karyawan, audit, notifikasi) | 29 | `TRUNCATE ... RESTART IDENTITY` |
+| `employees` | 1 | `DELETE` (bukan TRUNCATE) |
+
+**Mengapa `employees` pakai `DELETE`, bukan `TRUNCATE`:** di PostgreSQL, `TRUNCATE ... CASCADE` **mengosongkan** tabel yang mereferensikan — rantai `employees` → `users` akan menghapus akun login. Dengan `DELETE`, FK `users.employee_id → employees` yang bertanda `ON DELETE SET NULL` hanya meng-NULL-kan kolomnya, dan baris `users` tidak pernah tersentuh.
+
+Setelah `reset-data`:
+- Kredensial login **tetap berlaku** (password lama tidak berubah).
+- `users.employee_id` menjadi `NULL` — tautan akun↔karyawan hilang dan **belum ada UI untuk menautkan ulang** (lihat `docs/ROADMAP-FITUR.md` §UA-2).
+- **Master data Inventory & Facility harus diisi ulang manual** sebelum bisa membuat produk/ruangan: Inventory (satuan, kategori, sub-kategori, merek) dan Facility (tipe ruangan, kategori perawatan).
+- Berkas di `backend/uploads/employees/` menjadi orphan; boleh dihapus manual. ⚠️ **JANGAN hapus `backend/uploads/company/`** — logo perusahaan masih dipakai karena `company_settings` dipertahankan.
+- Di browser, lakukan hard refresh (`Ctrl+Shift+R`) agar cache React Query bersih.
+
+> Untuk ikut mengosongkan master data HR, jalankan `npm run reset-data -- --include-hr-master`. Ini yang dipakai `reset-and-seed` agar seeder bisa mengisi ulang tanpa tabrakan unique `code`.
+
+> **Selalu backup dulu:**
+> ```bash
+> pg_dump -h localhost -p 5432 -U postgres -d bebang_db -F c -f backups/pre-reset.dump
+> ```
+> Folder `backups/` sudah masuk `.gitignore` — **jangan pernah commit** file dump karena berisi data karyawan sebenarnya.
 
 ---
 
@@ -293,7 +323,60 @@ Membuat seluruh skema (68 migration). Cukup dijalankan sekali saat setup awal, a
 
 ---
 
-## 7. Deployment Production (Docker)
+## 7. Menjalankan Test
+
+### Backend (dari `backend/`)
+
+Test backend memakai **database terpisah** `bebang_test` (konfigurasinya di `backend/.env.test`), bukan `bebang_db`. Buat database itu sekali:
+```sql
+CREATE DATABASE bebang_test;
+```
+
+```bash
+npm run test              # semua test (Jest)
+npm run test:unit         # unit test saja
+npm run test:integration  # integration test saja
+npm run test:coverage     # laporan coverage
+```
+
+Yang perlu diketahui:
+- **Integration test memakai PostgreSQL sungguhan.** Database harus hidup; `bebang_test` di-`DROP SCHEMA public CASCADE` lalu dibuat ulang di awal setiap run, dan seluruh migration dijalankan otomatis (`src/test/setup.ts`). Jadi **jangan** arahkan `.env.test` ke database yang berisi data yang Anda sayangi.
+- Test berjalan **serial** (`maxWorkers: 1` di `jest.config.js`) karena semua suite berbagi satu database. `testTimeout` = 30 detik.
+- **Coverage threshold 80%** (branches/functions/lines/statements) — `test:coverage` gagal bila di bawah itu.
+
+Menjalankan satu file / satu test saja (Jest mencocokkan substring path):
+```bash
+npx jest opname.api                     # semua file yang path-nya memuat "opname.api"
+npx jest -t "menolak create tanpa"      # cocokkan judul describe/it
+npm run test:integration -- opname.api  # satu file integration
+```
+
+### Frontend (dari `frontend/`)
+
+```bash
+npm run test          # Vitest mode watch
+npm run test:run      # sekali jalan
+npm run test:coverage # laporan coverage
+npm run test:e2e      # Playwright E2E (butuh backend + frontend jalan)
+```
+
+Satu file / satu test saja:
+```bash
+npx vitest run src/hooks/useEmployee.test.ts
+npx vitest run -t "renders label"
+npx playwright test tests/login.spec.ts
+```
+
+### Lint & type-check
+
+```bash
+cd backend  && npm run lint && npm run type-check
+cd frontend && npm run lint && npm run build   # build = tsc + vite build
+```
+
+---
+
+## 8. Deployment Production (Docker)
 
 File `docker/docker-compose.prod.yml` menjalankan: **app** (backend, Node) + **nginx** (serve frontend build + proxy `/api`) + **postgres**.
 
@@ -326,12 +409,17 @@ Kode (`backend/src/config/env.ts`) **menolak start** di luar `development`/`test
 Selain itu:
 - `NODE_ENV=production` wajib di-set pada service `app` (sudah default di compose prod).
 - nginx prod hanya listen **port 80 (tanpa TLS)**. Untuk publik, tambahkan **HTTPS/TLS** (mis. reverse proxy/terminasi TLS atau konfigurasi cert di nginx).
+- **PWA butuh HTTPS.** Frontend memakai `vite-plugin-pwa` + Workbox, dan install ke home screen serta mode offline hanya aktif pada **secure context (HTTPS)** — `localhost` dikecualikan browser. Jadi selama prod masih port 80 tanpa TLS, fitur PWA **tidak akan aktif** meski build-nya sudah menghasilkan service worker.
+- **Service worker mati di dev** (`devOptions.enabled: false` di `vite.config.ts`). Untuk menguji PWA/offline, pakai build production:
+  ```bash
+  cd frontend && npm run build && npm run preview
+  ```
 - Redis masih **mock** — jika butuh cache nyata, aktifkan kembali klien di `backend/src/config/redis.ts` dan sediakan service Redis.
 - Pastikan volume `postgres-data` dan folder `uploads` di-backup secara berkala.
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Masalah | Kemungkinan penyebab & solusi |
 |---------|-------------------------------|
@@ -341,6 +429,10 @@ Selain itu:
 | Frontend tidak konek API | Pastikan backend jalan di `:3000`. Cek `frontend/.env` berisi `VITE_API_URL=/api`. |
 | Login gagal | Pastikan seed sudah dijalankan. Coba NIK `1234567890123456` / `password123`. |
 | Migration error "already exists" | Migration sudah pernah jalan sebagian. Untuk dev bisa reset: `npm run reset-and-seed` (⚠️ menghapus data). |
+| Setelah `reset-data`, produk/ruangan tidak bisa dibuat | Master data Inventory & Facility ikut terhapus. Isi ulang dulu: satuan, kategori, sub-kategori, merek (Inventory); tipe ruangan, kategori perawatan (Facility). |
+| Setelah reset, halaman masih menampilkan data lama | Cache React Query di browser. Hard refresh `Ctrl+Shift+R`. |
+| Integration test gagal connect DB | Buat database `bebang_test` dan pastikan `backend/.env.test` benar. Lihat [bagian 7](#7-menjalankan-test). |
+| Tombol "Install app" (PWA) tidak muncul | Service worker mati di `vite dev`, dan PWA butuh HTTPS di production. Uji dengan `npm run build && npm run preview`. |
 | Server production gagal start dengan error `FATAL: JWT_SECRET ...` | Set `JWT_SECRET` ≥32 karakter dan `DB_PASSWORD` non-default. |
 | Container Docker tidak mau start | Cek log: `docker-compose logs <service>` (mis. `docker-compose logs postgres`). |
 
